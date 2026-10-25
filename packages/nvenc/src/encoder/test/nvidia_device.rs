@@ -1,4 +1,4 @@
-use super::NVIDIA_VENDOR_ID;
+use super::{NVIDIA_VENDOR_ID, hold_gpu_slot};
 use windows::Win32::Foundation::HMODULE;
 use windows::Win32::Graphics::Direct3D::D3D_DRIVER_TYPE_UNKNOWN;
 use windows::Win32::Graphics::Direct3D11::{
@@ -7,6 +7,8 @@ use windows::Win32::Graphics::Direct3D11::{
 use windows::Win32::Graphics::Dxgi::{CreateDXGIFactory1, IDXGIFactory1};
 
 pub fn nvidia_device() -> ID3D11Device {
+    hold_gpu_slot();
+
     let factory: IDXGIFactory1 = unsafe { CreateDXGIFactory1() }.unwrap();
     let adapter = (0..)
         .map_while(|index| unsafe { factory.EnumAdapters1(index) }.ok())
