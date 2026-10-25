@@ -117,9 +117,9 @@ cd apps/client
 
 Каждый пуш в `master` запускает `.github/workflows/release.yml`:
 
-1. Клиент: тесты, lint и подписанная сборка, `versionCode` = 100 + номер запуска, `versionName` = `0.1.<versionCode>`.
+1. Клиент: тесты, lint и подписанная сборка, `versionCode` = 100 + номер запуска, `versionName` = `1.0.<versionCode>`.
 2. Сервер на Windows: тесты и `cargo build --release`.
-3. Релиз `v0.1.<versionCode>` с файлами `fastcast-tv.apk`, `fastcast-tv.json` (`versionCode`, `versionName`, `url`, `sha256`, `size`) и `fastcast-server-windows-x64.zip`.
+3. Релиз `v1.0.<versionCode>` с файлами `fastcast-tv.apk`, `fastcast-tv.json` (`versionCode`, `versionName`, `url`, `sha256`, `size`) и `fastcast-server-windows-x64.zip`.
 
 Секреты репозитория: `ANDROID_KEYSTORE_BASE64` (ключ в base64) и `ANDROID_KEYSTORE_PASSWORD`.
 

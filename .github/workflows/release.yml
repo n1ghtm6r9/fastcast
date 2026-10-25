@@ -23,7 +23,7 @@ jobs:
         run: |
           code=$((100 + GITHUB_RUN_NUMBER))
           echo "code=$code" >> "$GITHUB_OUTPUT"
-          echo "name=0.1.$code" >> "$GITHUB_OUTPUT"
+          echo "name=1.0.$code" >> "$GITHUB_OUTPUT"
 
   client:
     needs: version
