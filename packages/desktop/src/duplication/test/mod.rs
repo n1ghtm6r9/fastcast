@@ -1,0 +1,20 @@
+mod acquire_desktop_image;
+mod frame_bytes;
+mod has_visible_pixel;
+pub use acquire_desktop_image::*;
+pub use frame_bytes::*;
+pub use has_visible_pixel::*;
+
+mod a_captured_frame_has_visible_content_test;
+mod a_frame_without_a_mouse_update_keeps_the_pointer_test;
+mod a_mouse_update_moves_the_pointer_test;
+mod a_part_of_a_millisecond_rounds_up_test;
+mod a_rotated_output_is_rejected_test;
+mod a_timeout_keeps_the_previous_frame_test;
+mod a_timeout_of_whole_milliseconds_converts_exactly_test;
+mod a_very_long_timeout_saturates_test;
+mod a_zero_timeout_does_not_wait_test;
+mod access_lost_is_reported_as_its_own_error_test;
+mod an_unrotated_output_is_accepted_test;
+mod other_failures_keep_the_failed_call_and_the_cause_test;
+mod the_desktop_image_arrives_in_a_texture_of_the_output_size_test;

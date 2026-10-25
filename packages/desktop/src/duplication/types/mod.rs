@@ -1,0 +1,14 @@
+mod duplication;
+mod duplication_acquire;
+mod duplication_frame;
+mod duplication_height;
+mod duplication_new;
+mod duplication_pointer;
+mod duplication_take_frame;
+mod duplication_take_pointer_shape;
+mod duplication_width;
+mod frame_update;
+mod pointer_state;
+pub use duplication::*;
+pub use frame_update::*;
+pub use pointer_state::*;
