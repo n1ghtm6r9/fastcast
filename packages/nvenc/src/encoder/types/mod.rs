@@ -1,6 +1,11 @@
+mod encoder;
 mod encoder_codec;
+mod encoder_drop;
+mod encoder_open;
+mod encoder_send;
 mod encoder_settings;
 mod nvenc_error;
+pub use encoder::*;
 pub use encoder_codec::*;
 pub use encoder_settings::*;
 pub use nvenc_error::*;

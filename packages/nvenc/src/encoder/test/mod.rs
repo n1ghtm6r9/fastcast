@@ -1,6 +1,13 @@
+mod nvidia_device;
+mod nvidia_vendor_id;
 mod settings;
+pub use nvidia_device::*;
+pub use nvidia_vendor_id::*;
 pub use settings::*;
 
+mod a_4k_ten_bit_hevc_encoder_opens_test;
+mod an_h264_encoder_opens_on_the_nvidia_adapter_test;
+mod an_hevc_encoder_opens_on_the_nvidia_adapter_test;
 mod c_status_codes_map_to_nvenc_errors_test;
 mod closing_no_encoder_does_nothing_test;
 mod every_c_call_code_names_its_nvenc_function_test;
@@ -12,3 +19,4 @@ mod the_c_layer_rejects_a_preset_outside_1_to_7_test;
 mod the_c_layer_rejects_every_setting_outside_its_range_test;
 mod the_c_layer_rejects_odd_sizes_before_touching_the_driver_test;
 mod the_settings_reach_c_unchanged_test;
+mod twenty_encoders_opened_one_after_another_all_open_test;
