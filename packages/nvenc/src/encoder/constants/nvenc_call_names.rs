@@ -1,0 +1,16 @@
+pub const NVENC_CALL_NAMES: [&str; 14] = [
+    "LoadLibrary",
+    "nvEncOpenEncodeSessionEx",
+    "nvEncGetEncodeGUIDs",
+    "nvEncGetEncodeCaps",
+    "nvEncGetEncodePresetConfigEx",
+    "nvEncInitializeEncoder",
+    "nvEncCreateBitstreamBuffer",
+    "nvEncRegisterResource",
+    "nvEncMapInputResource",
+    "nvEncEncodePicture",
+    "nvEncLockBitstream",
+    "nvEncUnlockBitstream",
+    "nvEncUnmapInputResource",
+    "nvEncReconfigureEncoder",
+];

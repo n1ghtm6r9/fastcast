@@ -1,0 +1,14 @@
+mod settings;
+pub use settings::*;
+
+mod c_status_codes_map_to_nvenc_errors_test;
+mod closing_no_encoder_does_nothing_test;
+mod every_c_call_code_names_its_nvenc_function_test;
+mod missing_driver_errors_tell_the_user_what_to_do_test;
+mod nvenc_errors_name_the_failed_call_test;
+mod setting_a_bitrate_on_no_encoder_is_rejected_test;
+mod the_c_layer_rejects_a_null_device_test;
+mod the_c_layer_rejects_a_preset_outside_1_to_7_test;
+mod the_c_layer_rejects_every_setting_outside_its_range_test;
+mod the_c_layer_rejects_odd_sizes_before_touching_the_driver_test;
+mod the_settings_reach_c_unchanged_test;
