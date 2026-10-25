@@ -7,7 +7,7 @@ import org.junit.Test
 class TheSilenceTimerExpiresOnlyAfterAQuietLimitTest {
 
     private var nowMs = 0L
-    private val timer = SilenceTimer(LIMIT_MS) { nowMs }
+    private val timer = SilenceTimer(LIMIT_MS, LIMIT_MS) { nowMs }
 
     @Test
     fun `a timer just short of the limit has not expired`() {

@@ -17,14 +17,13 @@ class StreamClient(
     private val urlFor: () -> String,
     private val listener: StreamListener,
     private val backoff: ReconnectBackoff = ReconnectBackoff(),
-    private val silenceLimitMs: Long = SILENCE_LIMIT_MS,
+    private val silence: SilenceTimer = SilenceTimer(),
     private val health: StreamHealth = StreamHealth(),
 ) {
 
     val bytesReceived = AtomicLong()
 
     private val lock = Any()
-    private val silence = SilenceTimer(silenceLimitMs)
     private val httpClient = OkHttpClient.Builder()
         .connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
         .build()
@@ -81,14 +80,14 @@ class StreamClient(
     private fun openSocket() {
         socket?.cancel()
         generation++
-        silence.touch()
+        silence.restart()
         health.restart()
         val request = Request.Builder().url(urlFor()).build()
         socket = httpClient.newWebSocket(request, SocketEvents(generation))
     }
 
     private fun watchForSilence() {
-        val periodMs = silenceLimitMs / SILENCE_CHECKS_PER_LIMIT
+        val periodMs = silence.checkPeriodMs
         scheduler.scheduleWithFixedDelay({ dropIfSilent() }, periodMs, periodMs, TimeUnit.MILLISECONDS)
     }
 
@@ -144,7 +143,7 @@ class StreamClient(
 
         override fun onOpen(webSocket: WebSocket, response: Response) {
             if (!isCurrent(id)) return
-            silence.touch()
+            silence.restart()
             listener.onConnected()
         }
 
@@ -186,7 +185,5 @@ class StreamClient(
         const val THREAD_NAME = "fastcast-stream"
         const val CLOSED_BY_SERVER = "Closed by server"
         const val NO_DATA = "No data from server"
-        const val SILENCE_LIMIT_MS = 5_000L
-        const val SILENCE_CHECKS_PER_LIMIT = 5
     }
 }

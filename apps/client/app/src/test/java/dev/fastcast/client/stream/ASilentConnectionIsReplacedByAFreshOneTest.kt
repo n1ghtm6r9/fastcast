@@ -10,7 +10,12 @@ class ASilentConnectionIsReplacedByAFreshOneTest {
 
     private val server = FakeWebSocketServer()
     private val listener = RecordingStreamListener()
-    private val client = StreamClient({ server.url }, listener, ReconnectBackoff(listOf(30L)), SILENCE_LIMIT_MS)
+    private val client = StreamClient(
+        { server.url },
+        listener,
+        ReconnectBackoff(listOf(30L)),
+        SilenceTimer(SILENCE_LIMIT_MS, SILENCE_LIMIT_MS),
+    )
 
     @After
     fun tearDown() {
