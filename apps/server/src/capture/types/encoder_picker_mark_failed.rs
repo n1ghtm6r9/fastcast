@@ -1,12 +1,8 @@
 use crate::capture::EncoderPicker;
-use crate::settings::{EncoderChoice, VideoEncoder};
+use crate::settings::VideoEncoder;
 
 impl EncoderPicker {
     pub fn mark_failed(&self, encoder: VideoEncoder) {
-        if self.choice != EncoderChoice::Auto {
-            return;
-        }
-
         let mut state = self.lock_state();
 
         if !state.unusable.contains(&encoder) {

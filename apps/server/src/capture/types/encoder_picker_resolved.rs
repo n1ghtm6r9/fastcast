@@ -1,11 +1,8 @@
 use crate::capture::EncoderPicker;
-use crate::settings::{EncoderChoice, VideoEncoder};
+use crate::settings::VideoEncoder;
 
 impl EncoderPicker {
     pub fn resolved(&self) -> Option<VideoEncoder> {
-        match self.choice {
-            EncoderChoice::Fixed(encoder) => Some(encoder),
-            EncoderChoice::Auto => self.lock_state().resolved,
-        }
+        self.lock_state().resolved
     }
 }

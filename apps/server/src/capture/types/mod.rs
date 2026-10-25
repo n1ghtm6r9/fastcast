@@ -3,6 +3,7 @@ mod capture_error;
 mod capture_report;
 mod capture_target;
 mod encoder_picker;
+mod encoder_picker_allows;
 mod encoder_picker_forget_failures;
 mod encoder_picker_lock_state;
 mod encoder_picker_mark_failed;

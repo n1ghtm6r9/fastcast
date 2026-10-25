@@ -8,6 +8,7 @@ impl EncoderPicker {
         self.order
             .iter()
             .copied()
+            .filter(|&encoder| self.allows(encoder))
             .find(|encoder| !state.unusable.contains(encoder))
     }
 }
