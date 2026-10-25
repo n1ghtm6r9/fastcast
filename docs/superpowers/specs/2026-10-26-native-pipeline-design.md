@@ -177,7 +177,7 @@ Input: the duplicated desktop texture, `B8G8R8A8_UNORM`, gamma-encoded sRGB valu
 
 ## TV components
 
-- `apps/client/native` — Rust `cdylib` `libfastcast.so` (crate `fastcast-native`), uses `wire`. Owns the socket thread (`recvmmsg` batches on Android), Hello retries, frame receiver, feedback timer and a bounded queue of delivered frames. JNI surface in `dev.fastcast.client.stream.NativeLink`.
+- `apps/client/native` — Rust `cdylib` `libfastcast_native.so` (crate `fastcast-native`), uses `wire`. Owns the socket thread (plain `recv_from` in Phase 1, `recvmmsg` batches in Phase 4), Hello retries, frame receiver, feedback timer and a bounded queue of delivered frames. JNI surface in `dev.fastcast.client.stream.NativeLink`.
 - Kotlin `NativeStreamClient` replaces the OkHttp `StreamClient` and keeps the `StreamListener` contract (`onConnecting`, `onConnected`, `onConfig`, `onFrame`, `onHealthy`, `onDisconnected`), reusing `ReconnectBackoff`, `SilenceTimer`, `StreamHealth`. OkHttp stays only for updates.
 - Display mode: prefer the largest picture, then the highest refresh rate up to 120 Hz that the chosen decoder can sustain at that size (`VideoCapabilities.areSizeAndRateSupported`); `Surface.setFrameRate` on API 30+.
 
