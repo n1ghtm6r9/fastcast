@@ -1,6 +1,7 @@
 [workspace]
 resolver = "3"
 members = [
+    "apps/client/native",
     "apps/server",
     "packages/*"
 ]
@@ -16,9 +17,11 @@ edition = "2024"
 axum = { version = "0.8.9", features = ["ws"] }
 base64 = "0.22"
 bytes = "1.12"
+cc = "1.10.0"
 dotenvy = "0.15.7"
 embed-resource = "3.0.12"
 futures-util = "0.3.34"
+jni-sys = "0.4.1"
 mimalloc = { version = "0.1.52", default-features = false }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
@@ -29,7 +32,10 @@ tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
 windows = "0.62.2"
 
+desktop = { path = "packages/desktop" }
 media = { path = "packages/media" }
+nvenc = { path = "packages/nvenc" }
+wire = { path = "packages/wire" }
 
 [profile.dev]
 opt-level = 3
@@ -59,3 +65,7 @@ strip = "debuginfo"
 
 [profile.release.package."*"]
 opt-level = 3
+
+[profile.android]
+inherits = "release"
+panic = "unwind"
