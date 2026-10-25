@@ -109,9 +109,9 @@ class VideoDecoder(
         releaseCodec()
         pending = null
         firstFrameRendered = false
-        val mime = VideoMime.forCodec(config.codec)?.takeIf { it == VideoMime.AVC }
+        val mime = VideoMime.forCodec(config.codec)
             ?: throw UnsupportedStreamException("Unsupported codec ${config.codec}")
-        val parameters = AvcConfigurationRecord.parse(config.description)
+        val parameters = CodecConfigurationParser.parse(mime, config.description)
             ?: throw UnsupportedStreamException("Invalid codec description")
         val choice = DecoderSelector.select(mime, VideoFormatFactory.probe(mime, config))
             ?: throw UnsupportedStreamException("No decoder for $mime")
@@ -121,8 +121,11 @@ class VideoDecoder(
         nalLengthSize = parameters.nalLengthSize
         inputCapacity = inputCapacityOf(started, format)
         stats.decoderName = choice.name
+        stats.mime = mime
+        stats.outputColor = OutputColor.NONE
         Log.i(TAG, "Decoder ${choice.name} for ${config.codec} ${config.width}x${config.height}@${config.fps}")
         events.onVideoSize(config.width, config.height)
+        events.onConfigured()
     }
 
     private fun createCodec(name: String, format: MediaFormat, fps: Int): MediaCodec {
@@ -172,7 +175,7 @@ class VideoDecoder(
             val index = active.dequeueOutputBuffer(bufferInfo, waitUs)
             waitUs = 0L
             if (index == MediaCodec.INFO_TRY_AGAIN_LATER) break
-            if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) reportSize(active.outputFormat)
+            if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) onOutputFormatChanged(active.outputFormat)
             if (index >= 0) newest = supersede(active, newest, index)
         }
         if (newest != NO_BUFFER) render(active, newest)
@@ -195,6 +198,11 @@ class VideoDecoder(
             firstFrameRendered = true
             events.onFirstFrame()
         }
+    }
+
+    private fun onOutputFormatChanged(format: MediaFormat) {
+        stats.outputColor = OutputColor.of(format)
+        reportSize(format)
     }
 
     private fun reportSize(format: MediaFormat) {

@@ -18,6 +18,9 @@ object DecoderSelector {
         return DecoderChoice(best.name, supportsLowLatency(best, mime))
     }
 
+    fun canDecodeInHardware(mime: String, width: Int, height: Int, fps: Int): Boolean =
+        decodersFor(mime).any { !isSoftware(it) && supportsSizeAndRate(it, mime, width, height, fps) }
+
     private fun decodersFor(mime: String): List<MediaCodecInfo> =
         MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos.filter { isDecoderFor(it, mime) }
 
@@ -39,6 +42,11 @@ object DecoderSelector {
 
     private fun supportsFormat(info: MediaCodecInfo, mime: String, probe: MediaFormat): Boolean =
         withCapabilities(info, mime, false) { it.isFormatSupported(probe) }
+
+    private fun supportsSizeAndRate(info: MediaCodecInfo, mime: String, width: Int, height: Int, fps: Int): Boolean =
+        withCapabilities(info, mime, false) {
+            it.videoCapabilities?.areSizeAndRateSupported(width, height, fps.toDouble()) == true
+        }
 
     private fun supportsLowLatency(info: MediaCodecInfo, mime: String): Boolean =
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&

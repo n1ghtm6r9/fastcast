@@ -1,0 +1,24 @@
+package dev.fastcast.client.testing
+
+import dev.fastcast.client.decoder.OutputColor
+import dev.fastcast.client.player.StatsSnapshot
+
+fun aStatsSnapshot(
+    width: Int = 3840,
+    height: Int = 2160,
+    framesPerSecond: Double = 59.93,
+    megabitsPerSecond: Double = 31.24,
+    decoderName: String = "c2.mtk.hevc.decoder",
+    droppedFrames: Long = 0L,
+    mime: String = "video/hevc",
+    color: OutputColor = OutputColor(standard = 1, range = 2, transfer = 3),
+): StatsSnapshot = StatsSnapshot(
+    width = width,
+    height = height,
+    framesPerSecond = framesPerSecond,
+    megabitsPerSecond = megabitsPerSecond,
+    decoderName = decoderName,
+    droppedFrames = droppedFrames,
+    mime = mime,
+    color = color,
+)

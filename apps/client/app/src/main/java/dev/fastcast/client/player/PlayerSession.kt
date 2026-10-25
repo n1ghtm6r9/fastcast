@@ -12,15 +12,22 @@ import dev.fastcast.client.stream.StreamClient
 import dev.fastcast.client.stream.StreamListener
 
 class PlayerSession(
-    address: String,
+    url: String,
     surface: Surface,
     private val listener: PlayerSessionListener,
+    displayLabel: () -> String,
 ) : StreamListener, DecoderEvents {
 
     private val mainHandler = Handler(Looper.getMainLooper())
-    private val stream = StreamClient("ws://$address/ws", this)
+    private val stream = StreamClient(url, this)
     private val decoder = VideoDecoder(surface, this)
     private val throughput = ThroughputSampler(SystemClock.elapsedRealtime())
+    private val reportedThroughput = ThroughputSampler(SystemClock.elapsedRealtime())
+    private val reporter = StatsReporter(
+        snapshot = { snapshotOf(reportedThroughput, SystemClock.elapsedRealtime()) },
+        display = displayLabel,
+        send = stream::send,
+    )
 
     @Volatile
     private var active = false
@@ -35,25 +42,17 @@ class PlayerSession(
         active = true
         decoder.start()
         stream.start()
+        reporter.start()
     }
 
     fun stop() {
         active = false
+        reporter.stop()
         stream.stop()
         decoder.stop()
     }
 
-    fun snapshot(nowMs: Long): StatsSnapshot {
-        val rates = throughput.sample(nowMs, stream.bytesReceived.get(), decoder.stats.framesRendered.get())
-        return StatsSnapshot(
-            width = videoWidth,
-            height = videoHeight,
-            framesPerSecond = rates.framesPerSecond,
-            megabitsPerSecond = rates.megabitsPerSecond,
-            decoderName = decoder.stats.decoderName,
-            droppedFrames = decoder.stats.framesDropped.get(),
-        )
-    }
+    fun snapshot(nowMs: Long): StatsSnapshot = snapshotOf(throughput, nowMs)
 
     override fun onConnecting() = postStatus(PlayerStatus.Connecting)
 
@@ -66,6 +65,8 @@ class PlayerSession(
     override fun onDisconnected(retryInMs: Long, reason: String) =
         postStatus(PlayerStatus.Reconnecting(retryInMs, reason))
 
+    override fun onConfigured() = reporter.reportNow()
+
     override fun onVideoSize(width: Int, height: Int) {
         videoWidth = width
         videoHeight = height
@@ -76,7 +77,21 @@ class PlayerSession(
 
     override fun onFailure(message: String) {
         postStatus(PlayerStatus.DecoderError(message))
-        stream.reconnect()
+        reporter.reportFailure(message, stream::reconnect)
+    }
+
+    private fun snapshotOf(sampler: ThroughputSampler, nowMs: Long): StatsSnapshot {
+        val rates = sampler.sample(nowMs, stream.bytesReceived.get(), decoder.stats.framesRendered.get())
+        return StatsSnapshot(
+            width = videoWidth,
+            height = videoHeight,
+            framesPerSecond = rates.framesPerSecond,
+            megabitsPerSecond = rates.megabitsPerSecond,
+            decoderName = decoder.stats.decoderName,
+            droppedFrames = decoder.stats.framesDropped.get(),
+            mime = decoder.stats.mime,
+            color = decoder.stats.outputColor,
+        )
     }
 
     private fun postStatus(status: PlayerStatus) {

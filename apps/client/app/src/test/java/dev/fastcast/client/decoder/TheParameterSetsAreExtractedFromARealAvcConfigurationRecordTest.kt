@@ -38,6 +38,13 @@ class TheParameterSetsAreExtractedFromARealAvcConfigurationRecordTest {
     }
 
     @Test
+    fun `the csd buffers are csd0 followed by csd1`() {
+        assertEquals(2, record.csdBuffers.size)
+        assertArrayEquals(record.csd0, record.csdBuffers[0])
+        assertArrayEquals(record.csd1, record.csdBuffers[1])
+    }
+
+    @Test
     fun `the parameter sets carry the h264 nal unit types seven and eight`() {
         assertEquals(7, record.csd0[4].toInt() and 0x1F)
         assertEquals(8, record.csd1[4].toInt() and 0x1F)

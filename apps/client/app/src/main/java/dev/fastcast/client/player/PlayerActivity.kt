@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import android.view.Display
 import android.view.KeyEvent
 import android.view.Surface
 import android.view.View
@@ -14,6 +15,14 @@ import android.view.WindowManager
 import android.widget.TextView
 import dev.fastcast.client.R
 import dev.fastcast.client.connect.ConnectActivity
+import dev.fastcast.client.decoder.DecoderSelector
+import dev.fastcast.client.decoder.SupportedCodecs
+import dev.fastcast.client.display.DisplayModeChooser
+import dev.fastcast.client.display.DisplayModes
+import dev.fastcast.client.display.MinimalPostProcessing
+import dev.fastcast.client.display.PreferredDisplayMode
+import dev.fastcast.client.stream.StreamRequest
+import dev.fastcast.client.stream.StreamUrl
 import dev.fastcast.client.update.UpdateCheckCache
 import dev.fastcast.client.update.UpdateChecker
 import dev.fastcast.client.update.UpdateLookup
@@ -23,6 +32,7 @@ import kotlin.math.ceil
 class PlayerActivity : Activity(), PlayerSessionListener {
 
     private lateinit var address: String
+    private lateinit var streamUrl: String
     private lateinit var videoSurface: VideoSurfaceView
     private lateinit var statusText: TextView
     private lateinit var statsText: TextView
@@ -41,6 +51,7 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         }
     }
 
+    private var screen: Display? = null
     private var session: PlayerSession? = null
     private var lastError: String? = null
     private var statsVisible = false
@@ -49,6 +60,7 @@ class PlayerActivity : Activity(), PlayerSessionListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        MinimalPostProcessing.request(window)
         setContentView(R.layout.activity_player)
         ImmersiveMode.enter(window)
         val requestedAddress = intent.getStringExtra(EXTRA_ADDRESS)
@@ -57,6 +69,8 @@ class PlayerActivity : Activity(), PlayerSessionListener {
             return
         }
         address = requestedAddress
+        screen = DisplayModes.defaultDisplay(this)
+        streamUrl = StreamUrl.build(address, requestStream())
         videoSurface = findViewById(R.id.video_surface)
         statusText = findViewById(R.id.status_text)
         statsText = findViewById(R.id.stats_text)
@@ -114,10 +128,23 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         finish()
     }
 
+    private fun requestStream(): StreamRequest? {
+        val display = screen ?: return null
+        val chosen = DisplayModeChooser.choose(DisplayModes.supported(display))
+        chosen?.let { PreferredDisplayMode.apply(window, it) }
+        val mode = chosen ?: DisplayModes.active(display)
+        val codecs = SupportedCodecs.among { mime ->
+            DecoderSelector.canDecodeInHardware(mime, mode.width, mode.height, mode.fps)
+        }
+        return StreamRequest(mode.width, mode.height, mode.fps, codecs)
+    }
+
+    private fun activeDisplayLabel(): String = screen?.let { DisplayModes.active(it).label }.orEmpty()
+
     private fun startSession(surface: Surface) {
         stopSession()
         showStatus(PlayerStatus.Connecting)
-        session = PlayerSession(address, surface, this).also { it.start() }
+        session = PlayerSession(streamUrl, surface, this, ::activeDisplayLabel).also { it.start() }
     }
 
     private fun stopSession() {

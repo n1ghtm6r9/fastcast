@@ -51,6 +51,8 @@ class StreamClient(
         openSocketIfRunning()
     }
 
+    fun send(text: String): Boolean = synchronized(lock) { socket?.send(text) == true }
+
     fun reconnect() {
         synchronized(lock) {
             if (!running) return

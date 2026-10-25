@@ -9,4 +9,10 @@ class DecoderStats {
 
     @Volatile
     var decoderName: String = ""
+
+    @Volatile
+    var mime: String = ""
+
+    @Volatile
+    var outputColor: OutputColor = OutputColor.NONE
 }

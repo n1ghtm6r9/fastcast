@@ -4,22 +4,21 @@ import java.nio.BufferUnderflowException
 import java.nio.ByteBuffer
 
 class AvcConfigurationRecord private constructor(
-    val nalLengthSize: Int,
+    override val nalLengthSize: Int,
     val sequenceParameterSets: List<ByteArray>,
     val pictureParameterSets: List<ByteArray>,
-) {
+) : CodecConfiguration {
 
     val csd0: ByteArray
-        get() = withStartCodes(sequenceParameterSets)
+        get() = sequenceParameterSets.withStartCodes()
 
     val csd1: ByteArray
-        get() = withStartCodes(pictureParameterSets)
+        get() = pictureParameterSets.withStartCodes()
 
-    private fun withStartCodes(parameterSets: List<ByteArray>): ByteArray =
-        parameterSets.fold(ByteArray(0)) { accumulated, parameterSet -> accumulated + START_CODE + parameterSet }
+    override val csdBuffers: List<ByteArray>
+        get() = listOf(csd0, csd1)
 
     companion object {
-        private val START_CODE = byteArrayOf(0, 0, 0, 1)
         private const val LENGTH_SIZE_POSITION = 4
         private const val LENGTH_SIZE_MASK = 0x03
         private const val SEQUENCE_PARAMETER_SET_COUNT_MASK = 0x1F

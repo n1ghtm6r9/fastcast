@@ -10,8 +10,7 @@ object VideoFormatFactory {
     private const val MIN_INPUT_SIZE = 2 * 1024 * 1024
     private const val REALTIME_PRIORITY = 0
     private const val LOW_LATENCY_ENABLED = 1
-    private const val FIRST_CSD = "csd-0"
-    private const val SECOND_CSD = "csd-1"
+    private const val CSD_KEY_PREFIX = "csd-"
     private const val QUALCOMM_LOW_LATENCY = "vendor.qti-ext-dec-low-latency.enable"
 
     fun probe(mime: String, config: ConfigMessage): MediaFormat =
@@ -22,11 +21,12 @@ object VideoFormatFactory {
     fun create(
         mime: String,
         config: ConfigMessage,
-        parameters: AvcConfigurationRecord,
+        parameters: CodecConfiguration,
         choice: DecoderChoice,
     ): MediaFormat = probe(mime, config).apply {
-        setByteBuffer(FIRST_CSD, ByteBuffer.wrap(parameters.csd0))
-        setByteBuffer(SECOND_CSD, ByteBuffer.wrap(parameters.csd1))
+        parameters.csdBuffers.forEachIndexed { index, csd ->
+            setByteBuffer("$CSD_KEY_PREFIX$index", ByteBuffer.wrap(csd))
+        }
         setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, maxInputSize(config))
         setInteger(MediaFormat.KEY_PRIORITY, REALTIME_PRIORITY)
         setInteger(MediaFormat.KEY_OPERATING_RATE, config.fps)

@@ -2,6 +2,8 @@ package dev.fastcast.client.decoder
 
 interface DecoderEvents {
 
+    fun onConfigured()
+
     fun onVideoSize(width: Int, height: Int)
 
     fun onFirstFrame()
