@@ -29,6 +29,10 @@ pub enum DisplayError {
         mode: DisplayMode,
         code: i32,
     },
+    DetachRefused {
+        device: String,
+        code: i32,
+    },
     OutputNotFound {
         device: String,
     },
@@ -66,6 +70,10 @@ impl fmt::Display for DisplayError {
             Self::ModeChangeRefused { device, mode, code } => write!(
                 formatter,
                 "Windows refused to switch {device} to {mode} (display change code {code})"
+            ),
+            Self::DetachRefused { device, code } => write!(
+                formatter,
+                "Windows refused to turn {device} off (display change code {code})"
             ),
             Self::OutputNotFound { device } => write!(
                 formatter,
