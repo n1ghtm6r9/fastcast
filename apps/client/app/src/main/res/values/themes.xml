@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.Fastcast" parent="@android:style/Theme.Material.NoActionBar">
-        <item name="android:windowBackground">@color/background</item>
+        <item name="android:windowBackground">@drawable/bg_screen</item>
         <item name="android:colorBackground">@color/background</item>
         <item name="android:statusBarColor">@color/background</item>
         <item name="android:navigationBarColor">@color/background</item>
@@ -24,5 +24,20 @@
         <item name="android:padding">12dp</item>
         <item name="android:textColor">@color/text</item>
         <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="MenuButton">
+        <item name="android:background">@drawable/bg_button</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:minWidth">176dp</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:stateListAnimator">@animator/lift_on_focus</item>
+        <item name="android:textColor">@color/button_text</item>
+        <item name="android:textSize">20sp</item>
     </style>
 </resources>

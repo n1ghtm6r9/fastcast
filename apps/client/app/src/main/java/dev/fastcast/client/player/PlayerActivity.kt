@@ -17,6 +17,7 @@ import dev.fastcast.client.R
 import dev.fastcast.client.connect.ConnectActivity
 import dev.fastcast.client.decoder.DecoderSelector
 import dev.fastcast.client.decoder.SupportedCodecs
+import dev.fastcast.client.discovery.DiscoveredServer
 import dev.fastcast.client.display.DisplayModeChooser
 import dev.fastcast.client.display.DisplayModes
 import dev.fastcast.client.display.MinimalPostProcessing
@@ -32,10 +33,16 @@ import kotlin.math.ceil
 class PlayerActivity : Activity(), PlayerSessionListener {
 
     private lateinit var address: String
+    private lateinit var serverName: String
     private lateinit var streamUrl: String
     private lateinit var videoSurface: VideoSurfaceView
+    private lateinit var statusPanel: View
+    private lateinit var statusSpinner: View
     private lateinit var statusText: TextView
     private lateinit var statsText: TextView
+    private lateinit var controlsHint: View
+    private lateinit var menuSubtitle: TextView
+    private lateinit var menu: PlayerMenu
 
     private val handler = Handler(Looper.getMainLooper())
     private val updateLookup = UpdateLookup(
@@ -50,12 +57,13 @@ class PlayerActivity : Activity(), PlayerSessionListener {
             handler.postDelayed(this, STATS_INTERVAL_MS)
         }
     }
+    private val hideControlsHint = Runnable { controlsHint.visibility = View.GONE }
 
     private var screen: Display? = null
     private var session: PlayerSession? = null
     private var lastError: String? = null
     private var statsVisible = false
-    private var leavingForUpdate = false
+    private var controlsHintShown = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,12 +77,25 @@ class PlayerActivity : Activity(), PlayerSessionListener {
             return
         }
         address = requestedAddress
+        serverName = intent.getStringExtra(EXTRA_NAME) ?: requestedAddress
         screen = DisplayModes.defaultDisplay(this)
         streamUrl = StreamUrl.build(address, requestStream())
         videoSurface = findViewById(R.id.video_surface)
+        statusPanel = findViewById(R.id.status_panel)
+        statusSpinner = findViewById(R.id.status_spinner)
         statusText = findViewById(R.id.status_text)
         statsText = findViewById(R.id.stats_text)
-        findViewById<View>(R.id.player_root).setOnClickListener { toggleStats() }
+        controlsHint = findViewById(R.id.controls_hint)
+        menuSubtitle = findViewById(R.id.menu_subtitle)
+        findViewById<TextView>(R.id.menu_title).text = serverName
+        menu = PlayerMenu(findViewById(R.id.menu_panel), findViewById(R.id.menu_resume), handler)
+        findViewById<View>(R.id.menu_resume).setOnClickListener { menu.close() }
+        findViewById<View>(R.id.menu_stats).setOnClickListener {
+            menu.close()
+            toggleStats()
+        }
+        findViewById<View>(R.id.menu_disconnect).setOnClickListener { finish() }
+        findViewById<View>(R.id.player_root).setOnClickListener { openMenu() }
         videoSurface.holder.addCallback(SurfaceLifecycle(::startSession, ::stopSession))
         showStatus(PlayerStatus.Connecting)
     }
@@ -94,16 +115,31 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         if (hasFocus) ImmersiveMode.enter(window)
     }
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (keyCode in STATS_KEYS) {
-            if (event.repeatCount == 0) toggleStats()
-            return true
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (menu.isOpen) menu.keepOpen()
+        return super.dispatchKeyEvent(event)
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean = when (RemoteKeys.actionFor(keyCode)) {
+        RemoteAction.Leave -> {
+            if (event.repeatCount == 0) leave()
+            true
         }
-        return super.onKeyDown(keyCode, event)
+        RemoteAction.ToggleStats -> {
+            if (event.repeatCount == 0) toggleStats()
+            true
+        }
+        RemoteAction.ShowMenu -> if (menu.isOpen) {
+            super.onKeyDown(keyCode, event)
+        } else {
+            openMenu()
+            true
+        }
+        null -> super.onKeyDown(keyCode, event)
     }
 
     override fun finish() {
-        setResult(RESULT_OK, Intent().putExtra(EXTRA_ERROR, lastError).putExtra(EXTRA_UPDATE_FOUND, leavingForUpdate))
+        setResult(RESULT_OK, Intent().putExtra(EXTRA_ERROR, lastError))
         super.finish()
     }
 
@@ -122,10 +158,20 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         videoSurface.setVideoSize(width, height)
     }
 
+    private fun leave() {
+        if (menu.isOpen) menu.close() else finish()
+    }
+
     private fun leaveForUpdate() {
-        leavingForUpdate = true
         if (isTaskRoot) startActivity(Intent(this, ConnectActivity::class.java))
         finish()
+    }
+
+    private fun openMenu() {
+        handler.removeCallbacks(hideControlsHint)
+        controlsHint.visibility = View.GONE
+        menuSubtitle.text = getString(R.string.menu_subtitle, address, activeDisplayLabel())
+        menu.open()
     }
 
     private fun requestStream(): StreamRequest? {
@@ -164,11 +210,20 @@ class PlayerActivity : Activity(), PlayerSessionListener {
     private fun showStatus(status: PlayerStatus) {
         val message = statusMessage(status)
         statusText.text = message
-        statusText.visibility = if (message == null) View.GONE else View.VISIBLE
+        statusPanel.visibility = if (message == null) View.GONE else View.VISIBLE
+        statusSpinner.visibility = if (status is PlayerStatus.DecoderError) View.GONE else View.VISIBLE
+        if (status == PlayerStatus.Playing) showControlsHintOnce()
+    }
+
+    private fun showControlsHintOnce() {
+        if (controlsHintShown || menu.isOpen) return
+        controlsHintShown = true
+        controlsHint.visibility = View.VISIBLE
+        handler.postDelayed(hideControlsHint, CONTROLS_HINT_MS)
     }
 
     private fun statusMessage(status: PlayerStatus): String? = when (status) {
-        PlayerStatus.Connecting -> getString(R.string.status_connecting)
+        PlayerStatus.Connecting -> getString(R.string.status_connecting, serverName)
         PlayerStatus.WaitingForVideo -> getString(R.string.status_waiting_for_video)
         PlayerStatus.Playing -> null
         is PlayerStatus.Reconnecting -> getString(R.string.status_reconnecting, secondsUntil(status.retryInMs))
@@ -198,22 +253,18 @@ class PlayerActivity : Activity(), PlayerSessionListener {
     }
 
     companion object {
-        const val EXTRA_ADDRESS = "dev.fastcast.client.player.ADDRESS"
         const val EXTRA_ERROR = "dev.fastcast.client.player.ERROR"
-        const val EXTRA_UPDATE_FOUND = "dev.fastcast.client.player.UPDATE_FOUND"
 
+        private const val EXTRA_ADDRESS = "dev.fastcast.client.player.ADDRESS"
+        private const val EXTRA_NAME = "dev.fastcast.client.player.NAME"
         private const val STATS_INTERVAL_MS = 1_000L
+        private const val CONTROLS_HINT_MS = 4_000L
         private const val MILLISECONDS_PER_SECOND = 1_000.0
         private const val NO_DECODER = "-"
-        private val STATS_KEYS = setOf(
-            KeyEvent.KEYCODE_DPAD_CENTER,
-            KeyEvent.KEYCODE_ENTER,
-            KeyEvent.KEYCODE_NUMPAD_ENTER,
-            KeyEvent.KEYCODE_INFO,
-            KeyEvent.KEYCODE_MENU,
-        )
 
-        fun createIntent(context: Context, address: String): Intent =
-            Intent(context, PlayerActivity::class.java).putExtra(EXTRA_ADDRESS, address)
+        fun createIntent(context: Context, server: DiscoveredServer): Intent =
+            Intent(context, PlayerActivity::class.java)
+                .putExtra(EXTRA_ADDRESS, server.address)
+                .putExtra(EXTRA_NAME, server.name)
     }
 }
