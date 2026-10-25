@@ -1,9 +1,11 @@
+mod discovery_port;
 mod listen_ip;
 mod max_probe_bytes;
 mod probe_kind;
 mod protocol_version;
 mod receive_buffer_bytes;
 mod server_reply_kind;
+pub use discovery_port::*;
 pub use listen_ip::*;
 pub use max_probe_bytes::*;
 pub use probe_kind::*;

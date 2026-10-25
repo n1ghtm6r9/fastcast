@@ -4,7 +4,6 @@ use crate::settings::EncoderChoice;
 pub struct Settings {
     pub web_host: String,
     pub web_port: u16,
-    pub discovery_port: u16,
     pub server_name: String,
     pub ffmpeg_path: String,
     pub video_encoder: EncoderChoice,

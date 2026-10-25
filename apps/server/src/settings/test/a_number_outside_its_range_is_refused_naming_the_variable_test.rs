@@ -6,8 +6,6 @@ fn a_number_outside_its_range_is_refused_naming_the_variable() {
     let cases = [
         ("WEB_PORT", "0"),
         ("WEB_PORT", "65536"),
-        ("DISCOVERY_PORT", "0"),
-        ("DISCOVERY_PORT", "65536"),
         ("CAPTURE_OUTPUT", "64"),
         ("CAPTURE_FPS", "0"),
         ("CAPTURE_FPS", "241"),

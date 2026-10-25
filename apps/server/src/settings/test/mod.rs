@@ -3,6 +3,7 @@ pub use environment_with::*;
 
 mod a_blank_server_name_is_skipped_and_a_name_is_trimmed_test;
 mod a_blank_value_counts_as_not_set_test;
+mod a_leftover_discovery_port_variable_is_ignored_test;
 mod a_number_outside_its_range_is_refused_naming_the_variable_test;
 mod a_refusal_says_which_variable_and_what_it_wanted_test;
 mod a_switch_is_read_as_on_or_off_in_any_case_test;

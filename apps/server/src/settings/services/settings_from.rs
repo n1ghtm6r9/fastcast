@@ -1,5 +1,5 @@
 use crate::settings::constants::{
-    CAPTURE_FPS_SETTING, CAPTURE_OUTPUT_SETTING, DISCOVERY_PORT_SETTING, FFMPEG_PATH_SETTING,
+    CAPTURE_FPS_SETTING, CAPTURE_OUTPUT_SETTING, FFMPEG_PATH_SETTING,
     KEYFRAME_INTERVAL_SECONDS_SETTING, VIDEO_BITRATE_KBPS_SETTING, VIDEO_ENCODER_SETTING,
     VIRTUAL_DISPLAY_SETTING, WEB_HOST_SETTING, WEB_PORT_SETTING,
 };
@@ -12,7 +12,6 @@ pub fn settings_from(lookup: impl Fn(&str) -> Option<String>) -> Result<Settings
     Ok(Settings {
         web_host: read_text_setting(&WEB_HOST_SETTING, &lookup),
         web_port: read_number_setting(&WEB_PORT_SETTING, &lookup)? as u16,
-        discovery_port: read_number_setting(&DISCOVERY_PORT_SETTING, &lookup)? as u16,
         server_name: read_server_name(&lookup),
         ffmpeg_path: read_text_setting(&FFMPEG_PATH_SETTING, &lookup),
         video_encoder: read_encoder_choice(&VIDEO_ENCODER_SETTING, &lookup)?,

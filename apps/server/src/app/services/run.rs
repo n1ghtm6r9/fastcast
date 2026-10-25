@@ -1,6 +1,6 @@
 use crate::app::{AppError, init_dotenv, init_logger, log_urls, shutdown_signal};
 use crate::capture::{FfmpegBackend, supervise_capture, with_located_ffmpeg};
-use crate::discovery::{discovery_address, run_discovery};
+use crate::discovery::{DISCOVERY_PORT, discovery_address, run_discovery};
 use crate::hub::Hub;
 use crate::settings::load_settings;
 use crate::web::{bind_listener, serve_web};
@@ -17,7 +17,7 @@ pub async fn run() -> Result<(), AppError> {
     log_urls(&settings.web_host, settings.web_port);
 
     let responder = tokio::spawn(run_discovery(
-        discovery_address(settings.discovery_port),
+        discovery_address(DISCOVERY_PORT),
         settings.server_name.clone(),
         settings.web_port,
     ));

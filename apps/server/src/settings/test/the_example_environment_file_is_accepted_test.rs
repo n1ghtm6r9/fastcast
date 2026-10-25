@@ -18,7 +18,6 @@ fn the_example_environment_file_is_accepted() {
         .expect("the example file must hold values the server accepts");
 
     assert_eq!(settings.web_port, 3278);
-    assert_eq!(settings.discovery_port, 3278);
     assert_eq!(settings.server_name, "fastcast");
     assert_eq!(settings.video_encoder, EncoderChoice::Auto);
 }

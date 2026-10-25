@@ -1,6 +1,5 @@
 mod capture_fps_setting;
 mod capture_output_setting;
-mod discovery_port_setting;
 mod ffmpeg_path_setting;
 mod keyframe_interval_seconds_setting;
 mod server_name_fallback_variables;
@@ -12,7 +11,6 @@ mod web_host_setting;
 mod web_port_setting;
 pub use capture_fps_setting::*;
 pub use capture_output_setting::*;
-pub use discovery_port_setting::*;
 pub use ffmpeg_path_setting::*;
 pub use keyframe_interval_seconds_setting::*;
 pub use server_name_fallback_variables::*;

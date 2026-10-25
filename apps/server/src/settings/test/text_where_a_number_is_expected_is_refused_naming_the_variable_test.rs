@@ -5,7 +5,6 @@ use crate::settings::settings_from;
 fn text_where_a_number_is_expected_is_refused_naming_the_variable() {
     let variables = [
         "WEB_PORT",
-        "DISCOVERY_PORT",
         "CAPTURE_OUTPUT",
         "CAPTURE_FPS",
         "VIDEO_BITRATE_KBPS",
