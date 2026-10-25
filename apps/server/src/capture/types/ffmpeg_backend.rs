@@ -1,21 +1,16 @@
-use crate::capture::{AUTO_ENCODER_ORDER, EncoderPicker, HEVC_ENCODER_ORDER};
+use crate::capture::{EncoderPicker, ffmpeg_search_dirs};
 use crate::settings::Settings;
+use std::path::PathBuf;
 
 pub struct FfmpegBackend {
     pub(crate) settings: Settings,
+    pub(crate) search_dirs: Box<dyn Fn() -> Vec<PathBuf> + Send + Sync>,
     pub(crate) avc: EncoderPicker,
     pub(crate) hevc: EncoderPicker,
 }
 
 impl FfmpegBackend {
     pub fn new(settings: Settings) -> Self {
-        let avc = EncoderPicker::ordered(settings.video_encoder, &AUTO_ENCODER_ORDER);
-        let hevc = EncoderPicker::ordered(settings.video_encoder, &HEVC_ENCODER_ORDER);
-
-        Self {
-            settings,
-            avc,
-            hevc,
-        }
+        Self::with_search_dirs(settings, ffmpeg_search_dirs)
     }
 }

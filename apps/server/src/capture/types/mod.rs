@@ -16,6 +16,7 @@ mod encoder_picker_unusable;
 mod ffmpeg_backend;
 mod ffmpeg_backend_picker_for;
 mod ffmpeg_backend_run;
+mod ffmpeg_backend_with_search_dirs;
 mod picker_state;
 mod screen;
 mod watch_outcome;

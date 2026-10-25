@@ -10,7 +10,7 @@ fn the_default_ffmpeg_comes_from_the_first_directory_that_has_it() {
     let search_dirs = [missing, first.directory.clone(), second.directory.clone()];
 
     assert_eq!(
-        locate_ffmpeg("ffmpeg", &search_dirs),
+        locate_ffmpeg("ffmpeg", &search_dirs).expect("the first directory has it"),
         first.directory.join(FFMPEG_FILE_NAME).display().to_string()
     );
 }

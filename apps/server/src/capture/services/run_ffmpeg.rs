@@ -9,6 +9,7 @@ use tokio::time::timeout;
 use tracing::warn;
 
 pub async fn run_ffmpeg(
+    ffmpeg_path: &str,
     settings: &Settings,
     target: &CaptureTarget,
     encoder: VideoEncoder,
@@ -16,7 +17,7 @@ pub async fn run_ffmpeg(
     hub: &Hub,
 ) -> Result<CaptureReport, CaptureError> {
     let args = ffmpeg_args(settings, target, encoder, codec);
-    let mut child = spawn_ffmpeg(&settings.ffmpeg_path, &args)?;
+    let mut child = spawn_ffmpeg(ffmpeg_path, &args)?;
     let stdout = child.stdout.take().ok_or(CaptureError::MissingPipe)?;
     let stderr = child.stderr.take().ok_or(CaptureError::MissingPipe)?;
     let stderr_task = tokio::spawn(forward_stderr(stderr));
