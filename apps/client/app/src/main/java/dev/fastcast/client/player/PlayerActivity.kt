@@ -14,7 +14,6 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
 import dev.fastcast.client.R
-import dev.fastcast.client.connect.ConnectActivity
 import dev.fastcast.client.decoder.DecoderSelector
 import dev.fastcast.client.decoder.SupportedCodecs
 import dev.fastcast.client.discovery.DiscoveredServer
@@ -23,10 +22,6 @@ import dev.fastcast.client.display.DisplayModes
 import dev.fastcast.client.display.MinimalPostProcessing
 import dev.fastcast.client.display.PreferredDisplayMode
 import dev.fastcast.client.stream.StreamRequest
-import dev.fastcast.client.update.UpdateCheckCache
-import dev.fastcast.client.update.UpdateChecker
-import dev.fastcast.client.update.UpdateLookup
-import java.util.concurrent.Executor
 import kotlin.math.ceil
 
 class PlayerActivity : Activity(), PlayerSessionListener {
@@ -44,12 +39,6 @@ class PlayerActivity : Activity(), PlayerSessionListener {
     private lateinit var menu: PlayerMenu
 
     private val handler = Handler(Looper.getMainLooper())
-    private val updateLookup = UpdateLookup(
-        cache = UpdateCheckCache.shared,
-        fetch = UpdateChecker()::check,
-        deliver = Executor { handler.post(it) },
-        onUpdateAvailable = ::leaveForUpdate,
-    )
     private val statsTicker = object : Runnable {
         override fun run() {
             renderStats()
@@ -97,16 +86,6 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         findViewById<View>(R.id.player_root).setOnClickListener { openMenu() }
         videoSurface.holder.addCallback(SurfaceLifecycle(::startSession, ::stopSession))
         showStatus(PlayerStatus.Connecting)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        updateLookup.start()
-    }
-
-    override fun onStop() {
-        updateLookup.stop()
-        super.onStop()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -159,11 +138,6 @@ class PlayerActivity : Activity(), PlayerSessionListener {
 
     private fun leave() {
         if (menu.isOpen) menu.close() else finish()
-    }
-
-    private fun leaveForUpdate() {
-        if (isTaskRoot) startActivity(Intent(this, ConnectActivity::class.java))
-        finish()
     }
 
     private fun openMenu() {
