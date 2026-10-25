@@ -1,14 +1,15 @@
+use crate::app::{DotenvError, load_dotenv_files};
 use std::env;
 use std::path::PathBuf;
 
-pub fn init_dotenv() {
-    let _ = dotenvy::dotenv();
-
+pub fn init_dotenv() -> Result<(), DotenvError> {
+    let current_directory = env::current_dir().ok();
     let executable_directory = env::current_exe()
         .ok()
         .and_then(|executable| executable.parent().map(PathBuf::from));
 
-    if let Some(directory) = executable_directory {
-        let _ = dotenvy::from_path(directory.join(".env"));
-    }
+    load_dotenv_files(
+        current_directory.as_deref(),
+        executable_directory.as_deref(),
+    )
 }

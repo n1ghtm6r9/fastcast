@@ -7,7 +7,7 @@ use crate::web::{bind_listener, serve_web};
 use std::sync::Arc;
 
 pub async fn run() -> Result<(), AppError> {
-    init_dotenv();
+    init_dotenv()?;
     init_logger();
 
     let settings = with_located_ffmpeg(load_settings()?);
