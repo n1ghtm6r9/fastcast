@@ -1,0 +1,1 @@
+pub const BLUE_DIFFERENCE_SCALE: f32 = 1.8556;

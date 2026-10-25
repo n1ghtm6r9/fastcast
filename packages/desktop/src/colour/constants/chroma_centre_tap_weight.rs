@@ -1,0 +1,1 @@
+pub const CHROMA_CENTRE_TAP_WEIGHT: f32 = 0.5;

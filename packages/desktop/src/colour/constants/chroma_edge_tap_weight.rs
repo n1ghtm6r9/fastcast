@@ -1,0 +1,1 @@
+pub const CHROMA_EDGE_TAP_WEIGHT: f32 = 0.25;

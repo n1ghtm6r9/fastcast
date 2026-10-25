@@ -1,0 +1,1 @@
+pub const RED_DIFFERENCE_SCALE: f32 = 1.5748;
