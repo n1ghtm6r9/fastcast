@@ -1,10 +1,8 @@
 use crate::hub::Frame;
-use crate::web::{Admission, ViewerCursor, send_config, send_frame};
-use axum::extract::ws::{Message, WebSocket};
-use futures_util::stream::SplitSink;
+use crate::web::{Admission, ViewerCursor, ViewerSink, send_config, send_frame};
 
 pub async fn send_admitted(
-    sink: &mut SplitSink<WebSocket, Message>,
+    sink: &ViewerSink,
     cursor: &mut ViewerCursor,
     frame: &Frame,
 ) -> Result<(), axum::Error> {

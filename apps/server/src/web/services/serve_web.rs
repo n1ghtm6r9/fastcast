@@ -1,6 +1,5 @@
 use crate::hub::Hub;
-use crate::web::{WebError, router};
-use axum::serve::ListenerExt;
+use crate::web::{ViewerTimings, WebError, serve_web_with_timings};
 use std::future::Future;
 use std::sync::Arc;
 use tokio::net::TcpListener;
@@ -9,12 +8,5 @@ pub async fn serve_web<S>(listener: TcpListener, hub: Arc<Hub>, shutdown: S) -> 
 where
     S: Future<Output = ()> + Send + 'static,
 {
-    let listener = listener.tap_io(|stream| {
-        let _ = stream.set_nodelay(true);
-    });
-
-    axum::serve(listener, router(hub))
-        .with_graceful_shutdown(shutdown)
-        .await
-        .map_err(WebError::Serve)
+    serve_web_with_timings(listener, hub, ViewerTimings::default(), shutdown).await
 }

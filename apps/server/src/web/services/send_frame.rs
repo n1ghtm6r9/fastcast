@@ -1,11 +1,7 @@
 use crate::hub::Frame;
-use axum::extract::ws::{Message, WebSocket};
-use futures_util::SinkExt;
-use futures_util::stream::SplitSink;
+use crate::web::ViewerSink;
+use axum::extract::ws::Message;
 
-pub async fn send_frame(
-    sink: &mut SplitSink<WebSocket, Message>,
-    frame: &Frame,
-) -> Result<(), axum::Error> {
+pub async fn send_frame(sink: &ViewerSink, frame: &Frame) -> Result<(), axum::Error> {
     sink.send(Message::Binary(frame.wire.clone())).await
 }

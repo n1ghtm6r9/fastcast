@@ -1,11 +1,7 @@
 use crate::hub::StreamConfig;
-use axum::extract::ws::{Message, WebSocket};
-use futures_util::SinkExt;
-use futures_util::stream::SplitSink;
+use crate::web::ViewerSink;
+use axum::extract::ws::Message;
 
-pub async fn send_config(
-    sink: &mut SplitSink<WebSocket, Message>,
-    config: &StreamConfig,
-) -> Result<(), axum::Error> {
+pub async fn send_config(sink: &ViewerSink, config: &StreamConfig) -> Result<(), axum::Error> {
     sink.send(Message::Text(config.json.clone().into())).await
 }

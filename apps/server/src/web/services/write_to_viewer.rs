@@ -1,13 +1,11 @@
 use crate::hub::{Frame, StreamConfig};
-use crate::web::{ViewerCursor, send_admitted, send_config};
-use axum::extract::ws::{Message, WebSocket};
-use futures_util::stream::SplitSink;
+use crate::web::{ViewerCursor, ViewerSink, send_admitted, send_config};
 use std::sync::Arc;
 use tokio::sync::broadcast::{self, error::RecvError};
 use tracing::debug;
 
 pub async fn write_to_viewer(
-    sink: &mut SplitSink<WebSocket, Message>,
+    sink: &ViewerSink,
     cursor: &mut ViewerCursor,
     config: Option<Arc<StreamConfig>>,
     gop: Vec<Arc<Frame>>,

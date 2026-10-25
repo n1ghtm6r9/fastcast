@@ -1,5 +1,6 @@
 use crate::hub::Hub;
-use crate::web::{ViewerQuery, serve_viewer, viewer_request_from};
+use crate::web::{ViewerQuery, ViewerTimings, serve_viewer, viewer_request_from};
+use axum::Extension;
 use axum::extract::ws::WebSocketUpgrade;
 use axum::extract::{Query, State};
 use axum::http::header::ORIGIN;
@@ -12,6 +13,7 @@ pub async fn ws_handler(
     upgrade: WebSocketUpgrade,
     headers: HeaderMap,
     State(hub): State<Arc<Hub>>,
+    Extension(timings): Extension<ViewerTimings>,
     Query(query): Query<ViewerQuery>,
 ) -> Response {
     if let Some(origin) = headers.get(ORIGIN) {
@@ -22,5 +24,5 @@ pub async fn ws_handler(
 
     let request = viewer_request_from(&query);
 
-    upgrade.on_upgrade(move |socket| serve_viewer(socket, hub, request))
+    upgrade.on_upgrade(move |socket| serve_viewer(socket, hub, request, timings))
 }
