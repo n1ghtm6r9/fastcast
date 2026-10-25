@@ -1,0 +1,2 @@
+mod java_dev_fastcast_client_stream_native_link_protocol_version;
+pub use java_dev_fastcast_client_stream_native_link_protocol_version::*;
