@@ -2,9 +2,10 @@ package dev.fastcast.client.update
 
 import dev.fastcast.client.testing.anUpdateManifest
 import dev.fastcast.client.testing.asJson
+import java.io.IOException
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Test
 
 class TheCheckerFollowsRedirectsLikeGitHubDoesTest {
@@ -59,22 +60,22 @@ class TheCheckerFollowsRedirectsLikeGitHubDoesTest {
         server.redirect(LATEST_PATH, SECOND_HOP_PATH)
         server.redirect(SECOND_HOP_PATH, LATEST_PATH)
 
-        assertNull(checkerFor(LATEST_PATH).check())
+        assertThrows(IOException::class.java) { checkerFor(LATEST_PATH).check() }
     }
 
     @Test
     fun `a redirect that switches to another protocol is not followed`() {
         server.redirectToUrl(LATEST_PATH, "https://127.0.0.1:1$OBJECT_PATH")
 
-        assertNull(checkerFor(LATEST_PATH).check())
+        assertThrows(IOException::class.java) { checkerFor(LATEST_PATH).check() }
     }
 
     @Test
-    fun `a redirect to a missing file is no update`() {
+    fun `a redirect to a missing file fails the check`() {
         server.redirect(LATEST_PATH, OBJECT_PATH)
         server.serve(OBJECT_PATH, "Not Found".toByteArray(), status = 404)
 
-        assertNull(checkerFor(LATEST_PATH).check())
+        assertThrows(IOException::class.java) { checkerFor(LATEST_PATH).check() }
     }
 
     private fun checkerFor(path: String) = UpdateChecker(UpdateHttpClient.create(), server.urlOf(path), 100)

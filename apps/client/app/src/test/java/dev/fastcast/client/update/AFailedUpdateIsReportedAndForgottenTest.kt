@@ -94,14 +94,6 @@ class AFailedUpdateIsReportedAndForgottenTest {
         assertNull(cache.resolve { error("must not fetch") })
     }
 
-    @Test
-    fun `a failing check is forgotten by the shared cache`() {
-        start(fetch = { throw IOException("offline") })
-        listener.nextEvent()
-
-        assertNull(cache.resolve { error("must not fetch") })
-    }
-
     private fun start(
         fetch: () -> UpdateManifest? = { manifest },
         download: (UpdateManifest, (Long, Long) -> Unit, () -> Boolean) -> File = { _, _, _ -> error("no download") },

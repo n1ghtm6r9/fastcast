@@ -13,23 +13,23 @@ class UpdateChecker(
 ) {
 
     fun check(): UpdateManifest? {
-        val text = fetchText() ?: return null
-        return UpdateManifest.parse(text)?.takeIf { it.versionCode > installedVersionCode }
+        val manifest = UpdateManifest.parse(fetchText()) ?: throw IOException("The update manifest is unusable")
+        return manifest.takeIf { it.versionCode > installedVersionCode }
     }
 
-    private fun fetchText(): String? = try {
-        client.newCall(Request.Builder().url(manifestUrl).build()).execute().use(::readCappedBody)
-    } catch (e: IOException) {
-        null
+    private fun fetchText(): String = client.newCall(manifestRequest()).execute().use(::readCappedBody)
+
+    private fun manifestRequest(): Request = try {
+        Request.Builder().url(manifestUrl).build()
     } catch (e: IllegalArgumentException) {
-        null
+        throw IOException("The update manifest URL is invalid", e)
     }
 
-    private fun readCappedBody(response: Response): String? {
-        if (!response.isSuccessful) return null
-        val source = response.body?.source() ?: return null
+    private fun readCappedBody(response: Response): String {
+        if (!response.isSuccessful) throw IOException("The update manifest request failed with HTTP ${response.code}")
+        val source = response.body?.source() ?: throw IOException("The update manifest response has no body")
         source.request(MAX_BODY_BYTES + 1)
-        if (source.buffer.size > MAX_BODY_BYTES) return null
+        if (source.buffer.size > MAX_BODY_BYTES) throw IOException("The update manifest exceeds $MAX_BODY_BYTES bytes")
         return source.buffer.readUtf8()
     }
 

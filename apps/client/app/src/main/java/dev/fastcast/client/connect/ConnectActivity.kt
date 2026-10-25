@@ -17,6 +17,7 @@ import dev.fastcast.client.discovery.ServerFinder
 import dev.fastcast.client.discovery.ServerFinderListener
 import dev.fastcast.client.player.PlayerActivity
 import dev.fastcast.client.update.InstallFailureSignal
+import dev.fastcast.client.update.RejectedVersionStore
 import dev.fastcast.client.update.UpdateCheckCache
 import dev.fastcast.client.update.UpdateChecker
 import dev.fastcast.client.update.UpdateDownloader
@@ -68,6 +69,7 @@ class ConnectActivity : Activity(), ServerFinderListener, UpdateListener {
             listener = this,
             deliver = deliverOnMain,
             cache = UpdateCheckCache.shared,
+            rejected = RejectedVersionStore(applicationContext).versions,
             fetch = UpdateChecker()::check,
             download = UpdateDownloader(File(cacheDir, UPDATES_DIRECTORY))::download,
             install = UpdateInstaller(applicationContext)::install,

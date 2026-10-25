@@ -2,9 +2,10 @@ package dev.fastcast.client.update
 
 import dev.fastcast.client.testing.anUpdateManifest
 import dev.fastcast.client.testing.asJson
+import java.io.IOException
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Test
 
 class AnOversizedManifestIsRejectedByTheCheckerTest {
@@ -27,14 +28,14 @@ class AnOversizedManifestIsRejectedByTheCheckerTest {
     fun `a manifest one byte over sixteen kilobytes is rejected`() {
         server.serve(MANIFEST_PATH, paddedTo(SIXTEEN_KILOBYTES + 1))
 
-        assertNull(checker.check())
+        assertThrows(IOException::class.java) { checker.check() }
     }
 
     @Test
     fun `a very large answer is rejected`() {
         server.serve(MANIFEST_PATH, paddedTo(ONE_MEGABYTE))
 
-        assertNull(checker.check())
+        assertThrows(IOException::class.java) { checker.check() }
     }
 
     private fun paddedTo(totalBytes: Int): ByteArray {

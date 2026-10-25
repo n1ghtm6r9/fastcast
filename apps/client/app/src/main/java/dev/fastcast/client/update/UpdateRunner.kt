@@ -7,6 +7,7 @@ class UpdateRunner(
     private val listener: UpdateListener,
     private val deliver: Executor,
     private val cache: UpdateCheckCache,
+    private val rejected: RejectedVersions,
     private val fetch: () -> UpdateManifest?,
     private val download: (UpdateManifest, (Long, Long) -> Unit, () -> Boolean) -> File,
     private val install: (File, UpdateManifest) -> Unit,
@@ -53,16 +54,28 @@ class UpdateRunner(
         }
 
         private fun update() {
-            val manifest = cache.resolve(fetch)
+            val manifest = cache.resolve(fetch)?.takeUnless { rejected.isRejected(it.versionCode) }
             if (!active) return
             if (manifest == null) {
                 report { onNoUpdate() }
                 return
             }
             report { onUpdateFound(manifest) }
+            try {
+                downloadAndInstall(manifest)
+            } catch (e: Exception) {
+                if (active) cache.dismiss()
+                throw e
+            }
+        }
+
+        private fun downloadAndInstall(manifest: UpdateManifest) {
             val apk = download(manifest, ::reportProgress, ::isStopped)
             try {
                 if (active) install(apk, manifest)
+            } catch (e: Exception) {
+                rejected.reject(manifest.versionCode)
+                throw e
             } finally {
                 apk.delete()
             }
@@ -78,7 +91,6 @@ class UpdateRunner(
         }
 
         private fun fail(cause: Exception) {
-            cache.dismiss()
             report { onUpdateFailed(cause) }
         }
 

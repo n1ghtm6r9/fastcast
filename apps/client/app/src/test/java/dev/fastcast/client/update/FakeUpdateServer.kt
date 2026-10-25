@@ -1,5 +1,6 @@
 package dev.fastcast.client.update
 
+import com.sun.net.httpserver.HttpContext
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
 import java.net.InetAddress
@@ -16,6 +17,7 @@ class FakeUpdateServer : AutoCloseable {
     private val server = HttpServer.create(InetSocketAddress(InetAddress.getLoopbackAddress(), 0), BACKLOG)
     private val workers: ExecutorService = Executors.newCachedThreadPool { Thread(it).apply { isDaemon = true } }
     private val requests = ConcurrentHashMap<String, AtomicInteger>()
+    private val contexts = ConcurrentHashMap<String, HttpContext>()
     private val shutdown = CountDownLatch(1)
 
     private val baseUrl = "http://127.0.0.1:${server.address.port}"
@@ -56,7 +58,8 @@ class FakeUpdateServer : AutoCloseable {
     }
 
     private fun respond(path: String, handler: (HttpExchange) -> Unit) {
-        server.createContext(path) { exchange ->
+        contexts.remove(path)?.let(server::removeContext)
+        contexts[path] = server.createContext(path) { exchange ->
             requests.computeIfAbsent(path) { AtomicInteger() }.incrementAndGet()
             try {
                 handler(exchange)

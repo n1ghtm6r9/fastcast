@@ -16,7 +16,7 @@ class UpdateInstaller(private val context: Context) {
         try {
             installer.openSession(sessionId).use { session ->
                 copyInto(session, apk)
-                session.commit(statusSender(sessionId))
+                session.commit(statusSender(sessionId, manifest.versionCode))
             }
         } catch (e: Exception) {
             runCatching { installer.abandonSession(sessionId) }
@@ -42,8 +42,9 @@ class UpdateInstaller(private val context: Context) {
         }
     }
 
-    private fun statusSender(sessionId: Int): IntentSender {
+    private fun statusSender(sessionId: Int, versionCode: Int): IntentSender {
         val statusIntent = Intent(context, InstallStatusReceiver::class.java)
+            .putExtra(InstallStatusReceiver.EXTRA_VERSION_CODE, versionCode)
         val flags = PendingIntent.FLAG_UPDATE_CURRENT or mutabilityFlag()
         return PendingIntent.getBroadcast(context, sessionId, statusIntent, flags).intentSender
     }

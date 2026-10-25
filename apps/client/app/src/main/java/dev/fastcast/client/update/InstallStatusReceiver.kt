@@ -15,7 +15,7 @@ class InstallStatusReceiver : BroadcastReceiver() {
         when (status) {
             PackageInstaller.STATUS_PENDING_USER_ACTION -> askUser(context, intent)
             PackageInstaller.STATUS_SUCCESS -> Log.i(TAG, "Update installed")
-            else -> onFailure(status, message)
+            else -> onFailure(context, intent, status, message)
         }
     }
 
@@ -28,10 +28,15 @@ class InstallStatusReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun onFailure(status: Int, message: String?) {
+    private fun onFailure(context: Context, intent: Intent, status: Int, message: String?) {
         Log.w(TAG, "Update install failed with status $status: $message")
-        UpdateCheckCache.shared.dismiss()
+        rejectVersionOf(context, intent)
         InstallFailureSignal.listener?.run()
+    }
+
+    private fun rejectVersionOf(context: Context, intent: Intent) {
+        if (!intent.hasExtra(EXTRA_VERSION_CODE)) return
+        RejectedVersionStore(context).versions.reject(intent.getIntExtra(EXTRA_VERSION_CODE, 0))
     }
 
     private fun confirmationIntent(intent: Intent): Intent? =
@@ -42,7 +47,9 @@ class InstallStatusReceiver : BroadcastReceiver() {
             intent.getParcelableExtra(Intent.EXTRA_INTENT)
         }
 
-    private companion object {
-        const val TAG = "fastcast-update"
+    companion object {
+        const val EXTRA_VERSION_CODE = "dev.fastcast.client.update.VERSION_CODE"
+
+        private const val TAG = "fastcast-update"
     }
 }
