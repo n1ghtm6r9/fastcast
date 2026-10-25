@@ -1,10 +1,10 @@
 use super::{FakeFfmpeg, avc_target, default_settings};
 use crate::capture::{CaptureBackend, FfmpegBackend};
 use crate::hub::Hub;
-use crate::settings::{Settings, VideoEncoder};
+use crate::settings::Settings;
 
 #[tokio::test]
-async fn a_pipeline_that_exits_before_the_first_frame_moves_the_backend_to_the_next_encoder() {
+async fn a_pipeline_that_exits_before_the_first_frame_does_not_disable_its_encoder() {
     let ffmpeg = FakeFfmpeg::exiting_at_once();
     let settings = Settings {
         ffmpeg_path: ffmpeg.path(),
@@ -19,7 +19,7 @@ async fn a_pipeline_that_exits_before_the_first_frame_moves_the_backend_to_the_n
         .expect("the fake ffmpeg starts");
 
     assert_eq!(first.frames, 0);
-    assert_eq!(backend.avc.unusable(), vec![VideoEncoder::Nvenc]);
+    assert!(backend.avc.unusable().is_empty());
     assert_eq!(backend.avc.resolved(), None);
 
     let second = backend
@@ -28,8 +28,6 @@ async fn a_pipeline_that_exits_before_the_first_frame_moves_the_backend_to_the_n
         .expect("the fake ffmpeg starts");
 
     assert_eq!(second.frames, 0);
-    assert_eq!(
-        backend.avc.unusable(),
-        vec![VideoEncoder::Nvenc, VideoEncoder::Amf]
-    );
+    assert!(backend.avc.unusable().is_empty());
+    assert_eq!(backend.avc.resolved(), None);
 }

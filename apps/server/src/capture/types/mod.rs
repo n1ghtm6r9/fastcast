@@ -5,6 +5,7 @@ mod capture_target;
 mod encoder_picker;
 mod encoder_picker_allows;
 mod encoder_picker_forget_failures;
+mod encoder_picker_forget_resolved;
 mod encoder_picker_lock_state;
 mod encoder_picker_mark_failed;
 mod encoder_picker_next_candidate;

@@ -2,6 +2,8 @@ mod avc_target;
 mod default_settings;
 #[cfg(windows)]
 mod exits_at_once_script;
+#[cfg(windows)]
+mod fails_every_probe_script;
 mod fake_backend;
 mod fake_backend_kills;
 mod fake_backend_opened;
@@ -15,6 +17,8 @@ mod fake_ffmpeg_directory;
 mod fake_ffmpeg_drop;
 #[cfg(windows)]
 mod fake_ffmpeg_exiting_at_once;
+#[cfg(windows)]
+mod fake_ffmpeg_failing_every_probe;
 #[cfg(windows)]
 mod fake_ffmpeg_installed;
 #[cfg(windows)]
@@ -35,6 +39,8 @@ pub use avc_target::*;
 pub use default_settings::*;
 #[cfg(windows)]
 pub use exits_at_once_script::*;
+#[cfg(windows)]
+pub use fails_every_probe_script::*;
 pub use fake_backend::*;
 #[cfg(windows)]
 pub use fake_ffmpeg::*;
@@ -62,21 +68,23 @@ mod a_fixed_encoder_that_fails_its_probe_is_reported_and_no_other_encoder_is_tri
 mod a_fixed_encoder_that_works_for_no_codec_is_named_once_in_the_error_test;
 mod a_fixed_encoder_without_a_hevc_encoder_falls_back_to_avc_test;
 mod a_fixed_x264_is_never_offered_for_hevc_test;
+mod a_forgotten_encoder_whose_probe_fails_moves_the_pick_on_test;
+mod a_forgotten_encoder_whose_probe_still_passes_is_picked_again_test;
 mod a_missing_ffmpeg_is_reported_with_the_install_hint_test;
 mod a_missing_ffmpeg_keeps_the_supervisor_alive_and_retrying_test;
 mod a_missing_program_is_told_apart_from_other_spawn_failures_test;
 mod a_new_request_opens_a_new_screen_and_restarts_the_capture_test;
 #[cfg(windows)]
-mod a_pipeline_that_exits_before_the_first_frame_moves_the_backend_to_the_next_encoder_test;
+mod a_pipeline_that_exits_before_the_first_frame_does_not_disable_its_encoder_test;
 mod a_probe_error_stops_the_pick_and_marks_nothing_test;
 mod a_repeated_identical_sequence_header_keeps_the_gop_test;
 mod a_request_without_a_mode_captures_the_configured_monitor_test;
 mod a_request_without_codecs_is_served_avc_test;
 mod a_resolved_encoder_is_remembered_between_picks_test;
 mod a_run_nobody_watches_is_stopped_after_the_grace_and_reported_idle_test;
-mod a_run_that_ended_before_any_frame_counts_as_an_encoder_failure_test;
 mod a_run_that_ends_by_itself_is_reported_as_finished_test;
-mod a_run_that_produced_frames_is_not_an_encoder_failure_test;
+mod a_run_that_produced_frames_did_not_end_before_the_first_frame_test;
+mod a_run_without_frames_ended_before_the_first_frame_test;
 mod a_sequence_header_and_frames_end_up_in_the_hub_test;
 mod a_sequence_header_for_another_stream_replaces_the_config_and_clears_the_gop_test;
 mod a_sequence_header_the_server_cannot_describe_leaves_the_hub_without_a_config_test;
@@ -87,7 +95,7 @@ mod a_switched_off_virtual_display_captures_the_configured_monitor_test;
 mod a_viewer_returning_within_the_grace_keeps_ffmpeg_running_test;
 mod an_encoder_marked_failed_is_skipped_by_the_next_pick_test;
 mod an_encoder_marked_failed_twice_is_listed_once_test;
-mod an_error_is_not_blamed_on_the_encoder_test;
+mod an_error_is_not_a_run_that_ended_before_the_first_frame_test;
 mod arguments_are_split_on_any_whitespace_test;
 mod auto_falls_back_to_x264_when_no_hardware_encoder_passes_test;
 mod auto_takes_the_first_encoder_whose_probe_passes_test;
@@ -96,6 +104,7 @@ mod every_encoder_has_its_own_ffmpeg_codec_name_test;
 mod every_hevc_encoder_is_tried_before_falling_back_to_avc_test;
 mod ffmpeg_is_stopped_five_seconds_after_the_last_viewer_leaves_test;
 mod ffmpeg_that_exits_while_viewers_remain_is_restarted_after_one_second_test;
+mod forgetting_the_resolved_encoder_keeps_the_failure_marks_test;
 mod forwarding_stderr_ends_when_the_pipe_closes_and_survives_invalid_utf8_test;
 mod frames_before_the_sequence_header_are_dropped_by_the_hub_test;
 mod hevc_is_picked_when_the_viewer_lists_it_first_and_an_encoder_for_it_works_test;
@@ -129,6 +138,6 @@ mod viewers_gone_for_returns_after_the_grace_when_nobody_is_watching_test;
 mod viewers_gone_for_starts_the_grace_over_when_a_viewer_comes_and_goes_test;
 mod viewers_leaving_during_the_restart_delay_stop_the_restart_test;
 #[cfg(windows)]
-mod when_every_encoder_has_failed_the_backend_reports_none_usable_and_starts_over_test;
+mod when_every_probe_fails_the_backend_reports_none_usable_and_starts_over_test;
 mod when_every_probe_fails_the_error_lists_them_and_probing_starts_over_next_time_test;
 mod when_no_codec_has_a_working_encoder_the_error_names_each_encoder_once_test;

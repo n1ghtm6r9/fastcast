@@ -1,6 +1,7 @@
 use crate::capture::{
     CaptureBackend, CaptureError, CaptureReport, CaptureTarget, FfmpegBackend, Screen,
-    codec_name_of, encoder_failed, open_screen, pick_codec_and_encoder, probe_encoder, run_ffmpeg,
+    codec_name_of, ended_before_the_first_frame, open_screen, pick_codec_and_encoder,
+    probe_encoder, run_ffmpeg,
 };
 use crate::hub::{Hub, ViewerRequest};
 use tracing::{info, warn};
@@ -27,9 +28,11 @@ impl CaptureBackend for FfmpegBackend {
 
         let result = run_ffmpeg(&self.settings, target, encoder, codec, hub).await;
 
-        if encoder_failed(&result) {
-            warn!("ffmpeg stopped before the first frame with {encoder_name}");
-            self.picker_for(codec).mark_failed(encoder);
+        if ended_before_the_first_frame(&result) {
+            warn!(
+                "ffmpeg stopped before the first frame with {encoder_name}, the encoder is checked again before the next start"
+            );
+            self.picker_for(codec).forget_resolved();
         }
 
         result
