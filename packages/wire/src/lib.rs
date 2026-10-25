@@ -1,3 +1,4 @@
+mod control;
 mod fec;
 mod gf;
 mod layout;
@@ -7,6 +8,10 @@ mod receiver;
 #[cfg(test)]
 mod test_support;
 
+pub use control::{
+    BASE_FEC_PERCENT, FEC_DECAY_INTERVAL, FEC_LOSS_FACTOR, FecController, LossMeter,
+    MAX_FEC_PERCENT, ReceiveCounters,
+};
 pub use fec::{MAX_DATA_SHARDS, MAX_PARITY_SHARDS};
 pub use layout::{FrameLayout, MAX_FRAME_SIZE, parity_shards_for};
 pub use packet::{
