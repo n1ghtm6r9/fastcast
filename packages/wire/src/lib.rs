@@ -3,10 +3,11 @@ mod gf;
 mod layout;
 mod packet;
 mod packetizer;
+mod receiver;
 #[cfg(test)]
 mod test_support;
 
-pub use fec::{MAX_DATA_SHARDS, MAX_PARITY_SHARDS, recover_data};
+pub use fec::{MAX_DATA_SHARDS, MAX_PARITY_SHARDS};
 pub use layout::{FrameLayout, MAX_FRAME_SIZE, parity_shards_for};
 pub use packet::{
     Codec, CodecSupport, DATAGRAM_LIMIT, Datagram, FEEDBACK_SIZE, Feedback, FrameKind, HEADER_SIZE,
@@ -14,3 +15,6 @@ pub use packet::{
     Welcome, decode_datagram, encode_datagram,
 };
 pub use packetizer::{Datagrams, OutgoingFrame, Packetizer};
+pub use receiver::{
+    FRAME_TIMEOUT, FrameReceiver, MAX_PENDING_FRAMES, REORDER_WINDOW, ReceivedFrame,
+};
