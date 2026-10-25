@@ -1,0 +1,1 @@
+pub const HVCC_PROFILE_SPACE_SHIFT: u32 = 6;

@@ -1,0 +1,1 @@
+pub const HEVC_NAL_UNIT_TYPE_SHIFT: u32 = 1;

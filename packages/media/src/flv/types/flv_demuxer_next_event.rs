@@ -1,5 +1,5 @@
 use crate::flv::{
-    FlvDemuxer, FlvError, FlvEvent, VIDEO_TAG_TYPE, parse_avc_video_tag, read_flv_tag_data,
+    FlvDemuxer, FlvError, FlvEvent, VIDEO_TAG_TYPE, parse_video_tag, read_flv_tag_data,
     read_flv_tag_header, skip_flv_header,
 };
 use tokio::io::AsyncRead;
@@ -27,7 +27,7 @@ impl<R: AsyncRead + Unpin> FlvDemuxer<R> {
                 continue;
             }
 
-            if let Some(event) = parse_avc_video_tag(header.timestamp_ms, data) {
+            if let Some(event) = parse_video_tag(header.timestamp_ms, data) {
                 return Ok(Some(event));
             }
         }

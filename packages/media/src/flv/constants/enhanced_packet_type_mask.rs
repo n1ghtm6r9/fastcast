@@ -1,0 +1,1 @@
+pub const ENHANCED_PACKET_TYPE_MASK: u8 = 0x0f;

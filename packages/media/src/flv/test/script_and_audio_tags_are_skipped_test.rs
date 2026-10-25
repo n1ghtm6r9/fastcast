@@ -1,5 +1,5 @@
 use super::{SAMPLE_AVCC, avc_tag_data, demux_all, flv_header_bytes, flv_tag_bytes};
-use crate::flv::FlvEvent;
+use crate::flv::{FlvEvent, VideoCodec};
 use bytes::Bytes;
 
 #[tokio::test]
@@ -19,7 +19,10 @@ async fn script_and_audio_tags_are_skipped() {
     assert_eq!(
         demux_all(stream).await,
         vec![
-            FlvEvent::SequenceHeader(Bytes::from_static(SAMPLE_AVCC)),
+            FlvEvent::SequenceHeader {
+                codec: VideoCodec::Avc,
+                record: Bytes::from_static(SAMPLE_AVCC),
+            },
             FlvEvent::Frame {
                 key: true,
                 timestamp_ms: 10,

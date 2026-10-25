@@ -1,5 +1,5 @@
 use super::{SAMPLE_AVCC, avc_tag_data, flv_header_bytes, flv_tag_bytes};
-use crate::flv::{FlvDemuxer, FlvEvent};
+use crate::flv::{FlvDemuxer, FlvEvent, VideoCodec};
 use bytes::Bytes;
 use std::io::Cursor;
 
@@ -18,7 +18,10 @@ async fn a_stream_that_ends_in_the_middle_of_a_tag_ends_with_none_after_the_tags
 
     assert_eq!(
         demuxer.next_event().await.unwrap(),
-        Some(FlvEvent::SequenceHeader(Bytes::from_static(SAMPLE_AVCC)))
+        Some(FlvEvent::SequenceHeader {
+            codec: VideoCodec::Avc,
+            record: Bytes::from_static(SAMPLE_AVCC),
+        })
     );
     assert_eq!(demuxer.next_event().await.unwrap(), None);
 }

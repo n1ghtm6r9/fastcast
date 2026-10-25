@@ -1,0 +1,1 @@
+pub const PROFILE_TIER_LEVEL_PROFILE_BITS: usize = 88;

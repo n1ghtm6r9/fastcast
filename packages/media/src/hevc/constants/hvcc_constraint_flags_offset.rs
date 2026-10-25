@@ -1,0 +1,1 @@
+pub const HVCC_CONSTRAINT_FLAGS_OFFSET: usize = 6;

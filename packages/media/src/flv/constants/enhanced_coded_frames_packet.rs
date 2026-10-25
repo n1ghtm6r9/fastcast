@@ -1,0 +1,1 @@
+pub const ENHANCED_CODED_FRAMES_PACKET: u8 = 1;

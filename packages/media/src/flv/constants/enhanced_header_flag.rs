@@ -1,0 +1,1 @@
+pub const ENHANCED_HEADER_FLAG: u8 = 0x80;

@@ -1,0 +1,1 @@
+pub const ENHANCED_FRAME_TYPE_MASK: u8 = 0x70;

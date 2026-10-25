@@ -1,0 +1,1 @@
+pub const ENHANCED_SEQUENCE_START_PACKET: u8 = 0;

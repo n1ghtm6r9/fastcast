@@ -1,0 +1,1 @@
+pub const HVCC_COMPATIBILITY_FLAGS_OFFSET: usize = 2;
