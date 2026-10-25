@@ -1,4 +1,7 @@
 #[cfg(windows)]
-pub mod encoder;
+mod encoder;
 #[cfg(windows)]
-pub mod ffi;
+mod ffi;
+
+#[cfg(windows)]
+pub use encoder::{EncodedFrame, Encoder, EncoderCodec, EncoderSettings, NvencError};
