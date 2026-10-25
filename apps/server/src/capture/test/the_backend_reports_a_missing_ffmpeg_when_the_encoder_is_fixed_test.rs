@@ -1,6 +1,6 @@
-use super::{avc_target, default_settings};
+use super::default_settings;
 use crate::capture::{CaptureBackend, CaptureError, FfmpegBackend};
-use crate::hub::Hub;
+use crate::hub::ViewerRequest;
 use crate::settings::{EncoderChoice, Settings, VideoEncoder};
 
 #[tokio::test]
@@ -12,7 +12,7 @@ async fn the_backend_reports_a_missing_ffmpeg_when_the_encoder_is_fixed() {
     };
 
     let outcome = FfmpegBackend::new(settings)
-        .run(&Hub::new(), &avc_target())
+        .prepare(&ViewerRequest::default())
         .await;
 
     assert!(matches!(outcome, Err(CaptureError::FfmpegNotFound { .. })));

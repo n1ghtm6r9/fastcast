@@ -1,4 +1,4 @@
-use super::{FakeBackend, FakeRun, KillCounter, avc_target};
+use super::{FakeBackend, FakePreparation, FakeRun, KillCounter, capture_target};
 use crate::capture::{CaptureBackend, CaptureError, CaptureReport, CaptureTarget, Screen};
 use crate::fixtures::{config_of, nvenc_2560x1440_avcc};
 use crate::hub::{Hub, ViewerRequest};
@@ -6,6 +6,30 @@ use std::sync::atomic::Ordering;
 use tokio::time::sleep;
 
 impl CaptureBackend for FakeBackend {
+    type Pipeline = ();
+
+    async fn prepare(&self, _request: &ViewerRequest) -> Result<(), CaptureError> {
+        self.prepared.fetch_add(1, Ordering::SeqCst);
+
+        let preparation = self
+            .preparations
+            .lock()
+            .expect("the preparations lock is not poisoned")
+            .pop_front()
+            .unwrap_or(FakePreparation::Succeeds);
+
+        match preparation {
+            FakePreparation::Succeeds => Ok(()),
+            FakePreparation::Takes { delay } => {
+                sleep(delay).await;
+                Ok(())
+            }
+            FakePreparation::Fails => Err(CaptureError::FfmpegNotFound {
+                path: "fastcast-fake-ffmpeg".to_owned(),
+            }),
+        }
+    }
+
     async fn open_screen(&self, request: &ViewerRequest) -> Screen {
         self.opened
             .lock()
@@ -14,12 +38,17 @@ impl CaptureBackend for FakeBackend {
 
         Screen {
             request: request.clone(),
-            target: avc_target(),
+            target: capture_target(),
             display: None,
         }
     }
 
-    async fn run(&self, hub: &Hub, _target: &CaptureTarget) -> Result<CaptureReport, CaptureError> {
+    async fn run(
+        &self,
+        hub: &Hub,
+        _pipeline: &(),
+        _target: &CaptureTarget,
+    ) -> Result<CaptureReport, CaptureError> {
         self.started.fetch_add(1, Ordering::SeqCst);
 
         let run = self

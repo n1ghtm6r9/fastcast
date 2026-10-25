@@ -1,4 +1,4 @@
-mod avc_target;
+mod capture_target;
 mod default_settings;
 #[cfg(windows)]
 mod exits_at_once_script;
@@ -7,6 +7,8 @@ mod fails_every_probe_script;
 mod fake_backend;
 mod fake_backend_kills;
 mod fake_backend_opened;
+mod fake_backend_prepares;
+mod fake_backend_preparing;
 mod fake_backend_run;
 mod fake_backend_starts;
 #[cfg(windows)]
@@ -23,6 +25,7 @@ mod fake_ffmpeg_failing_every_probe;
 mod fake_ffmpeg_installed;
 #[cfg(windows)]
 mod fake_ffmpeg_path;
+mod fake_preparation;
 mod fake_run;
 mod flv_stream;
 mod flv_video_tag;
@@ -35,7 +38,7 @@ mod scripted_probe_calls;
 mod scripted_probe_probe;
 mod sequence_header_tag;
 mod settle;
-pub use avc_target::*;
+pub use capture_target::*;
 pub use default_settings::*;
 #[cfg(windows)]
 pub use exits_at_once_script::*;
@@ -46,6 +49,7 @@ pub use fake_backend::*;
 pub use fake_ffmpeg::*;
 #[cfg(windows)]
 pub use fake_ffmpeg_directory::*;
+pub use fake_preparation::*;
 pub use fake_run::*;
 pub use flv_stream::*;
 pub use flv_video_tag::*;
@@ -61,6 +65,10 @@ mod a_configured_ffmpeg_path_that_does_not_exist_is_refused_test;
 mod a_configured_ffmpeg_path_that_is_a_directory_is_refused_test;
 #[cfg(windows)]
 mod a_configured_ffmpeg_path_that_is_a_file_is_used_as_it_is_test;
+mod a_failed_preparation_does_not_open_the_screen_test;
+mod a_failed_preparation_is_not_retried_once_the_viewers_have_left_test;
+mod a_failed_preparation_is_retried_after_five_seconds_test;
+mod a_failed_run_gives_the_screen_back_test;
 mod a_failed_run_is_retried_after_five_seconds_test;
 mod a_fixed_encoder_is_probed_before_it_is_used_test;
 mod a_fixed_encoder_is_remembered_between_picks_test;
@@ -72,16 +80,25 @@ mod a_fixed_encoder_without_a_hevc_encoder_falls_back_to_avc_test;
 mod a_fixed_x264_is_never_offered_for_hevc_test;
 mod a_forgotten_encoder_whose_probe_fails_moves_the_pick_on_test;
 mod a_forgotten_encoder_whose_probe_still_passes_is_picked_again_test;
+mod a_kept_screen_is_given_back_when_the_next_preparation_fails_test;
 mod a_missing_ffmpeg_is_reported_with_the_install_hint_test;
 mod a_missing_ffmpeg_keeps_the_supervisor_alive_and_retrying_test;
 mod a_missing_program_is_told_apart_from_other_spawn_failures_test;
+mod a_new_request_ends_the_wait_before_a_retry_test;
 mod a_new_request_opens_a_new_screen_and_restarts_the_capture_test;
+mod a_new_request_while_ffmpeg_is_prepared_restarts_the_preparation_test;
 #[cfg(windows)]
 mod a_pipeline_that_exits_before_the_first_frame_does_not_disable_its_encoder_test;
+mod a_preparation_nobody_waits_for_is_dropped_after_the_grace_and_reported_idle_test;
+mod a_preparation_that_fails_is_reported_as_failed_test;
+mod a_preparation_that_succeeds_is_reported_ready_test;
+#[cfg(windows)]
+mod a_prepared_pipeline_holds_the_ffmpeg_the_encoder_and_the_codec_that_passed_test;
 mod a_probe_error_stops_the_pick_and_marks_nothing_test;
 mod a_repeated_identical_sequence_header_keeps_the_gop_test;
 mod a_request_without_a_mode_captures_the_configured_monitor_test;
-mod a_request_without_codecs_is_served_avc_test;
+#[cfg(windows)]
+mod a_request_without_codecs_is_prepared_for_avc_test;
 mod a_resolved_encoder_is_remembered_between_picks_test;
 mod a_run_nobody_watches_is_stopped_after_the_grace_and_reported_idle_test;
 mod a_run_that_ends_by_itself_is_reported_as_finished_test;
@@ -99,7 +116,7 @@ mod an_encoder_marked_failed_is_skipped_by_the_next_pick_test;
 mod an_encoder_marked_failed_twice_is_listed_once_test;
 mod an_error_is_not_a_run_that_ended_before_the_first_frame_test;
 #[cfg(windows)]
-mod an_ffmpeg_installed_after_a_failed_start_is_found_by_the_next_start_test;
+mod an_ffmpeg_installed_while_the_server_runs_is_found_by_the_next_preparation_test;
 mod arguments_are_split_on_any_whitespace_test;
 mod auto_falls_back_to_x264_when_no_hardware_encoder_passes_test;
 mod auto_takes_the_first_encoder_whose_probe_passes_test;
@@ -134,6 +151,7 @@ mod the_output_and_the_rate_come_from_the_target_and_the_bitrate_from_the_settin
 mod the_probe_encodes_one_black_frame_with_the_chosen_codec_test;
 mod the_qsv_pipeline_uses_the_documented_arguments_test;
 mod the_screen_is_kept_while_ffmpeg_restarts_test;
+mod the_screen_is_not_opened_before_ffmpeg_and_the_encoder_are_ready_test;
 mod the_screen_is_opened_for_what_the_viewer_asked_test;
 mod the_screen_is_released_when_nobody_watches_and_opened_again_for_the_next_viewer_test;
 mod the_x264_pipeline_uses_the_documented_arguments_test;
@@ -141,6 +159,7 @@ mod viewers_gone_for_never_returns_while_someone_is_watching_test;
 mod viewers_gone_for_returns_after_the_grace_when_nobody_is_watching_test;
 mod viewers_gone_for_starts_the_grace_over_when_a_viewer_comes_and_goes_test;
 mod viewers_leaving_during_the_restart_delay_stop_the_restart_test;
+mod viewers_leaving_while_ffmpeg_is_prepared_stop_the_preparation_test;
 #[cfg(windows)]
 mod when_every_probe_fails_the_backend_reports_none_usable_and_starts_over_test;
 mod when_every_probe_fails_the_error_lists_them_and_probing_starts_over_next_time_test;

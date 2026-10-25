@@ -1,4 +1,4 @@
-use super::{avc_target, default_settings};
+use super::{capture_target, default_settings};
 use crate::capture::ffmpeg_args;
 use crate::settings::VideoEncoder;
 use media::VideoCodec;
@@ -7,7 +7,7 @@ use media::VideoCodec;
 fn the_x264_pipeline_uses_the_documented_arguments() {
     let line = ffmpeg_args(
         &default_settings(),
-        &avc_target(),
+        &capture_target(),
         VideoEncoder::X264,
         VideoCodec::Avc,
     )

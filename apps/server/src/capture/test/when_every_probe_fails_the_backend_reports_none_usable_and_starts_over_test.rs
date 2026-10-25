@@ -1,6 +1,6 @@
-use super::{FakeFfmpeg, avc_target, default_settings};
+use super::{FakeFfmpeg, default_settings};
 use crate::capture::{CaptureBackend, CaptureError, FfmpegBackend};
-use crate::hub::Hub;
+use crate::hub::ViewerRequest;
 use crate::settings::Settings;
 
 #[tokio::test]
@@ -11,11 +11,10 @@ async fn when_every_probe_fails_the_backend_reports_none_usable_and_starts_over(
         ..default_settings()
     };
     let backend = FfmpegBackend::new(settings);
-    let hub = Hub::new();
 
     for _ in 0..2 {
         let exhausted = backend
-            .run(&hub, &avc_target())
+            .prepare(&ViewerRequest::default())
             .await
             .expect_err("no encoder passes its probe");
 

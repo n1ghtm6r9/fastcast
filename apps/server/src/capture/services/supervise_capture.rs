@@ -1,6 +1,6 @@
 use crate::capture::{
-    CaptureBackend, RESTART_DELAY, RETRY_DELAY_AFTER_FAILURE, WatchOutcome, release_screen,
-    run_while_watched,
+    CaptureBackend, PrepareOutcome, RESTART_DELAY, WatchOutcome, prepare_while_watched,
+    release_screen, run_while_watched, wait_before_retry,
 };
 use crate::hub::Hub;
 use std::sync::Arc;
@@ -27,6 +27,29 @@ pub async fn supervise_capture<B: CaptureBackend>(hub: Arc<Hub>, backend: Arc<B>
         info!("a viewer is watching, starting the capture");
 
         let request = requests.borrow_and_update().clone();
+
+        let prepared =
+            prepare_while_watched(backend.as_ref(), &request, &mut viewers, &mut requests).await;
+
+        let pipeline = match prepared {
+            PrepareOutcome::Ready(pipeline) => pipeline,
+            PrepareOutcome::Failed(failure) => {
+                error!("the capture could not be prepared: {failure}");
+                release_screen(kept.take()).await;
+                wait_before_retry(&mut requests).await;
+                continue;
+            }
+            PrepareOutcome::Idle => {
+                info!("no viewers left, the capture is not started");
+                release_screen(kept.take()).await;
+                continue;
+            }
+            PrepareOutcome::Changed => {
+                info!("a viewer asked for another picture, preparing the capture again");
+                continue;
+            }
+        };
+
         let screen = match kept.take() {
             Some(screen) if screen.request == request => screen,
             stale => {
@@ -38,6 +61,7 @@ pub async fn supervise_capture<B: CaptureBackend>(hub: Arc<Hub>, backend: Arc<B>
         let outcome = run_while_watched(
             &hub,
             backend.as_ref(),
+            &pipeline,
             &screen.target,
             &mut viewers,
             &mut requests,
@@ -62,8 +86,8 @@ pub async fn supervise_capture<B: CaptureBackend>(hub: Arc<Hub>, backend: Arc<B>
             }
             WatchOutcome::Finished(Err(failure)) => {
                 error!("the capture failed: {failure}");
-                kept = Some(screen);
-                sleep(RETRY_DELAY_AFTER_FAILURE).await;
+                release_screen(Some(screen)).await;
+                wait_before_retry(&mut requests).await;
             }
         }
     }

@@ -1,6 +1,6 @@
-use super::{avc_target, default_settings};
+use super::default_settings;
 use crate::capture::{CaptureBackend, CaptureError, FfmpegBackend};
-use crate::hub::Hub;
+use crate::hub::ViewerRequest;
 use crate::settings::Settings;
 use std::env;
 
@@ -13,7 +13,7 @@ async fn the_backend_refuses_an_explicit_ffmpeg_path_that_is_not_a_file() {
     };
 
     let outcome = FfmpegBackend::new(settings)
-        .run(&Hub::new(), &avc_target())
+        .prepare(&ViewerRequest::default())
         .await;
 
     assert!(matches!(

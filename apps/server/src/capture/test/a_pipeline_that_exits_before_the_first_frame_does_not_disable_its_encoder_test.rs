@@ -1,6 +1,6 @@
-use super::{FakeFfmpeg, avc_target, default_settings};
+use super::{FakeFfmpeg, capture_target, default_settings};
 use crate::capture::{CaptureBackend, FfmpegBackend};
-use crate::hub::Hub;
+use crate::hub::{Hub, ViewerRequest};
 use crate::settings::Settings;
 
 #[tokio::test]
@@ -12,22 +12,21 @@ async fn a_pipeline_that_exits_before_the_first_frame_does_not_disable_its_encod
     };
     let backend = FfmpegBackend::new(settings);
     let hub = Hub::new();
+    let request = ViewerRequest::default();
 
-    let first = backend
-        .run(&hub, &avc_target())
-        .await
-        .expect("the fake ffmpeg starts");
+    for _ in 0..2 {
+        let pipeline = backend
+            .prepare(&request)
+            .await
+            .expect("the fake ffmpeg passes its probe");
 
-    assert_eq!(first.frames, 0);
-    assert!(backend.avc.unusable().is_empty());
-    assert_eq!(backend.avc.resolved(), None);
+        let report = backend
+            .run(&hub, &pipeline, &capture_target())
+            .await
+            .expect("the fake ffmpeg starts");
 
-    let second = backend
-        .run(&hub, &avc_target())
-        .await
-        .expect("the fake ffmpeg starts");
-
-    assert_eq!(second.frames, 0);
-    assert!(backend.avc.unusable().is_empty());
-    assert_eq!(backend.avc.resolved(), None);
+        assert_eq!(report.frames, 0);
+        assert!(backend.avc.unusable().is_empty());
+        assert_eq!(backend.avc.resolved(), None);
+    }
 }

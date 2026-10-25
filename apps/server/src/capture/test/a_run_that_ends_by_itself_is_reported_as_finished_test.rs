@@ -1,4 +1,4 @@
-use super::{FakeBackend, FakeRun, avc_target};
+use super::{FakeBackend, FakeRun, capture_target};
 use crate::capture::{WatchOutcome, run_while_watched};
 use crate::hub::Hub;
 use std::time::Duration;
@@ -18,7 +18,8 @@ async fn a_run_that_ends_by_itself_is_reported_as_finished() {
     let outcome = run_while_watched(
         &hub,
         backend.as_ref(),
-        &avc_target(),
+        &(),
+        &capture_target(),
         &mut viewers,
         &mut requests,
     )

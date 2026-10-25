@@ -1,4 +1,4 @@
-use super::{FakeBackend, avc_target};
+use super::{FakeBackend, capture_target};
 use crate::capture::{WatchOutcome, run_while_watched};
 use crate::hub::Hub;
 use std::time::Duration;
@@ -16,7 +16,8 @@ async fn a_run_nobody_watches_is_stopped_after_the_grace_and_reported_idle() {
     let outcome = run_while_watched(
         &hub,
         backend.as_ref(),
-        &avc_target(),
+        &(),
+        &capture_target(),
         &mut viewers,
         &mut requests,
     )

@@ -5,11 +5,7 @@ use media::VideoCodec;
 
 #[test]
 fn the_hevc_nvenc_pipeline_captures_the_target_output_with_the_documented_arguments() {
-    let target = CaptureTarget {
-        output: 1,
-        fps: 60,
-        codecs: vec![VideoCodec::Hevc],
-    };
+    let target = CaptureTarget { output: 1, fps: 60 };
 
     let line = ffmpeg_args(
         &default_settings(),

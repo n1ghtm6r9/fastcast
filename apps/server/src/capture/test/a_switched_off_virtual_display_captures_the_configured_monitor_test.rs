@@ -22,13 +22,6 @@ async fn a_switched_off_virtual_display_captures_the_configured_monitor() {
 
     let screen = open_screen(&settings, &request).await;
 
-    assert_eq!(
-        screen.target,
-        CaptureTarget {
-            output: 0,
-            fps: 60,
-            codecs: vec![VideoCodec::Hevc, VideoCodec::Avc],
-        }
-    );
+    assert_eq!(screen.target, CaptureTarget { output: 0, fps: 60 });
     assert!(screen.display.is_none());
 }

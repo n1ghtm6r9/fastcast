@@ -22,8 +22,7 @@ async fn a_request_without_a_mode_captures_the_configured_monitor() {
         screen.target,
         CaptureTarget {
             output: 2,
-            fps: 144,
-            codecs: vec![VideoCodec::Hevc],
+            fps: 144
         }
     );
     assert!(screen.display.is_none());
