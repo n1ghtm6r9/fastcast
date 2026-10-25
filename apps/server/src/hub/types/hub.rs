@@ -1,4 +1,5 @@
 use crate::hub::{BROADCAST_CAPACITY, Frame, HubState, ViewerRequest};
+use std::sync::atomic::AtomicBool;
 use std::sync::{Arc, Mutex};
 use tokio::sync::{broadcast, watch};
 
@@ -7,6 +8,7 @@ pub struct Hub {
     pub(crate) frames: broadcast::Sender<Arc<Frame>>,
     pub(crate) viewers: Arc<watch::Sender<usize>>,
     pub(crate) requests: watch::Sender<ViewerRequest>,
+    pub(crate) key_frame_wanted: AtomicBool,
 }
 
 impl Hub {
@@ -20,6 +22,7 @@ impl Hub {
             frames,
             viewers: Arc::new(viewers),
             requests,
+            key_frame_wanted: AtomicBool::new(false),
         }
     }
 }
