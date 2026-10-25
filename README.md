@@ -79,6 +79,11 @@ cd apps/client
    adb shell appops set dev.fastcast.client REQUEST_INSTALL_PACKAGES allow
    adb shell appops set dev.fastcast.client SYSTEM_ALERT_WINDOW allow
    ```
+   На телевизорах TCL ещё разреши автозапуск, иначе после обновления приложение не откроется само:
+   ```powershell
+   adb shell appops set dev.fastcast.client AUTO_START allow
+   adb shell appops set dev.fastcast.client ASSOC_START allow
+   ```
 3. Открой fastcast из лаунчера. Приложение само найдёт ПК и подключится. Если серверов несколько, выбери нужный: в следующий раз приложение подключится к нему само.
 
 Управление на ТВ: OK или Info показывает статистику (fps, Мбит/с, разрешение, декодер), «Назад» возвращает к списку серверов.
