@@ -18,11 +18,13 @@ dependencies = [
  "axum",
  "base64",
  "bytes",
+ "desktop",
  "dotenvy",
  "embed-resource",
  "futures-util",
  "media",
  "mimalloc",
+ "nvenc",
  "serde",
  "serde_json",
  "tokio",
@@ -31,6 +33,7 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "windows",
+ "wire",
 ]
 
 [[package]]
