@@ -1,4 +1,4 @@
-use crate::duplication::{Duplication, read_pointer_shape};
+use crate::duplication::{Duplication, next_shape_generation, read_pointer_shape};
 use crate::gpu::DesktopError;
 
 impl Duplication {
@@ -8,7 +8,7 @@ impl Duplication {
         }
 
         self.pointer.shape = read_pointer_shape(&self.duplication, buffer_size)?;
-        self.pointer.shape_generation += 1;
+        self.pointer.shape_generation = next_shape_generation();
 
         Ok(true)
     }

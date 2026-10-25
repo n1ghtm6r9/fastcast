@@ -17,4 +17,5 @@ mod a_zero_timeout_does_not_wait_test;
 mod access_lost_is_reported_as_its_own_error_test;
 mod an_unrotated_output_is_accepted_test;
 mod other_failures_keep_the_failed_call_and_the_cause_test;
+mod shape_generations_are_never_reused_test;
 mod the_desktop_image_arrives_in_a_texture_of_the_output_size_test;
