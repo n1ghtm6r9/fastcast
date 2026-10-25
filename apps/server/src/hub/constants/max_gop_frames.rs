@@ -1,1 +1,1 @@
-pub const MAX_GOP_FRAMES: usize = 600;
+pub const MAX_GOP_FRAMES: usize = 2400;

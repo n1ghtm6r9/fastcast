@@ -12,7 +12,7 @@ fn a_number_outside_its_range_is_refused_naming_the_variable() {
         ("VIDEO_BITRATE_KBPS", "99"),
         ("VIDEO_BITRATE_KBPS", "200001"),
         ("KEYFRAME_INTERVAL_SECONDS", "0"),
-        ("KEYFRAME_INTERVAL_SECONDS", "61"),
+        ("KEYFRAME_INTERVAL_SECONDS", "11"),
     ];
 
     for (variable, value) in cases {
