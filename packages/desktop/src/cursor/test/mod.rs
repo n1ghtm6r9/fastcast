@@ -1,0 +1,17 @@
+mod black_screen;
+pub use black_screen::*;
+
+mod a_colour_cursor_keeps_its_alpha_test;
+mod a_cursor_beyond_every_edge_changes_nothing_test;
+mod a_cursor_off_the_left_edge_is_clipped_test;
+mod a_cursor_past_the_bottom_right_corner_is_clipped_test;
+mod a_half_transparent_cursor_blends_with_the_screen_test;
+mod a_masked_colour_cursor_keeps_its_mask_in_alpha_test;
+mod a_monochrome_cursor_reads_and_then_xor_rows_test;
+mod a_monochrome_shape_too_short_for_both_masks_gives_no_cursor_test;
+mod a_shape_pitch_narrower_than_a_row_gives_no_cursor_test;
+mod a_short_buffer_gives_no_cursor_test;
+mod a_zero_sized_shape_gives_no_cursor_test;
+mod an_inverting_cursor_flips_the_screen_under_it_test;
+mod an_unknown_shape_type_gives_no_cursor_test;
+mod rows_are_read_with_the_shape_pitch_test;

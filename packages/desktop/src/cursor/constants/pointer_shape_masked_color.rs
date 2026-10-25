@@ -1,0 +1,1 @@
+pub const POINTER_SHAPE_MASKED_COLOR: u32 = 4;
