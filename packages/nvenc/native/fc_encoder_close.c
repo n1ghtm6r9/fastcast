@@ -7,6 +7,7 @@ void fc_encoder_close(fc_encoder* encoder)
     }
 
     if (encoder->session != NULL) {
+        fc_release_textures(encoder);
         if (encoder->bitstream != NULL) {
             encoder->api.nvEncDestroyBitstreamBuffer(encoder->session, encoder->bitstream);
         }
@@ -18,5 +19,6 @@ void fc_encoder_close(fc_encoder* encoder)
     if (encoder->library != NULL) {
         FreeLibrary(encoder->library);
     }
+    free(encoder->output);
     free(encoder);
 }

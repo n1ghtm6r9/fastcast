@@ -12,6 +12,9 @@ impl Encoder {
         let result = unsafe { fc_encoder_open(device.as_raw(), &c_settings, &mut raw) };
         nvenc_result(result)?;
 
-        Ok(Encoder { raw })
+        Ok(Encoder {
+            raw,
+            settings: *settings,
+        })
     }
 }

@@ -1,10 +1,13 @@
+mod encoded_frame;
 mod encoder;
 mod encoder_codec;
 mod encoder_drop;
+mod encoder_encode;
 mod encoder_open;
 mod encoder_send;
 mod encoder_settings;
 mod nvenc_error;
+pub use encoded_frame::*;
 pub use encoder::*;
 pub use encoder_codec::*;
 pub use encoder_settings::*;
