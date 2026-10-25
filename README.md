@@ -38,7 +38,7 @@ packages/
 
 ## Сервер (Windows)
 
-Нужны Rust и ffmpeg версии 6 или новее: `winget install Gyan.FFmpeg`.
+Нужны Rust и ffmpeg версии 6 или новее: `winget install Gyan.FFmpeg`. Сервер сам находит `ffmpeg.exe` в PATH, в том числе в сохранённом PATH пользователя и системы. Поэтому консоль, открытая до установки ffmpeg, перезапускать не нужно. При старте сервер пишет, какой ffmpeg взял.
 
 Для отдельного экрана под ТВ один раз поставь драйвер Parsec Virtual Display Driver: https://github.com/nomi-san/parsec-vdd/releases. Права администратора серверу не нужны. Масштаб для 4K-экрана задаётся во время трансляции в «Параметры → Дисплей» (для ТВ удобно 200–300%). Windows настраивает его один раз и дальше запоминает.
 
@@ -58,7 +58,7 @@ cargo server             # = cargo run -p app --release
 | `WEB_HOST` / `WEB_PORT` | `0.0.0.0` / `3278` | адрес и порт сервера |
 | `DISCOVERY_PORT` | `3278` | UDP-порт автопоиска |
 | `SERVER_NAME` | имя компьютера | имя сервера в списке на ТВ |
-| `FFMPEG_PATH` | `ffmpeg` | путь к ffmpeg |
+| `FFMPEG_PATH` | `ffmpeg` | путь к ffmpeg; по умолчанию сервер ищет `ffmpeg.exe` в PATH сам |
 | `VIDEO_ENCODER` | `auto` | `auto`, `nvenc`, `amf`, `qsv`, `x264` |
 | `VIRTUAL_DISPLAY` | `on` | `on`: на время трансляции единственным экраном становится виртуальный монитор под разрешение ТВ; `off`: захват `CAPTURE_OUTPUT` без выключения мониторов |
 | `CAPTURE_OUTPUT` | `0` | номер монитора, если виртуального нет |

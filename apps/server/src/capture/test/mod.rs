@@ -10,9 +10,13 @@ mod fake_backend_starts;
 #[cfg(windows)]
 mod fake_ffmpeg;
 #[cfg(windows)]
+mod fake_ffmpeg_directory;
+#[cfg(windows)]
 mod fake_ffmpeg_drop;
 #[cfg(windows)]
 mod fake_ffmpeg_exiting_at_once;
+#[cfg(windows)]
+mod fake_ffmpeg_installed;
 #[cfg(windows)]
 mod fake_ffmpeg_path;
 mod fake_run;
@@ -34,6 +38,8 @@ pub use exits_at_once_script::*;
 pub use fake_backend::*;
 #[cfg(windows)]
 pub use fake_ffmpeg::*;
+#[cfg(windows)]
+pub use fake_ffmpeg_directory::*;
 pub use fake_run::*;
 pub use flv_stream::*;
 pub use flv_video_tag::*;
@@ -45,6 +51,8 @@ pub use scripted_probe::*;
 pub use sequence_header_tag::*;
 pub use settle::*;
 
+#[cfg(windows)]
+mod a_configured_ffmpeg_path_is_kept_as_it_is_test;
 mod a_failed_run_is_retried_after_five_seconds_test;
 mod a_fixed_encoder_ignores_failure_marks_test;
 mod a_fixed_encoder_is_used_without_probing_test;
@@ -92,6 +100,10 @@ mod the_amf_pipeline_uses_the_documented_arguments_test;
 mod the_backend_reports_a_missing_ffmpeg_when_the_encoder_is_fixed_test;
 mod the_backend_reports_a_missing_ffmpeg_while_probing_test;
 mod the_configured_rate_is_what_the_config_announces_test;
+#[cfg(windows)]
+mod the_default_ffmpeg_comes_from_the_first_directory_that_has_it_test;
+#[cfg(windows)]
+mod the_default_ffmpeg_stays_a_bare_name_when_no_directory_has_it_test;
 mod the_first_viewer_starts_ffmpeg_test;
 mod the_hevc_nvenc_pipeline_captures_the_target_output_with_the_documented_arguments_test;
 mod the_hub_is_cleared_when_ffmpeg_exits_by_itself_test;

@@ -5,9 +5,11 @@ mod encoder_args;
 mod encoder_failed;
 mod ffmpeg_args;
 mod ffmpeg_command;
+mod ffmpeg_search_dirs;
 mod forward_stderr;
 mod input_args;
 mod keyframe_interval_in_frames;
+mod locate_ffmpeg;
 mod open_screen;
 mod open_virtual_display;
 mod pick_codec_and_encoder;
@@ -21,12 +23,19 @@ mod release_screen;
 mod request_changed;
 mod run_ffmpeg;
 mod run_while_watched;
+#[cfg(windows)]
+mod saved_path_dirs;
+#[cfg(not(windows))]
+mod saved_path_dirs_unsupported;
+#[cfg(windows)]
+mod saved_path_of;
 mod spawn_error_of;
 mod spawn_ffmpeg;
 mod supervise_capture;
 mod tuning_args_of;
 mod viewers_gone_for;
 mod wait_for_exit;
+mod with_located_ffmpeg;
 pub use args_of::*;
 pub use codec_name_of::*;
 pub use codecs_or_avc::*;
@@ -34,9 +43,11 @@ pub use encoder_args::*;
 pub use encoder_failed::*;
 pub use ffmpeg_args::*;
 pub use ffmpeg_command::*;
+pub use ffmpeg_search_dirs::*;
 pub use forward_stderr::*;
 pub use input_args::*;
 pub use keyframe_interval_in_frames::*;
+pub use locate_ffmpeg::*;
 pub use open_screen::*;
 pub use open_virtual_display::*;
 pub use pick_codec_and_encoder::*;
@@ -50,9 +61,16 @@ pub use release_screen::*;
 pub use request_changed::*;
 pub use run_ffmpeg::*;
 pub use run_while_watched::*;
+#[cfg(windows)]
+pub use saved_path_dirs::*;
+#[cfg(not(windows))]
+pub use saved_path_dirs_unsupported::*;
+#[cfg(windows)]
+pub use saved_path_of::*;
 pub use spawn_error_of::*;
 pub use spawn_ffmpeg::*;
 pub use supervise_capture::*;
 pub use tuning_args_of::*;
 pub use viewers_gone_for::*;
 pub use wait_for_exit::*;
+pub use with_located_ffmpeg::*;

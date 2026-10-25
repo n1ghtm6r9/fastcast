@@ -1,5 +1,5 @@
 use crate::app::{AppError, init_dotenv, init_logger, log_urls, shutdown_signal};
-use crate::capture::{FfmpegBackend, supervise_capture};
+use crate::capture::{FfmpegBackend, supervise_capture, with_located_ffmpeg};
 use crate::discovery::{discovery_address, run_discovery};
 use crate::hub::Hub;
 use crate::settings::load_settings;
@@ -10,7 +10,7 @@ pub async fn run() -> Result<(), AppError> {
     init_dotenv();
     init_logger();
 
-    let settings = load_settings()?;
+    let settings = with_located_ffmpeg(load_settings()?);
     let hub = Arc::new(Hub::new());
     let listener = bind_listener(&settings.web_host, settings.web_port).await?;
 

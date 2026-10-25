@@ -1,0 +1,1 @@
+pub const LONGEST_ENVIRONMENT_VALUE: usize = 32_768;
