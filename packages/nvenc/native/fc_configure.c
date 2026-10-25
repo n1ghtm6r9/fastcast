@@ -4,8 +4,6 @@ fc_result fc_configure(fc_encoder* encoder)
 {
     const fc_settings* settings = &encoder->settings;
     NV_ENC_CONFIG* config = &encoder->config;
-    uint32_t bits_per_second = settings->bitrate_kbps * 1000u;
-    uint32_t vbv_size = fc_vbv_size(settings->bitrate_kbps, settings->fps);
     NV_ENC_PRESET_CONFIG preset;
     NVENCSTATUS status;
 
@@ -27,11 +25,7 @@ fc_result fc_configure(fc_encoder* encoder)
     config->profileGUID = fc_profile_guid(settings->codec, settings->bit_depth);
     config->gopLength = NVENC_INFINITE_GOPLENGTH;
     config->frameIntervalP = 1;
-    config->rcParams.rateControlMode = NV_ENC_PARAMS_RC_CBR;
-    config->rcParams.averageBitRate = bits_per_second;
-    config->rcParams.maxBitRate = bits_per_second;
-    config->rcParams.vbvBufferSize = vbv_size;
-    config->rcParams.vbvInitialDelay = vbv_size;
+    fc_set_rate_control(&config->rcParams, settings->bitrate_kbps, settings->fps);
 
     if (settings->codec == FC_CODEC_HEVC) {
         fc_configure_hevc(&config->encodeCodecConfig.hevcConfig, settings->bit_depth);

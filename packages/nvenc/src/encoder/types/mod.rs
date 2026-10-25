@@ -5,6 +5,7 @@ mod encoder_drop;
 mod encoder_encode;
 mod encoder_open;
 mod encoder_send;
+mod encoder_set_bitrate;
 mod encoder_settings;
 mod nvenc_error;
 pub use encoded_frame::*;
