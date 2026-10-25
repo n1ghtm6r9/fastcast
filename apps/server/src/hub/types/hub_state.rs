@@ -5,4 +5,5 @@ use std::sync::Arc;
 pub struct HubState {
     pub config: Option<Arc<StreamConfig>>,
     pub gop: Vec<Arc<Frame>>,
+    pub awaiting_reset: bool,
 }

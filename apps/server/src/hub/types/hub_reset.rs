@@ -6,5 +6,6 @@ impl Hub {
 
         state.config = None;
         state.gop.clear();
+        state.awaiting_reset = false;
     }
 }

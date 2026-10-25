@@ -5,6 +5,10 @@ impl Hub {
     pub fn set_config(&self, config: StreamConfig) -> bool {
         let mut state = self.lock_state();
 
+        if state.awaiting_reset {
+            return false;
+        }
+
         let unchanged = state
             .config
             .as_deref()
