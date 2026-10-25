@@ -1,0 +1,13 @@
+mod first_attached_output;
+pub use first_attached_output::*;
+
+mod a_device_opens_on_the_adapter_of_an_output_test;
+mod a_plain_desktop_error_has_no_source_test;
+mod a_wide_name_ends_at_its_first_nul_test;
+mod an_api_error_has_the_windows_error_as_its_source_test;
+mod an_odd_size_error_names_both_sides_test;
+mod desktop_errors_name_the_failed_call_test;
+mod no_device_opens_on_an_unknown_adapter_test;
+mod the_desktop_has_an_attached_output_test;
+mod the_extent_of_a_rectangle_spanning_the_origin_is_its_full_length_test;
+mod the_extent_of_an_inverted_rectangle_is_zero_test;
