@@ -1,0 +1,3 @@
+use crate::display::IOCTL_INPUT_SIZE;
+
+pub const EMPTY_IOCTL_INPUT: [u8; IOCTL_INPUT_SIZE] = [0; IOCTL_INPUT_SIZE];

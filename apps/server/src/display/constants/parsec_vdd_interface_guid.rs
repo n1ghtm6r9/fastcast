@@ -1,0 +1,1 @@
+pub const PARSEC_VDD_INTERFACE_GUID: u128 = 0x00b4_1627_04c4_429e_a26e_0265_cf50_c8fa;

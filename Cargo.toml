@@ -27,6 +27,7 @@ tokio-tungstenite = "0.29"
 tower = { version = "0.5.3", features = ["util"] }
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
+windows = "0.62.2"
 
 media = { path = "packages/media" }
 
