@@ -1,0 +1,7 @@
+mod every_non_zero_element_times_its_inverse_is_one_test;
+mod mul_add_slice_agrees_with_gf_mul_for_every_byte_test;
+mod mul_add_slice_xors_the_scaled_source_into_the_target_test;
+mod multiplication_distributes_over_xor_test;
+mod multiplying_by_zero_gives_zero_test;
+mod the_generator_two_has_order_255_test;
+mod two_times_128_wraps_through_the_field_polynomial_test;

@@ -1,0 +1,1 @@
+pub const FIELD_POLYNOMIAL: u16 = 0x11D;
