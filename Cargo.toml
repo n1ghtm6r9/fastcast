@@ -32,6 +32,7 @@ windows = "0.62.2"
 media = { path = "packages/media" }
 
 [profile.dev]
+opt-level = 3
 debug = "line-tables-only"
 incremental = false
 

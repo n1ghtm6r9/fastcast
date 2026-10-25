@@ -44,8 +44,10 @@ packages/
 
 ```powershell
 copy .env.example .env   # по желанию
-cargo server             # = cargo run -p app --release
+cargo run
 ```
+
+`cargo run` из корня репозитория собирает и запускает сервер. Профиль `dev` собирается с `opt-level = 3`, поэтому отладочная сборка не добавляет задержку.
 
 Готовая сборка лежит в каждом релизе: `fastcast-server-windows-x64.zip`.
 
