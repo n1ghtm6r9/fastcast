@@ -16,6 +16,7 @@ class ServerFinder(
     private val targets: () -> List<InetAddress> = BroadcastTargets::find,
     private val port: Int = DiscoveryProtocol.PORT,
     private val probeIntervalMs: Long = PROBE_INTERVAL_MS,
+    private val staleAfterMs: Long = STALE_AFTER_MS,
     private val bindAddress: InetAddress? = null,
 ) {
 
@@ -35,7 +36,8 @@ class ServerFinder(
 
     private inner class Search : Runnable {
 
-        private val servers = LinkedHashMap<String, DiscoveredServer>()
+        private val sightings = LinkedHashMap<String, Sighting>()
+        private val staleAfterNs = TimeUnit.MILLISECONDS.toNanos(staleAfterMs)
         private val thread = Thread(this, THREAD_NAME).apply { isDaemon = true }
 
         @Volatile
@@ -69,6 +71,7 @@ class ServerFinder(
             var nextProbeNs = System.nanoTime()
             while (active) {
                 if (System.nanoTime() - nextProbeNs >= 0) {
+                    forgetQuietServers()
                     sendProbes(socket)
                     nextProbeNs = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(probeIntervalMs)
                 }
@@ -111,8 +114,18 @@ class ServerFinder(
         }
 
         private fun remember(server: DiscoveredServer) {
-            if (servers.put(server.address, server) == server) return
-            val snapshot = servers.values.toList()
+            val previous = sightings.put(server.address, Sighting(server, System.nanoTime()))
+            if (previous?.server == server) return
+            report()
+        }
+
+        private fun forgetQuietServers() {
+            val oldestAllowedNs = System.nanoTime() - staleAfterNs
+            if (sightings.values.removeAll { it.seenAtNs - oldestAllowedNs < 0 }) report()
+        }
+
+        private fun report() {
+            val snapshot = sightings.values.map(Sighting::server)
             deliver.execute { if (active) listener.onServersChanged(snapshot) }
         }
     }
@@ -120,6 +133,7 @@ class ServerFinder(
     private companion object {
         const val THREAD_NAME = "fastcast-discovery"
         const val PROBE_INTERVAL_MS = 1_000L
+        const val STALE_AFTER_MS = 5_000L
         const val JOIN_TIMEOUT_MS = 1_000L
         const val RECEIVE_BUFFER_BYTES = DiscoveryProtocol.MAX_REPLY_BYTES + 1
     }
