@@ -9,7 +9,7 @@ class StoppingTheStreamClientEndsTheConversationForGoodTest {
 
     private val server = FakeWebSocketServer()
     private val listener = RecordingStreamListener()
-    private val client = StreamClient(server.url, listener, ReconnectBackoff(listOf(30L)))
+    private val client = StreamClient({ server.url }, listener, ReconnectBackoff(listOf(30L)))
 
     @After
     fun tearDown() {

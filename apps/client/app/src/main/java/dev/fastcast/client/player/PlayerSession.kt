@@ -12,14 +12,14 @@ import dev.fastcast.client.stream.StreamClient
 import dev.fastcast.client.stream.StreamListener
 
 class PlayerSession(
-    url: String,
+    private val offer: StreamOffer,
     surface: Surface,
     private val listener: PlayerSessionListener,
     displayLabel: () -> String,
 ) : StreamListener, DecoderEvents {
 
     private val mainHandler = Handler(Looper.getMainLooper())
-    private val stream = StreamClient(url, this)
+    private val stream = StreamClient(offer::url, this)
     private val decoder = VideoDecoder(surface, this)
     private val throughput = ThroughputSampler(SystemClock.elapsedRealtime())
     private val reportedThroughput = ThroughputSampler(SystemClock.elapsedRealtime())
@@ -58,9 +58,14 @@ class PlayerSession(
 
     override fun onConnected() = postStatus(PlayerStatus.WaitingForVideo)
 
-    override fun onConfig(config: ConfigMessage) = decoder.submit(config)
+    override fun onConfig(config: ConfigMessage) {
+        offer.codecConfigured(config.codec)
+        decoder.submit(config)
+    }
 
     override fun onFrame(frame: FrameMessage) = decoder.submit(frame)
+
+    override fun onHealthy() = offer.streamHealthy()
 
     override fun onDisconnected(retryInMs: Long, reason: String) =
         postStatus(PlayerStatus.Reconnecting(retryInMs, reason))
@@ -76,6 +81,7 @@ class PlayerSession(
     override fun onFirstFrame() = postStatus(PlayerStatus.Playing)
 
     override fun onFailure(message: String) {
+        offer.decoderFailed()
         postStatus(PlayerStatus.DecoderError(message))
         reporter.reportFailure(message, stream::reconnect)
     }

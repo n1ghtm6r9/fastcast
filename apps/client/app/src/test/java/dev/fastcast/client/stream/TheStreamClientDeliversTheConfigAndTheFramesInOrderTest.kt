@@ -14,7 +14,7 @@ class TheStreamClientDeliversTheConfigAndTheFramesInOrderTest {
 
     private val server = FakeWebSocketServer()
     private val listener = RecordingStreamListener()
-    private val client = StreamClient(server.url, listener)
+    private val client = StreamClient({ server.url }, listener)
     private val description = Base64.getEncoder().encodeToString(RealAvcConfigurationRecord.BYTES)
     private val configJson =
         """{"type":"config","codec":"avc1.64002a","width":2560,"height":1440,"fps":60,"description":"$description"}"""

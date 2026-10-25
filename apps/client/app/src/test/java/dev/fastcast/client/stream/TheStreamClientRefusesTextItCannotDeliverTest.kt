@@ -8,7 +8,7 @@ class TheStreamClientRefusesTextItCannotDeliverTest {
 
     private val server = FakeWebSocketServer()
     private val listener = RecordingStreamListener()
-    private val client = StreamClient(server.url, listener, ReconnectBackoff(listOf(5_000L)))
+    private val client = StreamClient({ server.url }, listener, ReconnectBackoff(listOf(5_000L)))
 
     @After
     fun tearDown() {

@@ -23,7 +23,6 @@ import dev.fastcast.client.display.DisplayModes
 import dev.fastcast.client.display.MinimalPostProcessing
 import dev.fastcast.client.display.PreferredDisplayMode
 import dev.fastcast.client.stream.StreamRequest
-import dev.fastcast.client.stream.StreamUrl
 import dev.fastcast.client.update.UpdateCheckCache
 import dev.fastcast.client.update.UpdateChecker
 import dev.fastcast.client.update.UpdateLookup
@@ -34,7 +33,7 @@ class PlayerActivity : Activity(), PlayerSessionListener {
 
     private lateinit var address: String
     private lateinit var serverName: String
-    private lateinit var streamUrl: String
+    private lateinit var offer: StreamOffer
     private lateinit var videoSurface: VideoSurfaceView
     private lateinit var statusPanel: View
     private lateinit var statusSpinner: View
@@ -79,7 +78,7 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         address = requestedAddress
         serverName = intent.getStringExtra(EXTRA_NAME) ?: requestedAddress
         screen = DisplayModes.defaultDisplay(this)
-        streamUrl = StreamUrl.build(address, requestStream())
+        offer = StreamOffer(address, requestStream())
         videoSurface = findViewById(R.id.video_surface)
         statusPanel = findViewById(R.id.status_panel)
         statusSpinner = findViewById(R.id.status_spinner)
@@ -190,7 +189,7 @@ class PlayerActivity : Activity(), PlayerSessionListener {
     private fun startSession(surface: Surface) {
         stopSession()
         showStatus(PlayerStatus.Connecting)
-        session = PlayerSession(streamUrl, surface, this, ::activeDisplayLabel).also { it.start() }
+        session = PlayerSession(offer, surface, this, ::activeDisplayLabel).also { it.start() }
     }
 
     private fun stopSession() {

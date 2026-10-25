@@ -14,10 +14,11 @@ import okhttp3.WebSocketListener
 import okio.ByteString
 
 class StreamClient(
-    private val url: String,
+    private val urlFor: () -> String,
     private val listener: StreamListener,
     private val backoff: ReconnectBackoff = ReconnectBackoff(),
     private val silenceLimitMs: Long = SILENCE_LIMIT_MS,
+    private val health: StreamHealth = StreamHealth(),
 ) {
 
     val bytesReceived = AtomicLong()
@@ -81,7 +82,8 @@ class StreamClient(
         socket?.cancel()
         generation++
         silence.touch()
-        val request = Request.Builder().url(url).build()
+        health.restart()
+        val request = Request.Builder().url(urlFor()).build()
         socket = httpClient.newWebSocket(request, SocketEvents(generation))
     }
 
@@ -157,7 +159,10 @@ class StreamClient(
             silence.touch()
             bytesReceived.addAndGet(bytes.size.toLong())
             val frame = FrameMessage.parse(bytes.toByteArray()) ?: return
-            backoff.reset()
+            if (health.frameDelivered()) {
+                backoff.reset()
+                listener.onHealthy()
+            }
             listener.onFrame(frame)
         }
 

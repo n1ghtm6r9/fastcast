@@ -28,6 +28,10 @@ class RecordingStreamListener : StreamListener {
         events.add(FRAME)
     }
 
+    override fun onHealthy() {
+        events.add(HEALTHY)
+    }
+
     override fun onDisconnected(retryInMs: Long, reason: String) {
         retryDelays.add(retryInMs)
         events.add(DISCONNECTED)
@@ -55,6 +59,7 @@ class RecordingStreamListener : StreamListener {
         const val CONNECTED = "connected"
         const val CONFIG = "config"
         const val FRAME = "frame"
+        const val HEALTHY = "healthy"
         const val DISCONNECTED = "disconnected"
         private const val TIMEOUT_SECONDS = 5L
     }

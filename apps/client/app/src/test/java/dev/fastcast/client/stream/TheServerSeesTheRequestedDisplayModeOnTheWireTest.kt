@@ -17,7 +17,7 @@ class TheServerSeesTheRequestedDisplayModeOnTheWireTest {
     }
 
     private fun connectWith(request: StreamRequest?): FakeConnection {
-        val started = StreamClient(StreamUrl.build(server.address, request), listener, ReconnectBackoff(listOf(30L)))
+        val started = StreamClient({ StreamUrl.build(server.address, request) }, listener, ReconnectBackoff(listOf(30L)))
         client = started
         started.start()
         return server.accept()

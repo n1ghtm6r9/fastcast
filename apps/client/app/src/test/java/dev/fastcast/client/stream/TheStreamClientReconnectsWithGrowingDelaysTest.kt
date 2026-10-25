@@ -9,7 +9,7 @@ class TheStreamClientReconnectsWithGrowingDelaysTest {
 
     private val server = FakeWebSocketServer()
     private val listener = RecordingStreamListener()
-    private val client = StreamClient(server.url, listener, ReconnectBackoff(listOf(40L, 80L, 160L)))
+    private val client = StreamClient({ server.url }, listener, ReconnectBackoff(listOf(40L, 80L, 160L)))
 
     @After
     fun tearDown() {
@@ -30,7 +30,7 @@ class TheStreamClientReconnectsWithGrowingDelaysTest {
     }
 
     @Test
-    fun `a delivered frame restarts the delays from the first one`() {
+    fun `a delivered frame alone does not restart the delays`() {
         client.start()
         server.accept().drop()
         val firstDelay = listener.nextRetryDelay()
@@ -43,7 +43,7 @@ class TheStreamClientReconnectsWithGrowingDelaysTest {
         connection.drop()
         val delayAfterFrame = listener.nextRetryDelay()
 
-        assertEquals(listOf(40L, 80L, 40L), listOf(firstDelay, secondDelay, delayAfterFrame))
+        assertEquals(listOf(40L, 80L, 160L), listOf(firstDelay, secondDelay, delayAfterFrame))
     }
 
     @Test
