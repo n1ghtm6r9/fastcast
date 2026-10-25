@@ -271,7 +271,7 @@ impl TimerResolution { pub fn one_millisecond() -> TimerResolution; }
   3. `FrameClock::new(target.fps)`, start instant, no picture yet. Until `stop` is set:
      - without a duplication: `Duplication::new` and `reopen_step_of`; `Restart` ends the run with `Ok`; `Retry` sleeps `until_repeat` and repeats the last picture when there is one; `Resume` keeps the new duplication.
      - `acquire(&device, until_repeat(now))`: an update converts `frame()` with `pointer()` and marks a picture; it is encoded only when `may_encode`. A timeout repeats the last picture when there is one. `DesktopError::AccessLost` drops the duplication. Other errors end the run.
-     - encoding: `force = hub.take_key_frame_request()`, `encoder.encode(converter.output(), force)`, then, unless `stop` is set, `publish_encoded_frame(hub, codec, target.fps, keyframe, &data, elapsed ms as u32)`, `clock.encoded(now)`, one more frame.
+     - encoding: `force = hub.take_key_frame_request()`, `encoder.encode(converter.output(), force)`, then, unless `stop` is set, `publish_encoded_frame(hub, codec, target.fps, keyframe, &data, elapsed ms as u32)`, `clock.encoded(now)`, one more frame. The converter and the encoder share `device` on this one thread, so D3D11 orders the conversion before NVENC reads the texture and no extra `Flush` is needed.
   4. `Ok(CaptureReport { frames })`.
 - The unsupported variant returns `Err(Native { frames: 0, cause: Unsupported })`.
 
