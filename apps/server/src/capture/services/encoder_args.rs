@@ -1,16 +1,24 @@
-use crate::capture::{AMF_ARGS, NVENC_ARGS, QSV_ARGS, X264_ARGS, args_of, rate_control_args};
+use crate::capture::{
+    COLOR_CONVERSION_FILTER, args_of, codec_name_of, profile_args_of, rate_control_args,
+    tuning_args_of,
+};
 use crate::settings::VideoEncoder;
+use media::VideoCodec;
 
-pub fn encoder_args(encoder: VideoEncoder, bitrate_kbps: u32, gop: u32) -> Vec<String> {
-    let head = match encoder {
-        VideoEncoder::Nvenc => NVENC_ARGS,
-        VideoEncoder::Amf => AMF_ARGS,
-        VideoEncoder::Qsv => QSV_ARGS,
-        VideoEncoder::X264 => X264_ARGS,
-    };
-    let mut args = args_of(head);
+pub fn encoder_args(
+    encoder: VideoEncoder,
+    codec: VideoCodec,
+    bitrate_kbps: u32,
+    gop: u32,
+) -> Vec<String> {
+    let mut args = args_of(&format!(
+        "-vf {COLOR_CONVERSION_FILTER} -c:v {}",
+        codec_name_of(encoder, codec)
+    ));
 
+    args.extend(args_of(tuning_args_of(encoder, codec)));
     args.extend(rate_control_args(bitrate_kbps, gop));
+    args.extend(args_of(profile_args_of(codec)));
 
     args
 }

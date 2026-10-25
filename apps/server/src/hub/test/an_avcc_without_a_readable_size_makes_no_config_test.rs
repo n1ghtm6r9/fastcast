@@ -1,5 +1,6 @@
-use crate::hub::stream_config_from_avcc;
+use crate::hub::stream_config_from_record;
 use bytes::Bytes;
+use media::VideoCodec;
 
 #[test]
 fn an_avcc_without_a_readable_size_makes_no_config() {
@@ -8,5 +9,5 @@ fn an_avcc_without_a_readable_size_makes_no_config() {
         0x68, 0xee, 0x3c,
     ]);
 
-    assert_eq!(stream_config_from_avcc(avcc, 60), None);
+    assert_eq!(stream_config_from_record(VideoCodec::Avc, avcc, 60), None);
 }

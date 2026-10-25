@@ -7,5 +7,5 @@ fn the_stream_config_exposes_its_codec_size_and_rate() {
 
     assert_eq!(config.codec, "avc1.640033");
     assert_eq!((config.width, config.height, config.fps), (2560, 1440, 60));
-    assert_eq!(config.avcc.to_vec(), avcc);
+    assert_eq!(config.record.to_vec(), avcc);
 }

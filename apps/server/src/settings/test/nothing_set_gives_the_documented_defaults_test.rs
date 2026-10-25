@@ -14,9 +14,10 @@ fn nothing_set_gives_the_documented_defaults() {
             server_name: "fastcast".to_string(),
             ffmpeg_path: "ffmpeg".to_string(),
             video_encoder: EncoderChoice::Auto,
+            virtual_display: true,
             capture_output: 0,
             capture_fps: 60,
-            video_bitrate_kbps: 20000,
+            video_bitrate_kbps: 40000,
             keyframe_interval_seconds: 2,
         }
     );

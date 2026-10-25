@@ -1,4 +1,4 @@
-use crate::hub::{Hub, Subscription};
+use crate::hub::{Hub, Subscription, ViewerRequest};
 use crate::web::{VIEWER_CLOSE_TIMEOUT, ViewerCursor, watch_for_close, write_to_viewer};
 use axum::extract::ws::WebSocket;
 use futures_util::{SinkExt, StreamExt};
@@ -6,7 +6,10 @@ use std::sync::Arc;
 use tokio::time::timeout;
 use tracing::debug;
 
-pub async fn serve_viewer(socket: WebSocket, hub: Arc<Hub>) {
+pub async fn serve_viewer(socket: WebSocket, hub: Arc<Hub>, request: ViewerRequest) {
+    debug!("a viewer asks for {request:?}");
+    hub.request(request);
+
     let Subscription {
         config,
         gop,

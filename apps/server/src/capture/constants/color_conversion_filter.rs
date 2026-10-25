@@ -1,0 +1,1 @@
+pub const COLOR_CONVERSION_FILTER: &str = "hwdownload,format=bgra,scale=out_color_matrix=bt709:out_range=tv:threads=0,format=nv12,setparams=range=tv:color_primaries=bt709:color_trc=bt709:colorspace=bt709";

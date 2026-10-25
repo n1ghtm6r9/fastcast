@@ -1,15 +1,21 @@
-use crate::capture::EncoderPicker;
+use crate::capture::{AUTO_ENCODER_ORDER, EncoderPicker, HEVC_ENCODER_ORDER};
 use crate::settings::Settings;
 
 pub struct FfmpegBackend {
     pub(crate) settings: Settings,
-    pub(crate) picker: EncoderPicker,
+    pub(crate) avc: EncoderPicker,
+    pub(crate) hevc: EncoderPicker,
 }
 
 impl FfmpegBackend {
     pub fn new(settings: Settings) -> Self {
-        let picker = EncoderPicker::new(settings.video_encoder);
+        let avc = EncoderPicker::ordered(settings.video_encoder, &AUTO_ENCODER_ORDER);
+        let hevc = EncoderPicker::ordered(settings.video_encoder, &HEVC_ENCODER_ORDER);
 
-        Self { settings, picker }
+        Self {
+            settings,
+            avc,
+            hevc,
+        }
     }
 }

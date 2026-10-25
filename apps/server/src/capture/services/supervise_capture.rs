@@ -1,5 +1,6 @@
 use crate::capture::{
-    CaptureBackend, RESTART_DELAY, RETRY_DELAY_AFTER_FAILURE, WatchOutcome, run_while_watched,
+    CaptureBackend, RESTART_DELAY, RETRY_DELAY_AFTER_FAILURE, WatchOutcome, release_screen,
+    run_while_watched,
 };
 use crate::hub::Hub;
 use std::sync::Arc;
@@ -8,28 +9,60 @@ use tracing::{error, info, warn};
 
 pub async fn supervise_capture<B: CaptureBackend>(hub: Arc<Hub>, backend: Arc<B>) {
     let mut viewers = hub.watch_viewers();
+    let mut requests = hub.watch_requests();
+    let mut kept = None;
 
     loop {
+        if *viewers.borrow() == 0 {
+            release_screen(kept.take()).await;
+        }
+
         let watched = viewers.wait_for(|count| *count > 0).await.is_ok();
 
         if !watched {
+            release_screen(kept.take()).await;
             return;
         }
 
         info!("a viewer is watching, starting the capture");
 
-        let outcome = run_while_watched(&hub, backend.as_ref(), &mut viewers).await;
+        let request = requests.borrow_and_update().clone();
+        let screen = match kept.take() {
+            Some(screen) if screen.request == request => screen,
+            stale => {
+                release_screen(stale).await;
+                backend.open_screen(&request).await
+            }
+        };
+
+        let outcome = run_while_watched(
+            &hub,
+            backend.as_ref(),
+            &screen.target,
+            &mut viewers,
+            &mut requests,
+        )
+        .await;
 
         hub.reset();
 
         match outcome {
-            WatchOutcome::Idle => info!("no viewers left, the capture is stopped"),
+            WatchOutcome::Idle => {
+                info!("no viewers left, the capture is stopped");
+                release_screen(Some(screen)).await;
+            }
+            WatchOutcome::Changed => {
+                info!("a viewer asked for another picture, restarting the capture");
+                release_screen(Some(screen)).await;
+            }
             WatchOutcome::Finished(Ok(report)) => {
                 warn!("ffmpeg stopped after {} frames, restarting", report.frames);
+                kept = Some(screen);
                 sleep(RESTART_DELAY).await;
             }
             WatchOutcome::Finished(Err(failure)) => {
                 error!("the capture failed: {failure}");
+                kept = Some(screen);
                 sleep(RETRY_DELAY_AFTER_FAILURE).await;
             }
         }

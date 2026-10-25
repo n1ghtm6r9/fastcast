@@ -1,4 +1,4 @@
-use super::default_settings;
+use super::{avc_target, default_settings};
 use crate::capture::{CaptureBackend, CaptureError, FfmpegBackend};
 use crate::hub::Hub;
 use crate::settings::Settings;
@@ -10,7 +10,9 @@ async fn the_backend_reports_a_missing_ffmpeg_while_probing() {
         ..default_settings()
     };
 
-    let outcome = FfmpegBackend::new(settings).run(&Hub::new()).await;
+    let outcome = FfmpegBackend::new(settings)
+        .run(&Hub::new(), &avc_target())
+        .await;
 
     assert!(matches!(outcome, Err(CaptureError::FfmpegNotFound { .. })));
 }

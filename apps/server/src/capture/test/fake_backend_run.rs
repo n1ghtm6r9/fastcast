@@ -1,12 +1,25 @@
-use super::{FakeBackend, FakeRun, KillCounter};
-use crate::capture::{CaptureBackend, CaptureError, CaptureReport};
+use super::{FakeBackend, FakeRun, KillCounter, avc_target};
+use crate::capture::{CaptureBackend, CaptureError, CaptureReport, CaptureTarget, Screen};
 use crate::fixtures::{config_of, nvenc_2560x1440_avcc};
-use crate::hub::Hub;
+use crate::hub::{Hub, ViewerRequest};
 use std::sync::atomic::Ordering;
 use tokio::time::sleep;
 
 impl CaptureBackend for FakeBackend {
-    async fn run(&self, hub: &Hub) -> Result<CaptureReport, CaptureError> {
+    async fn open_screen(&self, request: &ViewerRequest) -> Screen {
+        self.opened
+            .lock()
+            .expect("the opened lock is not poisoned")
+            .push(request.clone());
+
+        Screen {
+            request: request.clone(),
+            target: avc_target(),
+            display: None,
+        }
+    }
+
+    async fn run(&self, hub: &Hub, _target: &CaptureTarget) -> Result<CaptureReport, CaptureError> {
         self.started.fetch_add(1, Ordering::SeqCst);
 
         let run = self

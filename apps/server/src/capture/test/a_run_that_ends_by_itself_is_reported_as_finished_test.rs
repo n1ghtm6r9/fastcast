@@ -1,4 +1,4 @@
-use super::{FakeBackend, FakeRun};
+use super::{FakeBackend, FakeRun, avc_target};
 use crate::capture::{WatchOutcome, run_while_watched};
 use crate::hub::Hub;
 use std::time::Duration;
@@ -13,7 +13,16 @@ async fn a_run_that_ends_by_itself_is_reported_as_finished() {
     }]);
     let mut viewers = hub.watch_viewers();
 
-    let outcome = run_while_watched(&hub, backend.as_ref(), &mut viewers).await;
+    let mut requests = hub.watch_requests();
+
+    let outcome = run_while_watched(
+        &hub,
+        backend.as_ref(),
+        &avc_target(),
+        &mut viewers,
+        &mut requests,
+    )
+    .await;
 
     assert!(matches!(outcome, WatchOutcome::Finished(Ok(report)) if report.frames == 10));
 }

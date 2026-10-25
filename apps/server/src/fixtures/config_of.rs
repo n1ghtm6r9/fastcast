@@ -1,6 +1,8 @@
-use crate::hub::{StreamConfig, stream_config_from_avcc};
+use crate::hub::{StreamConfig, stream_config_from_record};
 use bytes::Bytes;
+use media::VideoCodec;
 
 pub fn config_of(avcc: &[u8], fps: u32) -> StreamConfig {
-    stream_config_from_avcc(Bytes::copy_from_slice(avcc), fps).expect("the avcC describes a stream")
+    stream_config_from_record(VideoCodec::Avc, Bytes::copy_from_slice(avcc), fps)
+        .expect("the avcC describes a stream")
 }

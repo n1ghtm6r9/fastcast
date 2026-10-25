@@ -1,4 +1,4 @@
-use super::{FakeFfmpeg, default_settings};
+use super::{FakeFfmpeg, avc_target, default_settings};
 use crate::capture::{CaptureBackend, CaptureError, FfmpegBackend};
 use crate::hub::Hub;
 use crate::settings::{Settings, VideoEncoder};
@@ -14,11 +14,14 @@ async fn when_every_encoder_has_failed_the_backend_reports_none_usable_and_start
     let hub = Hub::new();
 
     for _ in 0..4 {
-        backend.run(&hub).await.expect("the fake ffmpeg starts");
+        backend
+            .run(&hub, &avc_target())
+            .await
+            .expect("the fake ffmpeg starts");
     }
 
     let exhausted = backend
-        .run(&hub)
+        .run(&hub, &avc_target())
         .await
         .expect_err("every encoder has failed");
 
@@ -27,7 +30,10 @@ async fn when_every_encoder_has_failed_the_backend_reports_none_usable_and_start
         CaptureError::NoEncoderAvailable { tried } if tried.len() == 4
     ));
 
-    backend.run(&hub).await.expect("probing starts over");
+    backend
+        .run(&hub, &avc_target())
+        .await
+        .expect("probing starts over");
 
-    assert_eq!(backend.picker.unusable(), vec![VideoEncoder::Nvenc]);
+    assert_eq!(backend.avc.unusable(), vec![VideoEncoder::Nvenc]);
 }
