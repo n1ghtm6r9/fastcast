@@ -146,6 +146,8 @@ PC side:
 4. On shutdown every session gets Bye.
 5. A session that falls behind the hub broadcast skips to the next keyframe.
 6. Feedback with "keyframe needed" makes the next frame for that session wait for a keyframe, and the session re-sends the current config frame before that keyframe; with the native backend it also asks the encoder for an IDR at once.
+7. Feedback or Stats carrying a session id the server does not know (the server restarted, or the session timed out) is answered with a Bye carrying that session id, so the TV reconnects at once instead of waiting for its silence timer.
+8. On Windows the socket is created with `SIO_UDP_CONNRESET` off: an ICMP "port unreachable" caused by one vanished TV must not fail reads and sends for the others.
 
 ### Discovery (unchanged messages, new socket)
 
@@ -192,8 +194,8 @@ Input: the duplicated desktop texture, `B8G8R8A8_UNORM`, gamma-encoded sRGB valu
 ## Phases
 
 1. Transport: `wire`, server UDP endpoint, Rust receiver on the TV, Kotlin integration, removal of WebSocket and HTTP. Capture stays ffmpeg. Shipped as one release.
-2. Native capture and encode: `desktop`, `nvenc`, native backend with on-demand IDR and live bitrate.
+2. Native capture and encode: `desktop`, `nvenc`, native backend with on-demand IDR and the automatic ffmpeg fallback. `nvenc` can already change the bitrate live; its caller arrives with the phase 4 congestion controller.
 3. 4K 120: display mode and decoder selection up to 120 Hz, virtual display at 120 Hz, 10-bit when supported, bitrate defaults for 4K 120.
-4. Optimizations: SIMD GF(256) (AVX2, NEON), UDP segmentation offload, sub-frame slices, delay-based congestion control, latency telemetry overlay.
+4. Optimizations: SIMD GF(256) (AVX2, NEON), UDP segmentation offload, sub-frame slices, delay-based congestion control that sets the encoder bitrate live, latency telemetry overlay.
 
 Work that does not depend on another phase may start early (the Phase 2 crates are built in parallel with Phase 1).
