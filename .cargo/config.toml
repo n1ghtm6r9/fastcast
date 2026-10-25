@@ -1,0 +1,5 @@
+[alias]
+t = "nextest run --workspace"
+test-app = "nextest run -p app"
+test-media = "nextest run -p media"
+server = "run -p app --release"

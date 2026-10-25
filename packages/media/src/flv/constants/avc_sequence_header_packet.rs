@@ -1,0 +1,1 @@
+pub const AVC_SEQUENCE_HEADER_PACKET: u8 = 0;

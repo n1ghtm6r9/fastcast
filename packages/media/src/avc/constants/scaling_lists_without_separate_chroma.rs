@@ -1,0 +1,1 @@
+pub const SCALING_LISTS_WITHOUT_SEPARATE_CHROMA: usize = 8;

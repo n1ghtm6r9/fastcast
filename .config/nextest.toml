@@ -1,0 +1,6 @@
+[profile.default]
+slow-timeout = { period = "5s", terminate-after = 4 }
+leak-timeout = "1s"
+fail-fast = false
+failure-output = "immediate-final"
+final-status-level = "flaky"

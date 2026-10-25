@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">fastcast</string>
+    <string name="version_label" translatable="false">v%1$s</string>
+    <string name="update_progress">Updating to %1$s… %2$d%%</string>
+    <string name="discovery_searching">Searching for fastcast on your network…</string>
+    <string name="discovery_found">Choose a PC to connect to</string>
+    <string name="discovery_hint">Start fastcast on your PC; both devices must be on the same network</string>
+    <string name="error_connection">Connection failed: %1$s</string>
+    <string name="status_connecting">Connecting…</string>
+    <string name="status_waiting_for_video">Waiting for video…</string>
+    <string name="status_reconnecting">Reconnecting in %1$d s…</string>
+    <string name="status_decoder_error">Decoder error: %1$s</string>
+    <string name="stats_format">%1$dx%2$d  %3$.1f fps  %4$.1f Mbit/s\nDecoder: %5$s  Dropped: %6$d</string>
+</resources>

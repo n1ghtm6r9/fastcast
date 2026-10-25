@@ -1,0 +1,1 @@
+pub const LARGEST_FLV_HEADER_LENGTH: usize = 65536;

@@ -1,0 +1,102 @@
+mod default_settings;
+#[cfg(windows)]
+mod exits_at_once_script;
+mod fake_backend;
+mod fake_backend_kills;
+mod fake_backend_run;
+mod fake_backend_starts;
+#[cfg(windows)]
+mod fake_ffmpeg;
+#[cfg(windows)]
+mod fake_ffmpeg_drop;
+#[cfg(windows)]
+mod fake_ffmpeg_exiting_at_once;
+#[cfg(windows)]
+mod fake_ffmpeg_path;
+mod fake_run;
+mod flv_stream;
+mod flv_video_tag;
+mod frame_tag;
+mod kill_counter;
+#[cfg(windows)]
+mod next_fake_ffmpeg_id;
+mod scripted_probe;
+mod scripted_probe_calls;
+mod scripted_probe_probe;
+mod sequence_header_tag;
+mod settle;
+pub use default_settings::*;
+#[cfg(windows)]
+pub use exits_at_once_script::*;
+pub use fake_backend::*;
+#[cfg(windows)]
+pub use fake_ffmpeg::*;
+pub use fake_run::*;
+pub use flv_stream::*;
+pub use flv_video_tag::*;
+pub use frame_tag::*;
+pub use kill_counter::*;
+#[cfg(windows)]
+pub use next_fake_ffmpeg_id::*;
+pub use scripted_probe::*;
+pub use sequence_header_tag::*;
+pub use settle::*;
+
+mod a_failed_run_is_retried_after_five_seconds_test;
+mod a_fixed_encoder_ignores_failure_marks_test;
+mod a_fixed_encoder_is_used_without_probing_test;
+mod a_missing_ffmpeg_is_reported_with_the_install_hint_test;
+mod a_missing_ffmpeg_keeps_the_supervisor_alive_and_retrying_test;
+mod a_missing_program_is_told_apart_from_other_spawn_failures_test;
+#[cfg(windows)]
+mod a_pipeline_that_exits_before_the_first_frame_moves_the_backend_to_the_next_encoder_test;
+mod a_probe_error_stops_the_pick_and_marks_nothing_test;
+mod a_repeated_identical_sequence_header_keeps_the_gop_test;
+mod a_resolved_encoder_is_remembered_between_picks_test;
+mod a_run_nobody_watches_is_stopped_after_the_grace_and_reported_idle_test;
+mod a_run_that_ended_before_any_frame_counts_as_an_encoder_failure_test;
+mod a_run_that_ends_by_itself_is_reported_as_finished_test;
+mod a_run_that_produced_frames_is_not_an_encoder_failure_test;
+mod a_sequence_header_and_frames_end_up_in_the_hub_test;
+mod a_sequence_header_for_another_stream_replaces_the_config_and_clears_the_gop_test;
+mod a_sequence_header_the_server_cannot_describe_leaves_the_hub_without_a_config_test;
+mod a_spawn_failure_other_than_a_missing_program_keeps_its_cause_test;
+mod a_stream_that_is_not_flv_is_a_demux_error_test;
+mod a_stream_with_no_frames_reports_zero_frames_test;
+mod a_viewer_returning_within_the_grace_keeps_ffmpeg_running_test;
+mod an_encoder_marked_failed_is_skipped_by_the_next_pick_test;
+mod an_encoder_marked_failed_twice_is_listed_once_test;
+mod an_error_is_not_blamed_on_the_encoder_test;
+mod arguments_are_split_on_any_whitespace_test;
+mod auto_falls_back_to_x264_when_no_hardware_encoder_passes_test;
+mod auto_takes_the_first_encoder_whose_probe_passes_test;
+mod auto_walks_the_encoders_in_order_until_one_passes_test;
+mod every_encoder_has_its_own_ffmpeg_codec_name_test;
+mod ffmpeg_is_stopped_five_seconds_after_the_last_viewer_leaves_test;
+mod ffmpeg_that_exits_while_viewers_remain_is_restarted_after_one_second_test;
+mod forwarding_stderr_ends_when_the_pipe_closes_and_survives_invalid_utf8_test;
+mod frames_before_the_sequence_header_are_dropped_by_the_hub_test;
+mod marking_the_resolved_encoder_failed_forgets_it_and_moves_on_to_the_next_test;
+mod no_viewers_means_ffmpeg_is_never_started_test;
+mod probing_with_a_missing_ffmpeg_is_an_error_not_a_failed_probe_test;
+mod the_amf_pipeline_uses_the_documented_arguments_test;
+mod the_backend_reports_a_missing_ffmpeg_when_the_encoder_is_fixed_test;
+mod the_backend_reports_a_missing_ffmpeg_while_probing_test;
+mod the_configured_rate_is_what_the_config_announces_test;
+mod the_first_viewer_starts_ffmpeg_test;
+mod the_hub_is_cleared_when_ffmpeg_exits_by_itself_test;
+mod the_hub_is_cleared_when_the_last_viewer_has_left_and_ffmpeg_is_stopped_test;
+mod the_keyframe_interval_is_the_rate_times_the_seconds_test;
+mod the_no_encoder_error_names_every_encoder_tried_test;
+mod the_nvenc_pipeline_uses_the_documented_arguments_test;
+mod the_output_the_rate_and_the_bitrate_come_from_the_settings_test;
+mod the_probe_encodes_one_black_frame_with_the_chosen_codec_test;
+mod the_qsv_pipeline_uses_the_documented_arguments_test;
+mod the_x264_pipeline_uses_the_documented_arguments_test;
+mod viewers_gone_for_never_returns_while_someone_is_watching_test;
+mod viewers_gone_for_returns_after_the_grace_when_nobody_is_watching_test;
+mod viewers_gone_for_starts_the_grace_over_when_a_viewer_comes_and_goes_test;
+mod viewers_leaving_during_the_restart_delay_stop_the_restart_test;
+#[cfg(windows)]
+mod when_every_encoder_has_failed_the_backend_reports_none_usable_and_starts_over_test;
+mod when_every_probe_fails_the_error_lists_them_and_probing_starts_over_next_time_test;

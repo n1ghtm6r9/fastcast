@@ -1,0 +1,23 @@
+use super::environment_with;
+use crate::settings::{EncoderChoice, Settings, settings_from};
+
+#[test]
+fn nothing_set_gives_the_documented_defaults() {
+    let settings = settings_from(environment_with(&[])).expect("defaults are valid");
+
+    assert_eq!(
+        settings,
+        Settings {
+            web_host: "0.0.0.0".to_string(),
+            web_port: 3278,
+            discovery_port: 3278,
+            server_name: "fastcast".to_string(),
+            ffmpeg_path: "ffmpeg".to_string(),
+            video_encoder: EncoderChoice::Auto,
+            capture_output: 0,
+            capture_fps: 60,
+            video_bitrate_kbps: 20000,
+            keyframe_interval_seconds: 2,
+        }
+    );
+}
