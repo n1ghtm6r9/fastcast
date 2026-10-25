@@ -1,0 +1,18 @@
+mod raw_datagram;
+pub use raw_datagram::*;
+
+mod a_bye_datagram_is_the_twelve_byte_header_test;
+mod a_datagram_shorter_than_the_header_is_ignored_test;
+mod a_datagram_with_another_magic_is_ignored_test;
+mod a_datagram_with_another_version_is_ignored_test;
+mod a_hello_announcing_more_codecs_than_it_carries_is_ignored_test;
+mod a_hello_lists_its_codecs_after_the_mode_test;
+mod a_shard_header_follows_the_common_header_test;
+mod a_truncated_shard_header_is_ignored_test;
+mod an_unknown_frame_kind_is_ignored_test;
+mod an_unknown_kind_is_ignored_test;
+mod every_packet_kind_survives_a_round_trip_test;
+mod random_bytes_never_panic_the_decoder_test;
+mod stats_that_are_not_utf8_are_ignored_test;
+mod the_keyframe_request_is_bit_zero_of_the_feedback_flags_test;
+mod unknown_codec_ids_in_a_hello_are_skipped_test;
