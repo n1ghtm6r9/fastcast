@@ -1,0 +1,1 @@
+pub const FULLSCREEN_TRIANGLE_VERTICES: u32 = 3;

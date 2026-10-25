@@ -1,5 +1,7 @@
 mod first_attached_output;
+mod first_output_device;
 pub use first_attached_output::*;
+pub use first_output_device::*;
 
 mod a_device_opens_on_the_adapter_of_an_output_test;
 mod a_plain_desktop_error_has_no_source_test;

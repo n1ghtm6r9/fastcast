@@ -1,0 +1,1 @@
+pub const TEST_SEED: u64 = 0x9E37_79B9_7F4A_7C15;
