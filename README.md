@@ -77,7 +77,7 @@ cargo run
 
 ## Клиент (Google TV / Android TV)
 
-Нужны JDK 17 и Android SDK: переменные `JAVA_HOME` и `ANDROID_HOME`.
+Нужны JDK 17 и Android SDK: переменные `JAVA_HOME` и `ANDROID_HOME`. Нативную библиотеку приложения Gradle собирает сам: для этого нужны ещё Rust-цели `aarch64-linux-android` и `armv7-linux-androideabi`, а также Android NDK 27.3.13750724.
 
 ```powershell
 cd apps/client

@@ -53,6 +53,12 @@ jobs:
           printf 'storeFile=%s\nstorePassword=%s\nkeyAlias=fastcast\nkeyPassword=%s\n' \
             "$RUNNER_TEMP/fastcast-release.jks" "$KEYSTORE_PASSWORD" "$KEYSTORE_PASSWORD" > "$RUNNER_TEMP/keystore.properties"
           echo "FASTCAST_SIGNING=$RUNNER_TEMP/keystore.properties" >> "$GITHUB_ENV"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: android
       - name: Test, lint and build
         run: bash ./gradlew --no-daemon testDebugUnitTest lintDebug assembleRelease
       - name: Package
