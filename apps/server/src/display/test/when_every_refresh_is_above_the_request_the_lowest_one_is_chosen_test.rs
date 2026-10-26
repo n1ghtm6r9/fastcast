@@ -11,7 +11,7 @@ fn when_every_refresh_is_above_the_request_the_lowest_one_is_chosen() {
     ];
 
     assert_eq!(
-        choose_mode(mode_of(3840, 2160, 20), &available),
+        choose_mode(mode_of(3840, 2160, 25), &available),
         Some(mode_of(3840, 2160, 30))
     );
 }

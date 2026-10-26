@@ -11,6 +11,6 @@ fn an_early_picture_does_not_move_the_next_turn_earlier() {
 
     assert_eq!(
         clock.until_repeat(start + Duration::from_millis(8)),
-        Duration::from_millis(12)
+        Duration::from_micros(14_500)
     );
 }

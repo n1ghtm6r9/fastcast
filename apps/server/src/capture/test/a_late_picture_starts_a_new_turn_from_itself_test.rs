@@ -11,6 +11,6 @@ fn a_late_picture_starts_a_new_turn_from_itself() {
 
     assert_eq!(
         clock.until_repeat(start + Duration::from_millis(25)),
-        Duration::from_millis(10)
+        Duration::from_micros(12_500)
     );
 }

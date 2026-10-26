@@ -1,4 +1,4 @@
-use crate::capture::{CaptureTarget, Screen, open_virtual_display};
+use crate::capture::{CaptureTarget, Screen, capture_fps_for, open_virtual_display};
 use crate::hub::ViewerRequest;
 use crate::settings::Settings;
 
@@ -10,7 +10,7 @@ pub async fn open_screen(settings: &Settings, request: &ViewerRequest) -> Screen
     let target = match &display {
         Some(display) => CaptureTarget {
             output: display.output_index(),
-            fps: display.mode().refresh_hz,
+            fps: capture_fps_for(request.mode.unwrap_or(display.mode()), display.mode()),
         },
         None => CaptureTarget {
             output: settings.capture_output,

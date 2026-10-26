@@ -1,4 +1,5 @@
 mod args_of;
+mod capture_fps_for;
 mod codec_name_of;
 mod codecs_or_avc;
 mod encoder_args;
@@ -56,6 +57,7 @@ mod viewers_gone_for;
 mod wait_before_retry;
 mod wait_for_exit;
 pub use args_of::*;
+pub use capture_fps_for::*;
 pub use codec_name_of::*;
 pub use codecs_or_avc::*;
 pub use encoder_args::*;
