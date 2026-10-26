@@ -13,6 +13,7 @@ impl FrameReceiver {
                 self.waiting_for_keyframe = false;
                 self.video_lost_while_waiting = false;
             }
+            (FrameKind::Config, _) => self.config_lost = false,
             _ => {}
         }
 

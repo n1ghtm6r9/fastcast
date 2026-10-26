@@ -22,6 +22,9 @@ fn video_after_a_loss_waits_for_the_next_keyframe() {
     assert!(deliveries(&mut receiver, t0 + ms(5)).is_empty());
     assert!(receiver.keyframe_needed());
 
+    for datagram in datagrams_of(&mut packetizer, FrameKind::Config, false, &[7; 100], 10) {
+        feed(&mut receiver, &datagram, t0 + ms(5));
+    }
     for datagram in datagrams_of(&mut packetizer, FrameKind::Video, true, &[4; 100], 10) {
         feed(&mut receiver, &datagram, t0 + ms(5));
     }
@@ -30,6 +33,6 @@ fn video_after_a_loss_waits_for_the_next_keyframe() {
         .iter()
         .map(|frame| frame.number)
         .collect();
-    assert_eq!(numbers, [3]);
+    assert_eq!(numbers, [3, 4]);
     assert!(!receiver.keyframe_needed());
 }

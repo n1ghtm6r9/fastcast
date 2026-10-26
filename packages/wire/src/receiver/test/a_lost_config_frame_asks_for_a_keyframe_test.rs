@@ -5,7 +5,7 @@ use crate::receiver::test::{datagrams_of, deliveries, feed, ms};
 use std::time::Instant;
 
 #[test]
-fn a_lost_config_frame_does_not_ask_for_a_keyframe() {
+fn a_lost_config_frame_asks_for_a_keyframe() {
     let mut packetizer = Packetizer::new(1);
     let mut receiver = FrameReceiver::new();
     let t0 = Instant::now();
@@ -15,5 +15,5 @@ fn a_lost_config_frame_does_not_ask_for_a_keyframe() {
 
     assert!(deliveries(&mut receiver, t0 + ms(100)).is_empty());
     assert_eq!(receiver.lost_frames(), 1);
-    assert!(!receiver.keyframe_needed());
+    assert!(receiver.keyframe_needed());
 }
