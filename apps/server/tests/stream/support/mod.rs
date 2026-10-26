@@ -10,6 +10,10 @@ mod datagrams_lost_through_a_relay;
 mod encoded_datagram;
 mod frame_data;
 mod frame_period;
+#[cfg(windows)]
+mod grow_receive_buffer;
+#[cfg(not(windows))]
+mod grow_receive_buffer_unsupported;
 mod hello_resend;
 mod hex_bytes;
 mod hub_with_config;
@@ -57,6 +61,8 @@ mod test_viewer_take;
 mod test_viewer_welcome;
 mod valid_probe;
 mod video_frame;
+#[cfg(windows)]
+mod viewer_buffer_bytes;
 mod viewers_settle_within;
 mod wait_for_request;
 mod wait_for_viewers;
@@ -74,6 +80,10 @@ pub use datagrams_lost_through_a_relay::*;
 pub use encoded_datagram::*;
 pub use frame_data::*;
 pub use frame_period::*;
+#[cfg(windows)]
+pub use grow_receive_buffer::*;
+#[cfg(not(windows))]
+pub use grow_receive_buffer_unsupported::*;
 pub use hello_resend::*;
 pub use hex_bytes::*;
 pub use hub_with_config::*;
@@ -110,6 +120,8 @@ pub use stops_within::*;
 pub use test_viewer::*;
 pub use valid_probe::*;
 pub use video_frame::*;
+#[cfg(windows)]
+pub use viewer_buffer_bytes::*;
 pub use viewers_settle_within::*;
 pub use wait_for_request::*;
 pub use wait_for_viewers::*;

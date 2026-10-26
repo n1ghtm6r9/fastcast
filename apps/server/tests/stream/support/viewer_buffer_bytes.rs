@@ -1,0 +1,1 @@
+pub const VIEWER_BUFFER_BYTES: i32 = 4 * 1024 * 1024;
