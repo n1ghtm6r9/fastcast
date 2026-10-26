@@ -13,4 +13,10 @@ fn a_bind_failure_names_the_udp_address_and_the_cause() {
             .to_string()
             .starts_with("could not listen on udp 0.0.0.0:3278: taken")
     );
+    assert!(
+        failure
+            .to_string()
+            .ends_with("(is another FastCast already running?)"),
+        "{failure}"
+    );
 }

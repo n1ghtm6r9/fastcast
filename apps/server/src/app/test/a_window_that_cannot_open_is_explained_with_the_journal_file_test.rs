@@ -10,7 +10,7 @@ fn a_window_that_cannot_open_is_explained_with_the_journal_file() {
 
     assert_eq!(
         text,
-        "fastcast не смог открыть окно: OpenGL 2.0 is not supported\n\n\
+        "FastCast не смог открыть окно: OpenGL 2.0 is not supported\n\n\
          Подробности в журнале: C:\\Users\\me\\AppData\\Roaming\\fastcast\\fastcast.log"
     );
 }

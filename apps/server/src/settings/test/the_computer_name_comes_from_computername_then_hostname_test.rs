@@ -12,5 +12,5 @@ fn the_computer_name_comes_from_computername_then_hostname() {
 
     assert_eq!(computer_name_from(both), "DESKTOP-1");
     assert_eq!(computer_name_from(host_only), "box");
-    assert_eq!(computer_name_from(blank), "fastcast");
+    assert_eq!(computer_name_from(blank), "FastCast");
 }

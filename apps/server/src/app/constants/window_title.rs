@@ -1,1 +1,1 @@
-pub const WINDOW_TITLE: &str = "fastcast";
+pub const WINDOW_TITLE: &str = "FastCast";

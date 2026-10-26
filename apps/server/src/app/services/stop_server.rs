@@ -10,7 +10,7 @@ pub fn stop_server(runtime: Runtime, control: ServerControl, limit: Duration) {
 
     if stopped.is_err() {
         warn!(
-            "the server did not stop within {} ms, fastcast closes anyway",
+            "the server did not stop within {} ms, FastCast closes anyway",
             limit.as_millis()
         );
     }

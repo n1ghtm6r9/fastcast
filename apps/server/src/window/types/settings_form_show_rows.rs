@@ -105,7 +105,7 @@ impl SettingsForm {
         setting_row(
             ui,
             "Путь к ffmpeg",
-            "Только для запасного пути. Пусто — ffmpeg.exe рядом с fastcast.exe или в PATH.",
+            "Только для запасного пути. Пусто — ffmpeg.exe рядом с FastCast.exe или в PATH.",
             |ui| {
                 ui.add(
                     TextEdit::singleline(&mut edited.ffmpeg_path)

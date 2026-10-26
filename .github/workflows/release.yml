@@ -95,7 +95,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force dist | Out-Null
-          Copy-Item target/release/fastcast.exe dist/
+          Copy-Item target/release/fastcast.exe dist/FastCast.exe
           Compress-Archive -Path dist/* -DestinationPath fastcast-server-windows-x64.zip
       - uses: actions/upload-artifact@v4
         with:
@@ -118,6 +118,6 @@ jobs:
           gh release create "$tag" dist/* \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
-            --title "fastcast $tag" \
+            --title "FastCast $tag" \
             --notes "Build ${{ github.run_number }} from ${GITHUB_SHA::7}" \
             --latest

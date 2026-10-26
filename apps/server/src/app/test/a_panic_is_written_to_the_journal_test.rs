@@ -19,7 +19,7 @@ fn a_panic_is_written_to_the_journal() {
     assert!(
         shown
             .iter()
-            .any(|line| line.contains(" ERROR fastcast panicked at ")
+            .any(|line| line.contains(" ERROR FastCast panicked at ")
                 && line.ends_with(": the capture broke")),
         "{shown:?}"
     );

@@ -18,7 +18,7 @@ impl fmt::Display for StreamError {
         match self {
             Self::Bind { address, source } => write!(
                 formatter,
-                "could not listen on udp {address}: {source} (is another fastcast already running?)"
+                "could not listen on udp {address}: {source} (is another FastCast already running?)"
             ),
             Self::Socket { source } => {
                 write!(formatter, "could not set up the stream socket: {source}")

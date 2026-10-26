@@ -64,6 +64,7 @@ mod numbers_below_their_limits_are_applied_as_the_limits_test;
 #[cfg(windows)]
 mod only_the_monitors_of_the_first_graphics_card_are_listed_test;
 mod settings_that_could_not_be_saved_are_reported_test;
+mod the_ffmpeg_hint_names_the_fastcast_program_test;
 mod the_journal_names_its_file_test;
 mod the_journal_shows_its_lines_test;
 mod the_status_counts_the_connected_tvs_test;
