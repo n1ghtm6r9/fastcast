@@ -1,9 +1,10 @@
 use crate::app::{
-    AppError, init_dotenv, init_logger, log_ffmpeg, log_stream_address, shutdown_signal,
+    AppError, data_directory, init_logger, log_ffmpeg, log_stream_address, shutdown_signal,
 };
 use crate::capture::{FfmpegBackend, NativeBackend, SwitchingBackend, supervise_capture};
 use crate::hub::Hub;
-use crate::settings::load_settings;
+use crate::settings::constants::SETTINGS_FILE_NAME;
+use crate::settings::{SavedSettings, computer_name, read_saved_settings, settings_of};
 use crate::stream::{
     EndpointOptions, STREAM_PORT, StreamEndpoint, bind_stream_socket, stream_address,
 };
@@ -11,10 +12,14 @@ use std::sync::Arc;
 use tracing::warn;
 
 pub async fn run() -> Result<(), AppError> {
-    init_dotenv()?;
     init_logger();
 
-    let settings = load_settings()?;
+    let saved =
+        read_saved_settings(&data_directory().join(SETTINGS_FILE_NAME)).unwrap_or_else(|problem| {
+            warn!("{problem}, the defaults are used");
+            SavedSettings::default()
+        });
+    let settings = settings_of(&saved, &computer_name());
     let hub = Arc::new(Hub::new());
     let socket = bind_stream_socket(stream_address(STREAM_PORT))?;
 

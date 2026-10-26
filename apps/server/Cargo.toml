@@ -15,7 +15,6 @@ path = "src/main.rs"
 [dependencies]
 base64 = { workspace = true }
 bytes = { workspace = true }
-dotenvy = { workspace = true }
 media = { workspace = true }
 mimalloc = { workspace = true }
 serde = { workspace = true }

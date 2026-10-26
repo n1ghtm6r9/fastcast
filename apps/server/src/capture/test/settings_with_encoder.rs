@@ -1,6 +1,10 @@
-use crate::settings::{Settings, settings_from};
+use crate::settings::{SavedSettings, Settings, encoder_choice_named, settings_of};
 
 pub fn settings_with_encoder(name: &'static str) -> Settings {
-    settings_from(|key| (key == "VIDEO_ENCODER").then(|| name.to_owned()))
-        .expect("the encoder name is valid")
+    let saved = SavedSettings {
+        video_encoder: encoder_choice_named(name).expect("the encoder name is valid"),
+        ..SavedSettings::default()
+    };
+
+    settings_of(&saved, "fastcast")
 }

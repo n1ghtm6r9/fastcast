@@ -1,5 +1,5 @@
-use crate::settings::{Settings, settings_from};
+use crate::settings::{SavedSettings, Settings, settings_of};
 
 pub fn default_settings() -> Settings {
-    settings_from(|_| None).expect("the defaults are valid")
+    settings_of(&SavedSettings::default(), "fastcast")
 }

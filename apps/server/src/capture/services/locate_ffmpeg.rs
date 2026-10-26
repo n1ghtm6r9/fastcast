@@ -1,9 +1,9 @@
 use crate::capture::{CaptureError, FFMPEG_FILE_NAME};
-use crate::settings::constants::FFMPEG_PATH_SETTING;
+use crate::settings::constants::FFMPEG_SEARCH_PATH;
 use std::path::{Path, PathBuf};
 
 pub fn locate_ffmpeg(configured: &str, search_dirs: &[PathBuf]) -> Result<String, CaptureError> {
-    let found = if configured == FFMPEG_PATH_SETTING.default {
+    let found = if configured == FFMPEG_SEARCH_PATH {
         search_dirs
             .iter()
             .map(|dir| dir.join(FFMPEG_FILE_NAME))
