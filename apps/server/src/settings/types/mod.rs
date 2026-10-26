@@ -3,6 +3,7 @@ mod encoder_choice;
 mod log_level;
 mod number_setting;
 mod number_setting_clamped;
+mod number_setting_range;
 mod saved_settings;
 mod saved_settings_within_limits;
 mod settings;

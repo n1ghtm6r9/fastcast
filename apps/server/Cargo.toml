@@ -15,6 +15,7 @@ path = "src/main.rs"
 [dependencies]
 base64 = { workspace = true }
 bytes = { workspace = true }
+eframe = { workspace = true }
 media = { workspace = true }
 mimalloc = { workspace = true }
 serde = { workspace = true }
@@ -46,5 +47,6 @@ windows = { workspace = true, features = [
 embed-resource = { workspace = true }
 
 [dev-dependencies]
+egui_kittest = { workspace = true }
 fastcast-native = { workspace = true }
 tokio = { workspace = true, features = ["test-util"] }
