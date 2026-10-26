@@ -1,5 +1,5 @@
-use crate::fec::MAX_PARITY_SHARDS;
-use crate::layout::{FrameLayout, MAX_FRAME_SIZE};
+use crate::control::MAX_FEC_PERCENT;
+use crate::layout::{FrameLayout, MAX_FRAME_SIZE, parity_shards_for};
 use crate::packet::Shard;
 use crate::receiver::shard_length;
 
@@ -17,7 +17,7 @@ pub fn shard_layout(shard: &Shard<'_>) -> Option<FrameLayout> {
     let consistent = usize::from(header.blocks) == layout.blocks
         && block < layout.blocks
         && data_shards == layout.data_shards_in(block)
-        && parity_shards <= MAX_PARITY_SHARDS
+        && parity_shards <= parity_shards_for(data_shards, MAX_FEC_PERCENT)
         && usize::from(header.shard) < data_shards + parity_shards
         && shard.data.len() == shard_length(&layout, header);
 

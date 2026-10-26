@@ -1,3 +1,4 @@
+use crate::control::MAX_FEC_PERCENT;
 use crate::layout::{FrameLayout, MAX_FRAME_SIZE};
 use crate::packet::{Datagram, Packet, Shard, ShardHeader, write_datagram};
 use crate::packetizer::{
@@ -21,6 +22,7 @@ impl Packetizer {
         }
 
         let layout = FrameLayout::new(frame.payload.len() as u32);
+        let fec_percent = fec_percent.min(MAX_FEC_PERCENT);
         let scratch_length = plan_blocks(&layout, fec_percent, &mut self.plans);
 
         self.blocks.clear();

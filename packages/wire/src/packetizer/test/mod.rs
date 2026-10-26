@@ -17,3 +17,4 @@ mod frame_numbers_count_frames_test;
 mod no_datagram_exceeds_the_datagram_limit_test;
 mod parity_datagrams_rebuild_lost_data_shards_test;
 mod sequences_count_every_datagram_across_frames_test;
+mod the_packetizer_never_exceeds_the_maximum_fec_level_test;
