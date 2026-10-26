@@ -1,6 +1,6 @@
 use crate::link::{
-    LINK_TICK, Link, LinkShared, LinkTarget, SOCKET_BUFFER_REQUEST_BYTES, receive_buffer_of,
-    request_receive_buffer, run_link, unspecified_address_for,
+    LINK_TICK, Link, LinkShared, LinkTarget, SOCKET_BUFFER_REQUEST_BYTES, link_thread,
+    receive_buffer_of, request_receive_buffer, unspecified_address_for,
 };
 use std::io;
 use std::net::UdpSocket;
@@ -23,7 +23,7 @@ impl Link {
             .spawn({
                 let socket = Arc::clone(&socket);
                 let shared = Arc::clone(&shared);
-                move || run_link(socket, target, shared)
+                move || link_thread(socket, target, shared)
             })?;
 
         Ok(Link {
