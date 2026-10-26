@@ -131,12 +131,15 @@ TV side:
 
 Frame receiver rules:
 - Frame numbers start at 0 in every session, so the receiver starts by expecting frame 0.
-- A shard is ignored when its frame is larger than `MAX_FRAME_SIZE = 16 MiB`, or when its block count, data shard count, shard index or length disagrees with the layout of its frame size, or its frame kind, keyframe flag, frame size or parity count disagrees with earlier shards of the same frame or block.
+- A shard is ignored when its frame is larger than `MAX_FRAME_SIZE = 16 MiB`, or when its block count, data shard count, shard index or length disagrees with the layout of its frame size, or its parity count is more than `ceil(k × MAX_FEC_PERCENT / 100)` for the `k` data shards of its block, or its frame kind, keyframe flag, frame size or parity count disagrees with earlier shards of the same frame or block. The packetizer clamps the `fec_percent` it is given to `MAX_FEC_PERCENT = 50`, so a sender never builds a shard that the receiver ignores for this reason.
 - A complete frame equal to the next frame is delivered at once, then any following complete frames.
 - A complete later frame waits at most `REORDER_WINDOW = 5 ms` for the gap before the missing frames are declared lost.
 - The next frame is declared lost when it is still incomplete `FRAME_TIMEOUT = 100 ms` after the first shard of it or of any later frame arrived.
 - More than `MAX_PENDING_FRAMES = 64` pending frames: the oldest are declared lost.
-- After a lost frame the receiver waits for a keyframe: non-key video frames are dropped, config frames still pass, the next keyframe clears the wait. Feedback carries "keyframe needed" while waiting.
+- The block buffers of all pending frames together never exceed `MAX_PENDING_BYTES = 2 × MAX_FRAME_SIZE = 32 MiB`: while they do and more than one frame is pending, the oldest pending frame is declared lost, with any missing frames before it. A full-size frame at the maximum FEC level needs about 24 MiB, so a single frame always fits.
+- After a lost frame the receiver waits for a keyframe: non-key video frames are dropped, config frames still pass, the next keyframe clears the wait. While it waits, Feedback carries "keyframe needed" once a video frame has been lost or dropped; a lost frame that was never seen at all counts as a video frame.
+- A lost config frame is asked for again. A lost frame that was a config frame, or was never seen at all and so may have been one, makes Feedback carry "keyframe needed" until a config frame is delivered, even after a keyframe has cleared the wait, because the server answers every such request with the current config frame followed by a keyframe.
+- The `highest_frame` of Feedback is the last frame the receiver has finished with, delivered or declared lost (0 before any). It never names a frame that is still pending, so a "keyframe needed" whose `highest_frame` is older than the last keyframe the server sent is known to predate that keyframe, and the server ignores it.
 - Shards of delivered or lost frames and duplicate shards are ignored.
 
 PC side:
