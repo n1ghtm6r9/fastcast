@@ -18,6 +18,7 @@ import dev.fastcast.client.decoder.DecoderSelector
 import dev.fastcast.client.decoder.SupportedCodecs
 import dev.fastcast.client.discovery.DiscoveredServer
 import dev.fastcast.client.display.DisplayModeChooser
+import dev.fastcast.client.display.DisplayModeOption
 import dev.fastcast.client.display.DisplayModes
 import dev.fastcast.client.display.MinimalPostProcessing
 import dev.fastcast.client.display.PreferredDisplayMode
@@ -52,6 +53,7 @@ class PlayerActivity : Activity(), PlayerSessionListener {
     private var lastError: String? = null
     private var statsVisible = false
     private var controlsHintShown = false
+    private var modeSummary = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -149,21 +151,33 @@ class PlayerActivity : Activity(), PlayerSessionListener {
 
     private fun requestStream(): StreamRequest? {
         val display = screen ?: return null
-        val chosen = DisplayModeChooser.choose(DisplayModes.supported(display))
+        val modes = DisplayModes.supported(display)
+        val chosen = DisplayModeChooser.choose(modes) { hardwareCodecsAt(it).isNotEmpty() }
         chosen?.let { PreferredDisplayMode.apply(window, it) }
         val mode = chosen ?: DisplayModes.active(display)
-        val codecs = SupportedCodecs.among { mime ->
-            DecoderSelector.canDecodeInHardware(mime, mode.width, mode.height, mode.fps)
-        }
-        return StreamRequest(mode.width, mode.height, mode.fps, codecs)
+        val codecs = hardwareCodecsAt(mode)
+        val tenBit = tenBitCodecsAt(mode)
+        modeSummary = ModeSummary.of(modes, mode, codecs, tenBit)
+        return StreamRequest(mode.width, mode.height, mode.fps, codecs, tenBit)
     }
 
+    private fun hardwareCodecsAt(mode: DisplayModeOption): List<String> = SupportedCodecs.among { mime ->
+        DecoderSelector.canDecodeInHardware(mime, mode.width, mode.height, mode.fps)
+    }
+
+    private fun tenBitCodecsAt(mode: DisplayModeOption): Set<String> = SupportedCodecs.among { mime ->
+        DecoderSelector.canDecodeTenBitInHardware(mime, mode.width, mode.height, mode.fps)
+    }.toSet()
+
     private fun activeDisplayLabel(): String = screen?.let { DisplayModes.active(it).label }.orEmpty()
+
+    private fun reportedDisplayLabel(): String =
+        listOf(activeDisplayLabel(), modeSummary).filter { it.isNotEmpty() }.joinToString(REPORT_SEPARATOR)
 
     private fun startSession(surface: Surface) {
         stopSession()
         showStatus(PlayerStatus.Connecting)
-        session = PlayerSession(offer, surface, this, ::activeDisplayLabel).also { it.start() }
+        session = PlayerSession(offer, surface, this, ::reportedDisplayLabel).also { it.start() }
     }
 
     private fun stopSession() {
@@ -234,6 +248,7 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         private const val CONTROLS_HINT_MS = 4_000L
         private const val MILLISECONDS_PER_SECOND = 1_000.0
         private const val NO_DECODER = "-"
+        private const val REPORT_SEPARATOR = "; "
 
         fun createIntent(context: Context, server: DiscoveredServer): Intent =
             Intent(context, PlayerActivity::class.java)

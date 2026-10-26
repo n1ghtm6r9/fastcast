@@ -8,7 +8,7 @@ class ADisplayWithoutAModeNearSixtyHertzKeepsItsCurrentModeTest {
 
     @Test
     fun `no mode is chosen from an empty list`() {
-        assertNull(DisplayModeChooser.choose(emptyList()))
+        assertNull(DisplayModeChooser.choose(emptyList()) { false })
     }
 
     @Test
@@ -17,21 +17,21 @@ class ADisplayWithoutAModeNearSixtyHertzKeepsItsCurrentModeTest {
             aDisplayMode(modeId = index + 1, refreshRate = rate)
         }
 
-        assertNull(DisplayModeChooser.choose(modes))
+        assertNull(DisplayModeChooser.choose(modes) { false })
     }
 
     @Test
     fun `sixty point five hertz is outside the window`() {
-        assertNull(DisplayModeChooser.choose(listOf(aDisplayMode(refreshRate = 60.5f))))
+        assertNull(DisplayModeChooser.choose(listOf(aDisplayMode(refreshRate = 60.5f))) { false })
     }
 
     @Test
     fun `fifty nine point five hertz is outside the window`() {
-        assertNull(DisplayModeChooser.choose(listOf(aDisplayMode(refreshRate = 59.5f))))
+        assertNull(DisplayModeChooser.choose(listOf(aDisplayMode(refreshRate = 59.5f))) { false })
     }
 
     @Test
     fun `fifty hertz is not close enough to sixty`() {
-        assertNull(DisplayModeChooser.choose(listOf(aDisplayMode(refreshRate = 50f))))
+        assertNull(DisplayModeChooser.choose(listOf(aDisplayMode(refreshRate = 50f))) { false })
     }
 }

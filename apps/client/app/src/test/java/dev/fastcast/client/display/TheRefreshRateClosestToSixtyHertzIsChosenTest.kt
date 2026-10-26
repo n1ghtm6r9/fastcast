@@ -11,7 +11,7 @@ class TheRefreshRateClosestToSixtyHertzIsChosenTest {
         val ntsc = aDisplayMode(modeId = 1, refreshRate = 59.94f)
         val exact = aDisplayMode(modeId = 2, refreshRate = 60f)
 
-        assertEquals(exact, DisplayModeChooser.choose(listOf(ntsc, exact)))
+        assertEquals(exact, DisplayModeChooser.choose(listOf(ntsc, exact)) { false })
     }
 
     @Test
@@ -19,7 +19,7 @@ class TheRefreshRateClosestToSixtyHertzIsChosenTest {
         val ntsc = aDisplayMode(modeId = 1, refreshRate = 59.94f)
         val exact = aDisplayMode(modeId = 2, refreshRate = 60f)
 
-        assertEquals(exact, DisplayModeChooser.choose(listOf(exact, ntsc)))
+        assertEquals(exact, DisplayModeChooser.choose(listOf(exact, ntsc)) { false })
     }
 
     @Test
@@ -29,7 +29,7 @@ class TheRefreshRateClosestToSixtyHertzIsChosenTest {
             aDisplayMode(modeId = index + 2, refreshRate = rate)
         }
 
-        assertEquals(ntsc, DisplayModeChooser.choose(listOf(ntsc) + others))
+        assertEquals(ntsc, DisplayModeChooser.choose(listOf(ntsc) + others) { false })
     }
 
     @Test
@@ -37,7 +37,7 @@ class TheRefreshRateClosestToSixtyHertzIsChosenTest {
         val fast = aDisplayMode(modeId = 1, refreshRate = 120f)
         val sixty = aDisplayMode(modeId = 2, refreshRate = 60f)
 
-        assertEquals(sixty, DisplayModeChooser.choose(listOf(fast, sixty)))
+        assertEquals(sixty, DisplayModeChooser.choose(listOf(fast, sixty)) { false })
     }
 
     @Test
@@ -45,7 +45,7 @@ class TheRefreshRateClosestToSixtyHertzIsChosenTest {
         val first = aDisplayMode(modeId = 1, refreshRate = 60f)
         val second = aDisplayMode(modeId = 2, refreshRate = 60f)
 
-        assertEquals(first, DisplayModeChooser.choose(listOf(first, second)))
+        assertEquals(first, DisplayModeChooser.choose(listOf(first, second)) { false })
     }
 
     @Test
@@ -53,8 +53,8 @@ class TheRefreshRateClosestToSixtyHertzIsChosenTest {
         val above = aDisplayMode(modeId = 1, refreshRate = 60.49f)
         val below = aDisplayMode(modeId = 2, refreshRate = 59.51f)
 
-        assertEquals(above, DisplayModeChooser.choose(listOf(above)))
-        assertEquals(below, DisplayModeChooser.choose(listOf(below)))
+        assertEquals(above, DisplayModeChooser.choose(listOf(above)) { false })
+        assertEquals(below, DisplayModeChooser.choose(listOf(below)) { false })
     }
 
     @Test
@@ -62,6 +62,6 @@ class TheRefreshRateClosestToSixtyHertzIsChosenTest {
         val near = aDisplayMode(modeId = 1, refreshRate = 59.9f)
         val far = aDisplayMode(modeId = 2, refreshRate = 60.4f)
 
-        assertEquals(near, DisplayModeChooser.choose(listOf(far, near)))
+        assertEquals(near, DisplayModeChooser.choose(listOf(far, near)) { false })
     }
 }

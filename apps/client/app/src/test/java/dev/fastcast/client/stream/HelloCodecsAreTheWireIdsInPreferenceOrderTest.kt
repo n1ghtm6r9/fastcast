@@ -24,4 +24,9 @@ class HelloCodecsAreTheWireIdsInPreferenceOrderTest {
     fun `only unknown names give no codecs`() {
         assertArrayEquals(IntArray(0), HelloCodecs.of(listOf("vp9", "av1")))
     }
+
+    @Test
+    fun `a ten bit codec is offered with ten bits and the others with eight`() {
+        assertArrayEquals(intArrayOf(2, 10, 1, 8), HelloCodecs.of(listOf("hevc", "avc"), setOf("hevc")))
+    }
 }

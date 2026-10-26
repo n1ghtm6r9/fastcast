@@ -11,6 +11,7 @@ class StreamOffer(
 ) {
 
     private var codecs = request?.codecs.orEmpty()
+    private var tenBitCodecs = request?.tenBitCodecs.orEmpty()
     private var configuredCodec: String? = null
     private var failures = 0
 
@@ -18,7 +19,7 @@ class StreamOffer(
     fun target(): StreamTarget = StreamTarget(
         host = address.substringBeforeLast(HOST_PORT_SEPARATOR),
         port = portOfAddress(),
-        request = request?.let { StreamRequest(it.width, it.height, it.fps, codecs) },
+        request = request?.let { StreamRequest(it.width, it.height, it.fps, codecs, tenBitCodecs) },
     )
 
     @Synchronized
@@ -29,10 +30,10 @@ class StreamOffer(
     @Synchronized
     fun decoderFailed() {
         val failed = configuredCodec ?: return
-        if (failed != codecs.firstOrNull() || codecs.size < 2) return
+        if (failed != codecs.firstOrNull() || !hasFallbackFor(failed)) return
         failures++
         if (failures < FAILURES_BEFORE_DROP) return
-        codecs = codecs - failed
+        if (failed in tenBitCodecs) tenBitCodecs = tenBitCodecs - failed else codecs = codecs - failed
         failures = 0
     }
 
@@ -40,6 +41,8 @@ class StreamOffer(
     fun streamHealthy() {
         failures = 0
     }
+
+    private fun hasFallbackFor(codec: String): Boolean = codec in tenBitCodecs || codecs.size > 1
 
     private fun portOfAddress(): Int =
         address.substringAfterLast(HOST_PORT_SEPARATOR, "").toIntOrNull()
