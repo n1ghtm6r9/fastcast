@@ -9,7 +9,10 @@ pub fn choose_mode(requested: DisplayMode, available: &[DisplayMode]) -> Option<
     };
 
     same_size()
-        .filter(|mode| mode.refresh_hz.checked_rem(requested.refresh_hz) == Some(0))
+        .filter(|mode| {
+            mode.refresh_hz >= requested.refresh_hz
+                && mode.refresh_hz.checked_rem(requested.refresh_hz) == Some(0)
+        })
         .min_by_key(|mode| mode.refresh_hz)
         .or_else(|| {
             same_size()

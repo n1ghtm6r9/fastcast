@@ -7,6 +7,7 @@ pub use placement_of::*;
 
 mod a_display_at_another_refresh_or_place_is_not_back_test;
 mod a_mode_reads_as_width_x_height_at_refresh_test;
+mod a_mode_without_a_refresh_rate_is_no_multiple_of_the_request_test;
 mod a_new_display_of_another_adapter_is_not_a_parsec_display_test;
 mod a_parsec_display_that_was_already_attached_is_not_new_test;
 mod a_parsec_display_that_was_not_attached_before_is_the_new_one_test;
