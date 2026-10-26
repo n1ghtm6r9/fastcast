@@ -195,7 +195,7 @@ Input: the duplicated desktop texture, `B8G8R8A8_UNORM`, gamma-encoded sRGB valu
 
 1. Transport: `wire`, server UDP endpoint, Rust receiver on the TV, Kotlin integration, removal of WebSocket and HTTP. Capture stays ffmpeg. Shipped as one release.
 2. Native capture and encode: `desktop`, `nvenc`, native backend with on-demand IDR and the automatic ffmpeg fallback. `nvenc` can already change the bitrate live; its caller arrives with the phase 4 congestion controller.
-3. 4K 120: display mode and decoder selection up to 120 Hz, virtual display at 120 Hz, 10-bit when supported, bitrate defaults for 4K 120.
-4. Optimizations: SIMD GF(256) (AVX2, NEON), UDP segmentation offload, sub-frame slices, delay-based congestion control that sets the encoder bitrate live, latency telemetry overlay.
+3. 4K 120: display mode and decoder selection up to 120 Hz, virtual display at 120 Hz, 10-bit when supported, bitrate defaults for 4K 120, NVENC preset P1 at 4K 120 (on the RTX 5070 P4 takes 7.4 ms of the 8.3 ms frame, P1 3.6 ms).
+4. Optimizations: SIMD GF(256) (AVX2, NEON; scalar parity runs at about 146 MB/s on one core, so a 2 MB key frame costs 14 ms), UDP segmentation offload, sub-frame slices, delay-based congestion control that sets the encoder bitrate live, latency telemetry overlay, the AVC VUI bitstream restriction (no reordered frames) so Android decoders release every frame at once.
 
 Work that does not depend on another phase may start early (the Phase 2 crates are built in parallel with Phase 1).
