@@ -11,6 +11,7 @@ pub enum CaptureError {
     MissingPipe,
     Demux(FlvError),
     NoEncoderAvailable { tried: Vec<VideoEncoder> },
+    EncoderNotNative { encoder: VideoEncoder },
     Native { frames: u64, cause: NativeError },
 }
 
@@ -38,6 +39,10 @@ impl fmt::Display for CaptureError {
                     names.join(", ")
                 )
             }
+            Self::EncoderNotNative { encoder } => write!(
+                formatter,
+                "VIDEO_ENCODER is set to {encoder}, but native capture encodes with NVENC only"
+            ),
             Self::Native { frames, cause } => write!(
                 formatter,
                 "native capture failed after {frames} frames: {cause}"

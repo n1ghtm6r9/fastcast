@@ -54,6 +54,7 @@ mod scripted_probe;
 mod scripted_probe_calls;
 mod scripted_probe_probe;
 mod sequence_header_tag;
+mod settings_with_encoder;
 mod settle;
 #[cfg(windows)]
 mod try_lock_gpu_slot;
@@ -95,6 +96,7 @@ pub use next_fake_ffmpeg_id::*;
 pub use numbered_output::*;
 pub use scripted_probe::*;
 pub use sequence_header_tag::*;
+pub use settings_with_encoder::*;
 pub use settle::*;
 #[cfg(windows)]
 pub use try_lock_gpu_slot::*;
@@ -129,9 +131,11 @@ mod a_fixed_encoder_is_probed_before_it_is_used_test;
 mod a_fixed_encoder_is_remembered_between_picks_test;
 mod a_fixed_encoder_is_taken_for_hevc_when_it_can_encode_it_test;
 mod a_fixed_encoder_marked_failed_has_no_candidate_left_test;
+mod a_fixed_encoder_other_than_nvenc_is_refused_by_native_capture_test;
 mod a_fixed_encoder_that_fails_its_probe_is_reported_and_no_other_encoder_is_tried_test;
 mod a_fixed_encoder_that_works_for_no_codec_is_named_once_in_the_error_test;
 mod a_fixed_encoder_without_a_hevc_encoder_falls_back_to_avc_test;
+mod a_fixed_nvenc_is_fine_for_native_capture_test;
 mod a_fixed_x264_is_never_offered_for_hevc_test;
 mod a_forgotten_encoder_whose_probe_fails_moves_the_pick_on_test;
 mod a_forgotten_encoder_whose_probe_still_passes_is_picked_again_test;
@@ -173,6 +177,7 @@ mod a_preparation_that_succeeds_is_reported_ready_test;
 #[cfg(windows)]
 mod a_prepared_pipeline_holds_the_ffmpeg_the_encoder_and_the_codec_that_passed_test;
 mod a_probe_error_stops_the_pick_and_marks_nothing_test;
+mod a_refused_encoder_is_named_with_what_native_capture_uses_test;
 #[cfg(windows)]
 mod a_reopen_that_gave_up_is_not_a_lasting_failure_test;
 #[cfg(windows)]
@@ -207,6 +212,7 @@ mod a_switched_off_virtual_display_captures_the_configured_monitor_test;
 mod a_target_without_an_output_is_reported_missing_test;
 mod a_viewer_returning_within_the_grace_keeps_ffmpeg_running_test;
 mod a_worker_starts_only_after_the_previous_one_has_finished_test;
+mod an_automatic_encoder_choice_is_fine_for_native_capture_test;
 mod an_early_picture_does_not_move_the_next_turn_earlier_test;
 mod an_encoded_key_frame_describes_the_stream_before_it_is_published_test;
 #[cfg(windows)]
@@ -261,6 +267,7 @@ mod probing_with_a_missing_ffmpeg_is_an_error_not_a_failed_probe_test;
 mod reopens_that_keep_failing_give_up_after_the_give_up_time_test;
 mod the_amf_pipeline_uses_the_documented_arguments_test;
 mod the_auto_choice_runs_the_native_backend_when_it_prepares_test;
+mod the_auto_choice_uses_ffmpeg_for_a_fixed_encoder_other_than_nvenc_test;
 mod the_backend_refuses_an_explicit_ffmpeg_path_that_is_not_a_file_test;
 mod the_backend_reports_a_missing_ffmpeg_when_the_encoder_is_fixed_test;
 mod the_configured_rate_is_what_the_config_announces_test;
@@ -281,6 +288,7 @@ mod the_hub_is_cleared_when_ffmpeg_exits_by_itself_test;
 mod the_hub_is_cleared_when_the_last_viewer_has_left_and_ffmpeg_is_stopped_test;
 mod the_keyframe_interval_is_the_rate_times_the_seconds_test;
 mod the_last_picture_is_repeated_one_interval_after_it_was_encoded_test;
+mod the_native_backend_does_not_prepare_for_a_fixed_encoder_other_than_nvenc_test;
 mod the_native_backend_prefers_hevc_when_the_tv_decodes_it_test;
 #[cfg(windows)]
 mod the_native_backend_starts_with_a_described_key_frame_test;

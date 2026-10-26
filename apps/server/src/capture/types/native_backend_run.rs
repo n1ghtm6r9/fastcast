@@ -1,6 +1,7 @@
 use crate::capture::{
     CaptureBackend, CaptureError, CaptureReport, CaptureTarget, NativeBackend, NativeError,
-    NativePipeline, Screen, StopOnDrop, open_screen, run_native_capture, spawn_capture_worker,
+    NativePipeline, Screen, StopOnDrop, ensure_native_encoder, open_screen, run_native_capture,
+    spawn_capture_worker,
 };
 use crate::hub::{Hub, ViewerRequest};
 use media::VideoCodec;
@@ -13,6 +14,8 @@ impl CaptureBackend for NativeBackend {
     type Pipeline = NativePipeline;
 
     async fn prepare(&self, request: &ViewerRequest) -> Result<NativePipeline, CaptureError> {
+        ensure_native_encoder(self.settings.video_encoder)?;
+
         let codec = if request.codecs.contains(&VideoCodec::Hevc) {
             VideoCodec::Hevc
         } else {

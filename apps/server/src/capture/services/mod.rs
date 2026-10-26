@@ -5,6 +5,7 @@ mod encoder_args;
 #[cfg(windows)]
 mod encoder_codec_of;
 mod ended_before_the_first_frame;
+mod ensure_native_encoder;
 mod ffmpeg_args;
 mod ffmpeg_command;
 mod ffmpeg_search_dirs;
@@ -60,6 +61,7 @@ pub use encoder_args::*;
 #[cfg(windows)]
 pub use encoder_codec_of::*;
 pub use ended_before_the_first_frame::*;
+pub use ensure_native_encoder::*;
 pub use ffmpeg_args::*;
 pub use ffmpeg_command::*;
 pub use ffmpeg_search_dirs::*;
