@@ -51,6 +51,12 @@ class NativeStreamClient(
         if (handle == NO_HANDLE) UNKNOWN_BUFFER else link.receiveBufferBytes(handle)
     }
 
+    fun requestKeyFrame() {
+        synchronized(lock) {
+            if (handle != NO_HANDLE) link.requestKeyFrame(handle)
+        }
+    }
+
     fun reconnect() {
         synchronized(lock) {
             if (!running) return

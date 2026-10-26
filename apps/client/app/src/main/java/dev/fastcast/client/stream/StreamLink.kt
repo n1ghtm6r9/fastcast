@@ -10,5 +10,7 @@ interface StreamLink {
 
     fun receiveBufferBytes(link: Long): Int
 
+    fun requestKeyFrame(link: Long)
+
     fun close(link: Long)
 }

@@ -37,5 +37,8 @@ object NativeLink {
     external fun receiveBufferBytes(link: Long): Int
 
     @JvmStatic
+    external fun requestKeyFrame(link: Long)
+
+    @JvmStatic
     external fun close(link: Long)
 }

@@ -16,12 +16,16 @@ class FakeStreamLink : StreamLink {
     private val opened = LinkedBlockingQueue<Long>()
     private val openedTargets = CopyOnWriteArrayList<StreamTarget>()
     private val closedLinks = CopyOnWriteArrayList<Long>()
+    private val keyFrameRequests = CopyOnWriteArrayList<Long>()
 
     val targets: List<StreamTarget>
         get() = openedTargets.toList()
 
     val closedHandles: List<Long>
         get() = closedLinks.toList()
+
+    val keyFrameRequestedOn: List<Long>
+        get() = keyFrameRequests.toList()
 
     fun refuseNextOpens(count: Int) = refusals.set(count)
 
@@ -71,6 +75,10 @@ class FakeStreamLink : StreamLink {
     override fun receiveBufferBytes(link: Long): Int = if (inboxes.containsKey(link)) receiveBufferOf(link) else 0
 
     fun receiveBufferOf(handle: Long): Int = RECEIVE_BUFFER_BASE_BYTES + handle.toInt()
+
+    override fun requestKeyFrame(link: Long) {
+        keyFrameRequests.add(link)
+    }
 
     override fun close(link: Long) {
         closedLinks.add(link)
