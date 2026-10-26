@@ -1,3 +1,4 @@
+mod capture_backend_setting;
 mod capture_fps_setting;
 mod capture_output_setting;
 mod ffmpeg_path_setting;
@@ -7,6 +8,7 @@ mod server_name_setting;
 mod video_bitrate_kbps_setting;
 mod video_encoder_setting;
 mod virtual_display_setting;
+pub use capture_backend_setting::*;
 pub use capture_fps_setting::*;
 pub use capture_output_setting::*;
 pub use ffmpeg_path_setting::*;

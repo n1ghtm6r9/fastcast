@@ -1,11 +1,11 @@
 use crate::settings::constants::{
-    CAPTURE_FPS_SETTING, CAPTURE_OUTPUT_SETTING, FFMPEG_PATH_SETTING,
+    CAPTURE_BACKEND_SETTING, CAPTURE_FPS_SETTING, CAPTURE_OUTPUT_SETTING, FFMPEG_PATH_SETTING,
     KEYFRAME_INTERVAL_SECONDS_SETTING, VIDEO_BITRATE_KBPS_SETTING, VIDEO_ENCODER_SETTING,
     VIRTUAL_DISPLAY_SETTING,
 };
 use crate::settings::{
-    Settings, SettingsError, read_encoder_choice, read_number_setting, read_server_name,
-    read_switch_setting, read_text_setting,
+    Settings, SettingsError, read_backend_choice, read_encoder_choice, read_number_setting,
+    read_server_name, read_switch_setting, read_text_setting,
 };
 
 pub fn settings_from(lookup: impl Fn(&str) -> Option<String>) -> Result<Settings, SettingsError> {
@@ -13,6 +13,7 @@ pub fn settings_from(lookup: impl Fn(&str) -> Option<String>) -> Result<Settings
         server_name: read_server_name(&lookup),
         ffmpeg_path: read_text_setting(&FFMPEG_PATH_SETTING, &lookup),
         video_encoder: read_encoder_choice(&VIDEO_ENCODER_SETTING, &lookup)?,
+        capture_backend: read_backend_choice(&CAPTURE_BACKEND_SETTING, &lookup)?,
         virtual_display: read_switch_setting(&VIRTUAL_DISPLAY_SETTING, &lookup)?,
         capture_output: read_number_setting(&CAPTURE_OUTPUT_SETTING, &lookup)?,
         capture_fps: read_number_setting(&CAPTURE_FPS_SETTING, &lookup)?,

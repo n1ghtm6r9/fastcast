@@ -1,9 +1,11 @@
+mod backend_choice;
 mod encoder_choice;
 mod number_setting;
 mod settings;
 mod settings_error;
 mod text_setting;
 mod video_encoder;
+pub use backend_choice::*;
 pub use encoder_choice::*;
 pub use number_setting::*;
 pub use settings::*;
