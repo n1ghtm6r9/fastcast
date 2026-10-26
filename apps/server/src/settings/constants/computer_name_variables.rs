@@ -1,0 +1,1 @@
+pub const COMPUTER_NAME_VARIABLES: [&str; 2] = ["COMPUTERNAME", "HOSTNAME"];
