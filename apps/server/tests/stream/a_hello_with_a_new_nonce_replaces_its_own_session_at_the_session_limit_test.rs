@@ -1,6 +1,6 @@
 use crate::support::{
-    ARRIVAL_LIMIT, SILENCE_LIMIT, a_bare_hello, connect_viewers, hub_without_config, next_welcome,
-    start_endpoint, wait_for_viewers,
+    ARRIVAL_LIMIT, SILENCE_LIMIT, a_bare_hello, connect_viewers, hub_without_config,
+    next_welcome_for, start_endpoint, wait_for_viewers,
 };
 use app::stream::MAX_SESSIONS;
 use std::thread::sleep;
@@ -19,12 +19,11 @@ fn a_hello_with_a_new_nonce_replaces_its_own_session_at_the_session_limit() {
 
     viewers[0].send(&Packet::Hello(second_hello.clone()));
 
-    let (new_session, welcome) =
-        next_welcome(&viewers[0], ARRIVAL_LIMIT).expect("the new hello is welcomed");
+    let new_session = next_welcome_for(&viewers[0], second_hello.nonce, ARRIVAL_LIMIT)
+        .expect("the new hello is welcomed");
 
     sleep(SILENCE_LIMIT);
 
-    assert_eq!(welcome.nonce, second_hello.nonce);
     assert_ne!(new_session, old_session);
     assert_eq!(hub.viewer_count(), MAX_SESSIONS);
 }
