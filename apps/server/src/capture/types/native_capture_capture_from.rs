@@ -10,22 +10,22 @@ impl NativeCapture<'_> {
 
         match acquired {
             Ok(Some(_)) => {
-                self.converter
-                    .convert(&self.device, duplication.frame(), duplication.pointer())
-                    .map_err(NativeError::Desktop)?;
-                self.duplication = Some(duplication);
-                self.has_picture = true;
+                self.picture.arrived();
 
                 if self.clock.may_encode(arrived) {
+                    self.convert_waiting(&duplication)?;
                     self.encode_and_publish(arrived)?;
                 }
+
+                self.duplication = Some(duplication);
 
                 Ok(())
             }
             Ok(None) => {
+                self.convert_waiting(&duplication)?;
                 self.duplication = Some(duplication);
 
-                if self.has_picture {
+                if self.picture.exists() {
                     spin_until(arrived + self.clock.until_repeat(arrived));
                 }
 
@@ -34,7 +34,7 @@ impl NativeCapture<'_> {
             Err(DesktopError::AccessLost) => {
                 info!("access to the desktop was lost, opening the duplication again");
 
-                Ok(())
+                self.convert_waiting(&duplication)
             }
             Err(error) => Err(NativeError::Desktop(error)),
         }

@@ -34,6 +34,8 @@ mod native_capture;
 #[cfg(windows)]
 mod native_capture_capture_from;
 #[cfg(windows)]
+mod native_capture_convert_waiting;
+#[cfg(windows)]
 mod native_capture_encode_and_publish;
 #[cfg(windows)]
 mod native_capture_open;
@@ -49,6 +51,10 @@ mod native_error;
 mod native_error_is_lasting;
 mod native_pipeline;
 mod picker_state;
+mod picture;
+mod picture_arrived;
+mod picture_exists;
+mod picture_take_conversion;
 mod pipeline;
 mod prepare_outcome;
 mod reopen_failures;
@@ -85,6 +91,7 @@ pub use native_capture::*;
 pub use native_error::*;
 pub use native_pipeline::*;
 pub use picker_state::*;
+pub use picture::*;
 pub use pipeline::*;
 pub use prepare_outcome::*;
 pub use reopen_failures::*;
