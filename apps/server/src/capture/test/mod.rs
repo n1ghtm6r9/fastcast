@@ -35,6 +35,8 @@ mod frame_tag;
 #[cfg(windows)]
 mod frame_while_running;
 #[cfg(windows)]
+mod frames_in_the_second_after_the_first;
+#[cfg(windows)]
 mod frames_within_while_running;
 #[cfg(windows)]
 mod gpu_slots;
@@ -78,6 +80,8 @@ pub use flv_video_tag::*;
 pub use frame_tag::*;
 #[cfg(windows)]
 pub use frame_while_running::*;
+#[cfg(windows)]
+pub use frames_in_the_second_after_the_first::*;
 #[cfg(windows)]
 pub use frames_within_while_running::*;
 #[cfg(windows)]
@@ -150,6 +154,7 @@ mod a_key_frame_whose_parameter_sets_cannot_be_described_is_refused_test;
 mod a_key_frame_without_parameter_sets_is_described_test;
 mod a_key_frame_without_parameter_sets_is_refused_test;
 mod a_late_picture_starts_a_new_turn_from_itself_test;
+mod a_late_wake_up_does_not_shift_the_later_turns_test;
 mod a_later_key_frame_restarts_the_wait_test;
 mod a_missing_ffmpeg_is_reported_with_the_install_hint_test;
 mod a_missing_ffmpeg_keeps_the_supervisor_alive_and_retrying_test;
@@ -252,6 +257,8 @@ mod forgetting_the_resolved_encoder_keeps_the_failure_marks_test;
 mod forwarding_stderr_ends_when_the_pipe_closes_and_survives_invalid_utf8_test;
 mod frames_before_the_sequence_header_are_dropped_by_the_hub_test;
 #[cfg(windows)]
+mod frames_come_at_about_the_frame_rate_at_120_fps_test;
+#[cfg(windows)]
 mod frames_come_at_about_the_frame_rate_test;
 mod hevc_is_picked_when_the_viewer_lists_it_first_and_an_encoder_for_it_works_test;
 mod marking_the_resolved_encoder_failed_forgets_it_and_moves_on_to_the_next_test;
@@ -265,6 +272,7 @@ mod no_key_frame_is_wanted_without_a_request_test;
 mod no_viewers_means_ffmpeg_is_never_started_test;
 mod probing_with_a_missing_ffmpeg_is_an_error_not_a_failed_probe_test;
 mod reopens_that_keep_failing_give_up_after_the_give_up_time_test;
+mod spinning_does_not_return_before_the_deadline_test;
 mod the_amf_pipeline_uses_the_documented_arguments_test;
 mod the_auto_choice_runs_the_native_backend_when_it_prepares_test;
 mod the_auto_choice_uses_ffmpeg_for_a_fixed_encoder_other_than_nvenc_test;
@@ -313,6 +321,7 @@ mod viewers_gone_for_returns_after_the_grace_when_nobody_is_watching_test;
 mod viewers_gone_for_starts_the_grace_over_when_a_viewer_comes_and_goes_test;
 mod viewers_leaving_during_the_restart_delay_stop_the_restart_test;
 mod viewers_leaving_while_ffmpeg_is_prepared_stop_the_preparation_test;
+mod wake_ups_that_are_always_a_little_late_do_not_add_up_to_a_drift_test;
 #[cfg(windows)]
 mod when_every_probe_fails_the_backend_reports_none_usable_and_starts_over_test;
 mod when_every_probe_fails_the_error_lists_them_and_probing_starts_over_next_time_test;

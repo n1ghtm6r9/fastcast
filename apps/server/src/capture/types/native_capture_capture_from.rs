@@ -1,4 +1,4 @@
-use crate::capture::{NativeCapture, NativeError};
+use crate::capture::{NativeCapture, NativeError, spin_until};
 use desktop::{DesktopError, Duplication};
 use std::time::Instant;
 use tracing::info;
@@ -25,7 +25,11 @@ impl NativeCapture<'_> {
             Ok(None) => {
                 self.duplication = Some(duplication);
 
-                self.repeat(arrived)
+                if self.has_picture {
+                    spin_until(arrived + self.clock.until_repeat(arrived));
+                }
+
+                self.repeat(Instant::now())
             }
             Err(DesktopError::AccessLost) => {
                 info!("access to the desktop was lost, opening the duplication again");
