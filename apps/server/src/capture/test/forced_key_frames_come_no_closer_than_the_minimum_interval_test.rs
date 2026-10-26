@@ -3,7 +3,7 @@ use super::{
     hold_gpu_slot,
 };
 use crate::capture::{CaptureBackend, NativeBackend, NativePipeline};
-use crate::hub::Hub;
+use crate::hub::{EIGHT_BIT_DEPTH, Hub};
 use media::VideoCodec;
 use std::sync::Arc;
 use std::time::Duration;
@@ -17,6 +17,7 @@ async fn forced_key_frames_come_no_closer_than_the_minimum_interval() {
     let hub = Arc::new(Hub::new());
     let pipeline = NativePipeline {
         codec: VideoCodec::Hevc,
+        bit_depth: EIGHT_BIT_DEPTH,
     };
     let target = capture_target();
     let mut subscription = hub.join();

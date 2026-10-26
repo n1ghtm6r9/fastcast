@@ -1,7 +1,7 @@
 use crate::settings::constants::{
     CAPTURE_BACKEND_SETTING, CAPTURE_FPS_SETTING, CAPTURE_OUTPUT_SETTING, FFMPEG_PATH_SETTING,
     KEYFRAME_INTERVAL_SECONDS_SETTING, VIDEO_BITRATE_KBPS_SETTING, VIDEO_ENCODER_SETTING,
-    VIRTUAL_DISPLAY_SETTING,
+    VIDEO_TEN_BIT_SETTING, VIRTUAL_DISPLAY_SETTING,
 };
 use crate::settings::{
     Settings, SettingsError, read_backend_choice, read_encoder_choice, read_number_setting,
@@ -18,6 +18,7 @@ pub fn settings_from(lookup: impl Fn(&str) -> Option<String>) -> Result<Settings
         capture_output: read_number_setting(&CAPTURE_OUTPUT_SETTING, &lookup)?,
         capture_fps: read_number_setting(&CAPTURE_FPS_SETTING, &lookup)?,
         video_bitrate_kbps: read_number_setting(&VIDEO_BITRATE_KBPS_SETTING, &lookup)?,
+        ten_bit_video: read_switch_setting(&VIDEO_TEN_BIT_SETTING, &lookup)?,
         keyframe_interval_seconds: read_number_setting(
             &KEYFRAME_INTERVAL_SECONDS_SETTING,
             &lookup,

@@ -1,6 +1,6 @@
 use super::{default_settings, frame_while_running, frames_within_while_running, hold_gpu_slot};
 use crate::capture::{CaptureBackend, CaptureTarget, NativeBackend, NativePipeline};
-use crate::hub::Hub;
+use crate::hub::{EIGHT_BIT_DEPTH, Hub};
 use media::VideoCodec;
 use std::sync::Arc;
 use std::time::Duration;
@@ -11,6 +11,7 @@ pub async fn frames_in_the_second_after_the_first(fps: u32) -> usize {
     let hub = Arc::new(Hub::new());
     let pipeline = NativePipeline {
         codec: VideoCodec::Hevc,
+        bit_depth: EIGHT_BIT_DEPTH,
     };
     let target = CaptureTarget { output: 0, fps };
     let mut subscription = hub.join();

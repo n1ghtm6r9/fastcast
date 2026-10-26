@@ -10,5 +10,6 @@ pub struct Settings {
     pub capture_output: u32,
     pub capture_fps: u32,
     pub video_bitrate_kbps: u32,
+    pub ten_bit_video: bool,
     pub keyframe_interval_seconds: u32,
 }

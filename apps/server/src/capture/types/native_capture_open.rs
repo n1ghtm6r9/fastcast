@@ -1,10 +1,10 @@
 use crate::capture::{
     CaptureTarget, FrameClock, KeyFrameGate, NATIVE_ENCODER_PRESET, NativeCapture, NativeError,
-    Picture, ReopenFailures, encoder_codec_of, nvidia_output_for,
+    NativePipeline, Picture, ReopenFailures, converter_depth_of, encoder_codec_of,
+    nvidia_output_for,
 };
 use crate::hub::Hub;
-use desktop::{BitDepth, Converter, Duplication, GpuDevice, list_outputs};
-use media::VideoCodec;
+use desktop::{Converter, Duplication, GpuDevice, list_outputs};
 use nvenc::{Encoder, EncoderSettings};
 use std::sync::atomic::AtomicBool;
 use std::time::Instant;
@@ -12,7 +12,7 @@ use std::time::Instant;
 impl<'a> NativeCapture<'a> {
     pub fn open(
         hub: &'a Hub,
-        codec: VideoCodec,
+        pipeline: NativePipeline,
         target: &CaptureTarget,
         bitrate_kbps: u32,
         stop: &'a AtomicBool,
@@ -22,17 +22,22 @@ impl<'a> NativeCapture<'a> {
         let device = GpuDevice::new(output.adapter_luid).map_err(NativeError::Desktop)?;
         let duplication = Duplication::new(&device, &output).map_err(NativeError::Desktop)?;
         let size = (duplication.width(), duplication.height());
-        let converter = Converter::new(&device, size.0, size.1, BitDepth::Eight)
-            .map_err(NativeError::Desktop)?;
+        let converter = Converter::new(
+            &device,
+            size.0,
+            size.1,
+            converter_depth_of(pipeline.bit_depth),
+        )
+        .map_err(NativeError::Desktop)?;
         let encoder = Encoder::open(
             device.device(),
             &EncoderSettings {
-                codec: encoder_codec_of(codec),
+                codec: encoder_codec_of(pipeline.codec),
                 width: size.0,
                 height: size.1,
                 fps: target.fps,
                 bitrate_kbps,
-                bit_depth: 8,
+                bit_depth: pipeline.bit_depth,
                 preset: NATIVE_ENCODER_PRESET,
             },
         )
@@ -45,7 +50,7 @@ impl<'a> NativeCapture<'a> {
             device,
             hub,
             stop,
-            codec,
+            codec: pipeline.codec,
             fps: target.fps,
             output,
             size,

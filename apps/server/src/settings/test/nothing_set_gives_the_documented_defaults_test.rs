@@ -16,6 +16,7 @@ fn nothing_set_gives_the_documented_defaults() {
             capture_output: 0,
             capture_fps: 60,
             video_bitrate_kbps: 40000,
+            ten_bit_video: true,
             keyframe_interval_seconds: 1,
         }
     );
