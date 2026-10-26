@@ -1,0 +1,1 @@
+pub const HVCC_FOUR_BYTE_NAL_LENGTH_FIELD: u8 = 0x03;

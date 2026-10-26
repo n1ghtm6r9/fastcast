@@ -1,0 +1,1 @@
+pub const HVCC_TEMPORAL_LAYERS_SHIFT: u8 = 3;

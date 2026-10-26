@@ -1,0 +1,1 @@
+pub const HVCC_UNSPECIFIED_FRAME_RATE: [u8; 2] = [0x00, 0x00];

@@ -1,0 +1,1 @@
+pub const HVCC_TEMPORAL_ID_NESTING_SHIFT: u8 = 2;

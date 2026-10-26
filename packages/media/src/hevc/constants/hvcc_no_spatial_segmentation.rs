@@ -1,0 +1,1 @@
+pub const HVCC_NO_SPATIAL_SEGMENTATION: [u8; 2] = [0xF0, 0x00];

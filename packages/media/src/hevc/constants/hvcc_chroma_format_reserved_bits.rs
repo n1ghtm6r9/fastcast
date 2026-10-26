@@ -1,0 +1,1 @@
+pub const HVCC_CHROMA_FORMAT_RESERVED_BITS: u8 = 0xFC;

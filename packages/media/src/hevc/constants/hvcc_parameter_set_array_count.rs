@@ -1,0 +1,1 @@
+pub const HVCC_PARAMETER_SET_ARRAY_COUNT: u8 = 3;
