@@ -9,6 +9,6 @@ fn a_refused_encoder_is_named_with_what_native_capture_uses() {
 
     assert_eq!(
         failure.to_string(),
-        "VIDEO_ENCODER is set to x264, but native capture encodes with NVENC only"
+        "the encoder is set to x264, but native capture encodes with NVENC only"
     );
 }

@@ -20,7 +20,7 @@ impl fmt::Display for CaptureError {
         match self {
             Self::FfmpegNotFound { path } => write!(
                 formatter,
-                "ffmpeg was not found at \"{path}\": install it with `{FFMPEG_INSTALL_HINT}` or set FFMPEG_PATH to the full path of ffmpeg.exe"
+                "ffmpeg was not found at \"{path}\": install it with `{FFMPEG_INSTALL_HINT}` or put the full path of ffmpeg.exe into «Путь к ffmpeg»"
             ),
             Self::Spawn { path, source } => {
                 write!(formatter, "could not start \"{path}\": {source}")
@@ -41,7 +41,7 @@ impl fmt::Display for CaptureError {
             }
             Self::EncoderNotNative { encoder } => write!(
                 formatter,
-                "VIDEO_ENCODER is set to {encoder}, but native capture encodes with NVENC only"
+                "the encoder is set to {encoder}, but native capture encodes with NVENC only"
             ),
             Self::Native { frames, cause } => write!(
                 formatter,
