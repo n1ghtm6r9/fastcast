@@ -27,6 +27,7 @@ mod link_state;
 mod link_state_new;
 mod link_target;
 mod queue_state;
+mod queue_state_drop_frames_except_the_latest_config;
 pub use event_queue::*;
 pub use link::*;
 pub use link_event::*;

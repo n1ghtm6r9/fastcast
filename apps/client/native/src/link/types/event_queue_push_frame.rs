@@ -12,8 +12,7 @@ impl EventQueue {
         }
 
         if state.frames >= MAX_QUEUED_FRAMES {
-            state.events.retain(|queued| !queued.is_frame());
-            state.frames = 0;
+            state.drop_frames_except_the_latest_config();
             state.waiting_for_key_frame = true;
 
             if !key_video && !config {
