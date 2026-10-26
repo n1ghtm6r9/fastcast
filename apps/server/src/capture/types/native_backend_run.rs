@@ -1,7 +1,7 @@
 use crate::capture::{
     CaptureBackend, CaptureError, CaptureReport, CaptureTarget, NativeBackend, NativeError,
     NativePipeline, Screen, StopOnDrop, bit_depth_for, ensure_native_encoder, open_screen,
-    run_native_capture, spawn_capture_worker,
+    run_native_capture, spawn_capture_worker, stream_bitrate_kbps,
 };
 use crate::hub::{Hub, ViewerRequest};
 use media::VideoCodec;
@@ -38,13 +38,11 @@ impl CaptureBackend for NativeBackend {
         pipeline: &NativePipeline,
         target: &CaptureTarget,
     ) -> Result<CaptureReport, CaptureError> {
+        let bitrate_kbps = stream_bitrate_kbps(self.settings.video_bitrate_kbps, target.fps);
+
         info!(
             "starting native capture of output {} with NVENC {:?} {}-bit at {} fps, {} kbps",
-            target.output,
-            pipeline.codec,
-            pipeline.bit_depth,
-            target.fps,
-            self.settings.video_bitrate_kbps
+            target.output, pipeline.codec, pipeline.bit_depth, target.fps, bitrate_kbps
         );
 
         let stop = StopOnDrop(Arc::new(AtomicBool::new(false)));
@@ -55,7 +53,6 @@ impl CaptureBackend for NativeBackend {
             let hub = hub.clone();
             let pipeline = *pipeline;
             let target = target.clone();
-            let bitrate_kbps = self.settings.video_bitrate_kbps;
             let stopped = stop.0.clone();
 
             move || {

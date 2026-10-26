@@ -1,13 +1,13 @@
 use crate::capture::{
-    CaptureTarget, FrameClock, KeyFrameGate, NATIVE_ENCODER_PRESET, NativeCapture, NativeError,
-    NativePipeline, Picture, ReopenFailures, converter_depth_of, encoder_codec_of,
-    nvidia_output_for,
+    CaptureTarget, FrameClock, KeyFrameGate, NativeCapture, NativeError, NativePipeline, Picture,
+    ReopenFailures, converter_depth_of, encoder_codec_of, encoder_preset_for, nvidia_output_for,
 };
 use crate::hub::Hub;
 use desktop::{Converter, Duplication, GpuDevice, list_outputs};
 use nvenc::{Encoder, EncoderSettings};
 use std::sync::atomic::AtomicBool;
 use std::time::Instant;
+use tracing::info;
 
 impl<'a> NativeCapture<'a> {
     pub fn open(
@@ -29,6 +29,13 @@ impl<'a> NativeCapture<'a> {
             converter_depth_of(pipeline.bit_depth),
         )
         .map_err(NativeError::Desktop)?;
+        let preset = encoder_preset_for(size.0, size.1, target.fps);
+
+        info!(
+            "encoding {}x{} {}-bit at {} fps with NVENC preset P{}",
+            size.0, size.1, pipeline.bit_depth, target.fps, preset
+        );
+
         let encoder = Encoder::open(
             device.device(),
             &EncoderSettings {
@@ -38,7 +45,7 @@ impl<'a> NativeCapture<'a> {
                 fps: target.fps,
                 bitrate_kbps,
                 bit_depth: pipeline.bit_depth,
-                preset: NATIVE_ENCODER_PRESET,
+                preset,
             },
         )
         .map_err(NativeError::Encoder)?;
