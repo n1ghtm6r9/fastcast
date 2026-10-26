@@ -1,20 +1,30 @@
-use crate::app::{data_directory, init_logger, shutdown_signal};
-use crate::server::ServerControl;
+use crate::app::{data_directory, log_panics, serve_in_window, show_problem, window_problem_text};
+use crate::journal::{JOURNAL_FILE_NAME, start_journal};
 use crate::settings::constants::SETTINGS_FILE_NAME;
-use crate::settings::{SavedSettings, computer_name, read_saved_settings, settings_of};
-use tokio::runtime::Handle;
-use tracing::warn;
+use crate::settings::{SavedSettings, read_saved_settings};
+use tokio::runtime::Runtime;
+use tracing::{error, warn};
 
-pub async fn run() {
-    init_logger();
+pub fn run() {
+    let directory = data_directory();
+    let journal_file = directory.join(JOURNAL_FILE_NAME);
+    let settings_file = directory.join(SETTINGS_FILE_NAME);
+    let (saved, unread) = match read_saved_settings(&settings_file) {
+        Ok(saved) => (saved, None),
+        Err(problem) => (SavedSettings::default(), Some(problem)),
+    };
+    let journal = start_journal(saved.log_level, &journal_file);
 
-    let saved =
-        read_saved_settings(&data_directory().join(SETTINGS_FILE_NAME)).unwrap_or_else(|problem| {
-            warn!("{problem}, the defaults are used");
-            SavedSettings::default()
-        });
-    let control = ServerControl::start(&Handle::current(), settings_of(&saved, &computer_name()));
+    log_panics();
+    if let Some(problem) = unread {
+        warn!("{problem}, the defaults are used");
+    }
 
-    shutdown_signal().await;
-    control.stop().await;
+    match Runtime::new() {
+        Ok(runtime) => serve_in_window(runtime, &journal, saved, &settings_file, &journal_file),
+        Err(problem) => {
+            error!("the server runtime cannot start: {problem}");
+            show_problem(&window_problem_text(problem, &journal_file));
+        }
+    }
 }

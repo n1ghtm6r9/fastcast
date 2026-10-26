@@ -1,1 +1,24 @@
+mod answer_limit;
+mod idle_journal_level;
+mod next_settings;
+mod start_recording_control;
+mod test_computer_name;
+pub use answer_limit::*;
+pub use idle_journal_level::*;
+pub use next_settings::*;
+pub use start_recording_control::*;
+pub use test_computer_name::*;
+
+mod a_cut_icon_has_no_largest_picture_test;
+mod a_panic_is_written_to_the_journal_test;
+mod a_server_that_does_not_stop_does_not_keep_fastcast_open_test;
+mod a_window_that_cannot_open_is_explained_with_the_journal_file_test;
+mod an_icon_without_pictures_has_no_largest_picture_test;
+mod applied_settings_are_written_to_the_settings_file_test;
+mod applied_settings_change_the_journal_level_test;
+mod applied_settings_reach_the_server_named_after_the_computer_when_blank_test;
+mod closing_the_window_stops_the_server_test;
+mod settings_that_cannot_be_written_still_reach_the_server_test;
 mod the_data_directory_is_fastcast_in_appdata_or_in_the_temporary_directory_test;
+mod the_window_icon_is_the_largest_picture_of_the_fastcast_icon_test;
+mod the_window_opens_titled_fastcast_with_its_icon_test;

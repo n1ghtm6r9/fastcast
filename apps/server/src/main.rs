@@ -1,4 +1,5 @@
-#[tokio::main(flavor = "multi_thread")]
-async fn main() {
-    app::app::run().await;
+#![cfg_attr(windows, windows_subsystem = "windows")]
+
+fn main() {
+    app::app::run();
 }
