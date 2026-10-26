@@ -1,10 +1,8 @@
 use crate::support::{
-    TestViewer, a_bare_hello, hub_with_config, next_config, next_video_shard_header,
-    random_payload, start_endpoint, wait_for_viewers,
+    TestViewer, a_bare_hello, hub_with_config, next_config, next_video_shard_header_after,
+    random_payload, start_endpoint, wait_for_viewers, wait_until,
 };
-use std::thread::sleep;
-use std::time::Duration;
-use wire::{Feedback, Packet, SESSION_TIMEOUT};
+use wire::{Feedback, Packet, SESSION_TIMEOUT, ShardHeader};
 
 #[test]
 fn reported_loss_raises_the_parity_of_later_frames() {
@@ -26,10 +24,23 @@ fn reported_loss_raises_the_parity_of_later_frames() {
         ..Feedback::default()
     }));
 
-    sleep(Duration::from_millis(200));
-    hub.publish(true, 1, &random_payload(3, 50_000));
+    let payload = random_payload(3, 50_000);
+    let mut header: Option<ShardHeader> = None;
+    let mut timestamp = 0;
 
-    let header = next_video_shard_header(&viewer);
+    wait_until(SESSION_TIMEOUT / 2, || {
+        timestamp += 1;
+        hub.publish(true, timestamp, &payload);
+
+        let newest = header.map(|seen| seen.frame);
+        let seen = next_video_shard_header_after(&viewer, newest);
+
+        header = Some(seen);
+
+        seen.parity_shards == 12
+    });
+
+    let header = header.expect("a video frame arrives in time");
 
     assert_eq!(header.data_shards, 37);
     assert_eq!(header.parity_shards, 12);
