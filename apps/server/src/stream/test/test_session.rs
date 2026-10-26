@@ -1,0 +1,1 @@
+pub const TEST_SESSION: u32 = 0x5EED_0001;
