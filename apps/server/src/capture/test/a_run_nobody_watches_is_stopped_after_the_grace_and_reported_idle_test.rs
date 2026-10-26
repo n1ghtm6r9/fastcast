@@ -1,12 +1,13 @@
 use super::{FakeBackend, capture_target};
 use crate::capture::{WatchOutcome, run_while_watched};
 use crate::hub::Hub;
+use std::sync::Arc;
 use std::time::Duration;
 use tokio::time::Instant;
 
 #[tokio::test(start_paused = true)]
 async fn a_run_nobody_watches_is_stopped_after_the_grace_and_reported_idle() {
-    let hub = Hub::new();
+    let hub = Arc::new(Hub::new());
     let backend = FakeBackend::scripted(vec![]);
     let mut viewers = hub.watch_viewers();
     let started = Instant::now();

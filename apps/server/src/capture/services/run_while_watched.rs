@@ -2,10 +2,11 @@ use crate::capture::{
     CaptureBackend, CaptureTarget, IDLE_GRACE, WatchOutcome, request_changed, viewers_gone_for,
 };
 use crate::hub::{Hub, ViewerRequest};
+use std::sync::Arc;
 use tokio::sync::watch;
 
 pub async fn run_while_watched<B: CaptureBackend>(
-    hub: &Hub,
+    hub: &Arc<Hub>,
     backend: &B,
     pipeline: &B::Pipeline,
     target: &CaptureTarget,

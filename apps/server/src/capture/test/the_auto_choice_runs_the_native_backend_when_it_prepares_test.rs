@@ -1,0 +1,31 @@
+use super::{FakeBackend, FakeRun, capture_target};
+use crate::capture::{CaptureBackend, CaptureReport, SwitchingBackend};
+use crate::hub::{Hub, ViewerRequest};
+use crate::settings::BackendChoice;
+use std::sync::Arc;
+use std::time::Duration;
+
+#[tokio::test(start_paused = true)]
+async fn the_auto_choice_runs_the_native_backend_when_it_prepares() {
+    let native = FakeBackend::scripted(vec![FakeRun::EndsAfter {
+        delay: Duration::ZERO,
+        frames: 2,
+    }]);
+    let ffmpeg = FakeBackend::scripted(vec![]);
+    let backend = SwitchingBackend::new(BackendChoice::Auto, native.clone(), ffmpeg.clone());
+    let hub = Arc::new(Hub::new());
+
+    let pipeline = backend
+        .prepare(&ViewerRequest::default())
+        .await
+        .expect("the native backend prepares");
+
+    let report = backend
+        .run(&hub, &pipeline, &capture_target())
+        .await
+        .expect("the native run ends");
+
+    assert_eq!(report, CaptureReport { frames: 2 });
+    assert_eq!(native.starts(), 1);
+    assert_eq!(ffmpeg.starts(), 0);
+}

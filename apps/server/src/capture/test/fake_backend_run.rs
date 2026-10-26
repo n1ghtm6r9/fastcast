@@ -1,7 +1,10 @@
 use super::{FakeBackend, FakePreparation, FakeRun, KillCounter, capture_target};
-use crate::capture::{CaptureBackend, CaptureError, CaptureReport, CaptureTarget, Screen};
+use crate::capture::{
+    CaptureBackend, CaptureError, CaptureReport, CaptureTarget, NativeError, Screen,
+};
 use crate::fixtures::{config_of, nvenc_2560x1440_avcc};
 use crate::hub::{Hub, ViewerRequest};
+use std::sync::Arc;
 use std::sync::atomic::Ordering;
 use tokio::time::sleep;
 
@@ -45,7 +48,7 @@ impl CaptureBackend for FakeBackend {
 
     async fn run(
         &self,
-        hub: &Hub,
+        hub: &Arc<Hub>,
         _pipeline: &(),
         _target: &CaptureTarget,
     ) -> Result<CaptureReport, CaptureError> {
@@ -73,6 +76,12 @@ impl CaptureBackend for FakeBackend {
                 sleep(delay).await;
                 Err(CaptureError::MissingPipe)
             }
+            FakeRun::FailsNatively { frames } => Err(CaptureError::Native {
+                frames,
+                cause: NativeError::NotNvidia {
+                    adapter: "a fake adapter".to_owned(),
+                },
+            }),
         };
 
         kill_counter.disarm();

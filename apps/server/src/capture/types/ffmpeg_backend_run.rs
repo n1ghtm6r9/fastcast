@@ -4,6 +4,7 @@ use crate::capture::{
     pick_codec_and_encoder, probe_encoder, run_ffmpeg,
 };
 use crate::hub::{Hub, ViewerRequest};
+use std::sync::Arc;
 use tracing::{info, warn};
 
 impl CaptureBackend for FfmpegBackend {
@@ -31,7 +32,7 @@ impl CaptureBackend for FfmpegBackend {
 
     async fn run(
         &self,
-        hub: &Hub,
+        hub: &Arc<Hub>,
         pipeline: &Pipeline,
         target: &CaptureTarget,
     ) -> Result<CaptureReport, CaptureError> {

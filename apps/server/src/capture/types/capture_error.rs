@@ -1,4 +1,4 @@
-use crate::capture::FFMPEG_INSTALL_HINT;
+use crate::capture::{FFMPEG_INSTALL_HINT, NativeError};
 use crate::settings::VideoEncoder;
 use media::FlvError;
 use std::error::Error;
@@ -11,6 +11,7 @@ pub enum CaptureError {
     MissingPipe,
     Demux(FlvError),
     NoEncoderAvailable { tried: Vec<VideoEncoder> },
+    Native { frames: u64, cause: NativeError },
 }
 
 impl fmt::Display for CaptureError {
@@ -37,6 +38,10 @@ impl fmt::Display for CaptureError {
                     names.join(", ")
                 )
             }
+            Self::Native { frames, cause } => write!(
+                formatter,
+                "native capture failed after {frames} frames: {cause}"
+            ),
         }
     }
 }
@@ -46,6 +51,7 @@ impl Error for CaptureError {
         match self {
             Self::Spawn { source, .. } => Some(source),
             Self::Demux(error) => Some(error),
+            Self::Native { cause, .. } => Some(cause),
             _ => None,
         }
     }

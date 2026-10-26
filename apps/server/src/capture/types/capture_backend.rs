@@ -1,6 +1,7 @@
 use crate::capture::{CaptureError, CaptureReport, CaptureTarget, Screen};
 use crate::hub::{Hub, ViewerRequest};
 use std::future::Future;
+use std::sync::Arc;
 
 pub trait CaptureBackend: Send + Sync + 'static {
     type Pipeline: Send + Sync;
@@ -14,7 +15,7 @@ pub trait CaptureBackend: Send + Sync + 'static {
 
     fn run(
         &self,
-        hub: &Hub,
+        hub: &Arc<Hub>,
         pipeline: &Self::Pipeline,
         target: &CaptureTarget,
     ) -> impl Future<Output = Result<CaptureReport, CaptureError>> + Send;
