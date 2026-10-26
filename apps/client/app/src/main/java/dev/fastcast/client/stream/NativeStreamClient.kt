@@ -1,5 +1,6 @@
 package dev.fastcast.client.stream
 
+import dev.fastcast.client.stream.NativeLink.NO_HANDLE
 import java.util.concurrent.Executors
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.ScheduledFuture
@@ -196,7 +197,6 @@ class NativeStreamClient(
     }
 
     private companion object {
-        const val NO_HANDLE = 0L
         const val UNKNOWN_BUFFER = 0
         const val KIND_SIZE = 1
         const val RECEIVE_POLL_MS = 100

@@ -7,6 +7,8 @@ object NativeLink {
     const val EVENT_CONNECTED = 2
     const val EVENT_ENDED = 3
 
+    const val NO_HANDLE = 0L
+
     private const val LIBRARY = "fastcast_native"
 
     init {

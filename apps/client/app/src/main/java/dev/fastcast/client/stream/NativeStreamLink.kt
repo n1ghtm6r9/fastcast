@@ -8,15 +8,19 @@ object NativeStreamLink : StreamLink {
 
     override fun open(target: StreamTarget): Long {
         val request = target.request
-        return NativeLink.open(
-            target.host,
-            target.port,
-            Random.nextInt(),
-            request?.width ?: NO_MODE,
-            request?.height ?: NO_MODE,
-            request?.fps ?: NO_MODE,
-            request?.let { HelloCodecs.of(it.codecs) } ?: IntArray(0),
-        )
+        return try {
+            NativeLink.open(
+                target.host,
+                target.port,
+                Random.nextInt(),
+                request?.width ?: NO_MODE,
+                request?.height ?: NO_MODE,
+                request?.fps ?: NO_MODE,
+                request?.let { HelloCodecs.of(it.codecs) } ?: IntArray(0),
+            )
+        } catch (e: LinkageError) {
+            NativeLink.NO_HANDLE
+        }
     }
 
     override fun receive(link: Long, timeoutMs: Int): ByteArray? = NativeLink.receive(link, timeoutMs)
