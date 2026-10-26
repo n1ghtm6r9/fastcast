@@ -18,6 +18,7 @@ import dev.fastcast.client.decoder.DecoderSelector
 import dev.fastcast.client.decoder.SupportedCodecs
 import dev.fastcast.client.discovery.DiscoveredServer
 import dev.fastcast.client.display.DisplayModeChooser
+import dev.fastcast.client.display.DisplayModeOption
 import dev.fastcast.client.display.DisplayModes
 import dev.fastcast.client.display.MinimalPostProcessing
 import dev.fastcast.client.display.PreferredDisplayMode
@@ -149,13 +150,15 @@ class PlayerActivity : Activity(), PlayerSessionListener {
 
     private fun requestStream(): StreamRequest? {
         val display = screen ?: return null
-        val chosen = DisplayModeChooser.choose(DisplayModes.supported(display))
+        val modes = DisplayModes.supported(display)
+        val chosen = DisplayModeChooser.choose(modes) { hardwareCodecsAt(it).isNotEmpty() }
         chosen?.let { PreferredDisplayMode.apply(window, it) }
         val mode = chosen ?: DisplayModes.active(display)
-        val codecs = SupportedCodecs.among { mime ->
-            DecoderSelector.canDecodeInHardware(mime, mode.width, mode.height, mode.fps)
-        }
-        return StreamRequest(mode.width, mode.height, mode.fps, codecs)
+        return StreamRequest(mode.width, mode.height, mode.fps, hardwareCodecsAt(mode))
+    }
+
+    private fun hardwareCodecsAt(mode: DisplayModeOption): List<String> = SupportedCodecs.among { mime ->
+        DecoderSelector.canDecodeInHardware(mime, mode.width, mode.height, mode.fps)
     }
 
     private fun activeDisplayLabel(): String = screen?.let { DisplayModes.active(it).label }.orEmpty()

@@ -12,7 +12,7 @@ class TheLargestPictureIsChosenBeforeTheRefreshRateTest {
         val small = aDisplayMode(modeId = 1, width = 1920, height = 1080)
         val large = aDisplayMode(modeId = 2, width = 3840, height = 2160)
 
-        assertEquals(large, DisplayModeChooser.choose(listOf(small, large)))
+        assertEquals(large, DisplayModeChooser.choose(listOf(small, large)) { false })
     }
 
     @Test
@@ -20,7 +20,7 @@ class TheLargestPictureIsChosenBeforeTheRefreshRateTest {
         val small = aDisplayMode(modeId = 1, width = 1920, height = 1080)
         val large = aDisplayMode(modeId = 2, width = 3840, height = 2160)
 
-        assertEquals(large, DisplayModeChooser.choose(listOf(large, small)))
+        assertEquals(large, DisplayModeChooser.choose(listOf(large, small)) { false })
     }
 
     @Test
@@ -28,7 +28,7 @@ class TheLargestPictureIsChosenBeforeTheRefreshRateTest {
         val wide = aDisplayMode(modeId = 1, width = 4096, height = 1716)
         val tall = aDisplayMode(modeId = 2, width = 3840, height = 2160)
 
-        assertEquals(tall, DisplayModeChooser.choose(listOf(wide, tall)))
+        assertEquals(tall, DisplayModeChooser.choose(listOf(wide, tall)) { false })
     }
 
     @Test
@@ -36,7 +36,7 @@ class TheLargestPictureIsChosenBeforeTheRefreshRateTest {
         val largeButSlow = aDisplayMode(modeId = 1, width = 3840, height = 2160, refreshRate = 30f)
         val smallAndFast = aDisplayMode(modeId = 2, width = 1920, height = 1080, refreshRate = 60f)
 
-        assertNull(DisplayModeChooser.choose(listOf(largeButSlow, smallAndFast)))
+        assertNull(DisplayModeChooser.choose(listOf(largeButSlow, smallAndFast)) { false })
     }
 
     @Test
@@ -45,13 +45,13 @@ class TheLargestPictureIsChosenBeforeTheRefreshRateTest {
         val smallAtSixty = aDisplayMode(modeId = 2, width = 1920, height = 1080, refreshRate = 60f)
         val largeAtThirty = aDisplayMode(modeId = 3, width = 3840, height = 2160, refreshRate = 30f)
 
-        assertEquals(largeAtSixty, DisplayModeChooser.choose(listOf(smallAtSixty, largeAtThirty, largeAtSixty)))
+        assertEquals(largeAtSixty, DisplayModeChooser.choose(listOf(smallAtSixty, largeAtThirty, largeAtSixty)) { false })
     }
 
     @Test
     fun `a single suitable mode is chosen`() {
         val only = aDisplayMode(modeId = 7, width = 1280, height = 720, refreshRate = 60f)
 
-        assertEquals(only, DisplayModeChooser.choose(listOf(only)))
+        assertEquals(only, DisplayModeChooser.choose(listOf(only)) { false })
     }
 }

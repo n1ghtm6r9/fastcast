@@ -2,6 +2,8 @@ package dev.fastcast.client.decoder
 
 import android.media.MediaCodecInfo
 import android.media.MediaCodecInfo.CodecCapabilities
+import android.media.MediaCodecInfo.VideoCapabilities
+import android.media.MediaCodecInfo.VideoCapabilities.PerformancePoint
 import android.media.MediaCodecList
 import android.media.MediaFormat
 import android.os.Build
@@ -44,9 +46,20 @@ object DecoderSelector {
         withCapabilities(info, mime, false) { it.isFormatSupported(probe) }
 
     private fun supportsSizeAndRate(info: MediaCodecInfo, mime: String, width: Int, height: Int, fps: Int): Boolean =
-        withCapabilities(info, mime, false) {
-            it.videoCapabilities?.areSizeAndRateSupported(width, height, fps.toDouble()) == true
+        withCapabilities(info, mime, false) { capabilities ->
+            capabilities.videoCapabilities?.let { sustains(it, width, height, fps) } == true
         }
+
+    private fun sustains(video: VideoCapabilities, width: Int, height: Int, fps: Int): Boolean =
+        performancePointsCover(video, width, height, fps) ?: video.areSizeAndRateSupported(width, height, fps.toDouble())
+
+    private fun performancePointsCover(video: VideoCapabilities, width: Int, height: Int, fps: Int): Boolean? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return null
+        val points = video.supportedPerformancePoints
+        if (points.isNullOrEmpty()) return null
+        val required = PerformancePoint(width, height, fps)
+        return points.any { it.covers(required) }
+    }
 
     private fun supportsLowLatency(info: MediaCodecInfo, mime: String): Boolean =
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
