@@ -144,11 +144,11 @@ Frame receiver rules:
 
 PC side:
 1. Hello from an address creates a session (random non-zero id), replacing any older session of that address; a repeated Hello with the same nonce just repeats Welcome.
-2. The session joins the hub (config + GOP snapshot first, then live frames), asks the hub for the Hello's mode and codecs, and streams config and video frames to that address through its paced sender.
+2. The session asks the hub for the Hello's mode and codecs, joins it (config first, then the GOP snapshot when it holds 1 to `MAX_REPLAY_FRAMES = 30` frames, then live frames) and streams config and video frames to that address through its paced sender. Without a snapshot it can replay (none yet, or a GOP longer than 30 frames) the session asks the hub for a keyframe: the native backend answers with an IDR at once, with ffmpeg the viewer waits for the next keyframe, that is up to `KEYFRAME_INTERVAL_SECONDS` (1 s by default).
 3. A session without any datagram from its address for `SESSION_TIMEOUT = 3 s` ends; leaving releases the hub viewer, so capture stops after the existing 5 s grace.
 4. On shutdown every session gets Bye.
 5. A session that falls behind the hub broadcast skips to the next keyframe.
-6. Feedback with "keyframe needed" makes the next frame for that session wait for a keyframe, and the session re-sends the current config frame before that keyframe; with the native backend it also asks the encoder for an IDR at once.
+6. Feedback with "keyframe needed" makes the next frame for that session wait for a keyframe, and the session re-sends the current config frame before that keyframe. The session also asks the hub for a keyframe, as it does when it falls behind: the native backend encodes an IDR at once (forced keyframes are at least 250 ms apart), with ffmpeg the request has no effect and the viewer waits for the next keyframe, up to `KEYFRAME_INTERVAL_SECONDS` (1 s by default).
 7. Feedback or Stats carrying a session id the server does not know (the server restarted, or the session timed out) is answered with a Bye carrying that session id, so the TV reconnects at once instead of waiting for its silence timer.
 8. On Windows the socket is created with `SIO_UDP_CONNRESET` off: an ICMP "port unreachable" caused by one vanished TV must not fail reads and sends for the others.
 
