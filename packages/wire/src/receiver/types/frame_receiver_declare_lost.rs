@@ -1,5 +1,5 @@
 use crate::packet::FrameKind;
-use crate::receiver::FrameReceiver;
+use crate::receiver::{FrameReceiver, PendingFrame};
 use std::mem::replace;
 
 impl FrameReceiver {
@@ -12,10 +12,12 @@ impl FrameReceiver {
         let any_config = dropped
             .values()
             .any(|frame| frame.kind == FrameKind::Config);
+        let released: usize = dropped.values().map(PendingFrame::allocated_bytes).sum();
 
         self.lost_frames = self
             .lost_frames
             .saturating_add(u32::try_from(count).unwrap_or(u32::MAX));
+        self.pending_bytes = self.pending_bytes.saturating_sub(released);
         self.waiting_for_keyframe = true;
         self.video_lost_while_waiting |= never_seen || any_video;
         self.config_lost |= never_seen || any_config;

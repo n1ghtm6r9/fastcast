@@ -5,6 +5,7 @@ use std::collections::BTreeMap;
 pub struct FrameReceiver {
     pub(crate) expected: u64,
     pub(crate) pending: BTreeMap<u64, PendingFrame>,
+    pub(crate) pending_bytes: usize,
     pub(crate) waiting_for_keyframe: bool,
     pub(crate) video_lost_while_waiting: bool,
     pub(crate) config_lost: bool,

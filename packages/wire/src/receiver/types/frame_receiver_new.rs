@@ -6,6 +6,7 @@ impl FrameReceiver {
         FrameReceiver {
             expected: 0,
             pending: BTreeMap::new(),
+            pending_bytes: 0,
             waiting_for_keyframe: true,
             video_lost_while_waiting: false,
             config_lost: false,

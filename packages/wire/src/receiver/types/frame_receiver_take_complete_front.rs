@@ -13,6 +13,10 @@ impl FrameReceiver {
 
         self.expected += 1;
 
-        Some(entry.remove())
+        let frame = entry.remove();
+
+        self.pending_bytes = self.pending_bytes.saturating_sub(frame.allocated_bytes());
+
+        Some(frame)
     }
 }

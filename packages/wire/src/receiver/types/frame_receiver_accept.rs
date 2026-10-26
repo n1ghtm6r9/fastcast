@@ -25,9 +25,12 @@ impl FrameReceiver {
             return;
         }
 
+        let bytes_before = frame.allocated_bytes();
         let rebuilt = frame.store(shard, now);
 
+        self.pending_bytes += frame.allocated_bytes() - bytes_before;
         self.recovered_shards = self.recovered_shards.saturating_add(rebuilt as u32);
         self.enforce_pending_limit();
+        self.enforce_pending_bytes();
     }
 }
