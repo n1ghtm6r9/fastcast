@@ -8,7 +8,7 @@ import dev.fastcast.client.decoder.DecoderEvents
 import dev.fastcast.client.decoder.VideoDecoder
 import dev.fastcast.client.stream.ConfigMessage
 import dev.fastcast.client.stream.FrameMessage
-import dev.fastcast.client.stream.StreamClient
+import dev.fastcast.client.stream.NativeStreamClient
 import dev.fastcast.client.stream.StreamListener
 
 class PlayerSession(
@@ -19,7 +19,7 @@ class PlayerSession(
 ) : StreamListener, DecoderEvents {
 
     private val mainHandler = Handler(Looper.getMainLooper())
-    private val stream = StreamClient(offer::url, this)
+    private val stream = NativeStreamClient(offer::target, this)
     private val decoder = VideoDecoder(surface, this)
     private val throughput = ThroughputSampler(SystemClock.elapsedRealtime())
     private val reportedThroughput = ThroughputSampler(SystemClock.elapsedRealtime())

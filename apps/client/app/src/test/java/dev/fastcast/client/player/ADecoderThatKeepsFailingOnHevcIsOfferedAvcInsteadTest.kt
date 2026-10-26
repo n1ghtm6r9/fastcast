@@ -2,6 +2,7 @@ package dev.fastcast.client.player
 
 import dev.fastcast.client.stream.StreamRequest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class ADecoderThatKeepsFailingOnHevcIsOfferedAvcInsteadTest {
@@ -10,22 +11,22 @@ class ADecoderThatKeepsFailingOnHevcIsOfferedAvcInsteadTest {
 
     @Test
     fun `every supported codec is offered at first`() {
-        assertEquals(urlWithCodecs("hevc,avc"), offer.url())
+        assertEquals(listOf("hevc", "avc"), codecsOnOffer())
     }
 
     @Test
     fun `a single hevc failure keeps hevc on offer`() {
         hevcFails()
 
-        assertEquals(urlWithCodecs("hevc,avc"), offer.url())
+        assertEquals(listOf("hevc", "avc"), codecsOnOffer())
     }
 
     @Test
-    fun `two hevc failures in a row drop hevc from the next url`() {
+    fun `two hevc failures in a row drop hevc from the next target`() {
         hevcFails()
         hevcFails()
 
-        assertEquals(urlWithCodecs("avc"), offer.url())
+        assertEquals(listOf("avc"), codecsOnOffer())
     }
 
     @Test
@@ -34,7 +35,7 @@ class ADecoderThatKeepsFailingOnHevcIsOfferedAvcInsteadTest {
         offer.streamHealthy()
         hevcFails()
 
-        assertEquals(urlWithCodecs("hevc,avc"), offer.url())
+        assertEquals(listOf("hevc", "avc"), codecsOnOffer())
     }
 
     @Test
@@ -43,7 +44,7 @@ class ADecoderThatKeepsFailingOnHevcIsOfferedAvcInsteadTest {
         hevcFails()
         offer.streamHealthy()
 
-        assertEquals(urlWithCodecs("avc"), offer.url())
+        assertEquals(listOf("avc"), codecsOnOffer())
     }
 
     @Test
@@ -52,14 +53,14 @@ class ADecoderThatKeepsFailingOnHevcIsOfferedAvcInsteadTest {
         hevcFails()
         repeat(5) { avcFails() }
 
-        assertEquals(urlWithCodecs("avc"), offer.url())
+        assertEquals(listOf("avc"), codecsOnOffer())
     }
 
     @Test
     fun `a failing fallback codec leaves the offer alone`() {
         repeat(4) { avcFails() }
 
-        assertEquals(urlWithCodecs("hevc,avc"), offer.url())
+        assertEquals(listOf("hevc", "avc"), codecsOnOffer())
     }
 
     @Test
@@ -67,7 +68,7 @@ class ADecoderThatKeepsFailingOnHevcIsOfferedAvcInsteadTest {
         offer.decoderFailed()
         offer.decoderFailed()
 
-        assertEquals(urlWithCodecs("hevc,avc"), offer.url())
+        assertEquals(listOf("hevc", "avc"), codecsOnOffer())
     }
 
     @Test
@@ -77,14 +78,14 @@ class ADecoderThatKeepsFailingOnHevcIsOfferedAvcInsteadTest {
             offer.decoderFailed()
         }
 
-        assertEquals(urlWithCodecs("hevc,avc"), offer.url())
+        assertEquals(listOf("hevc", "avc"), codecsOnOffer())
     }
 
     @Test
-    fun `an offer without a display request is the plain endpoint`() {
+    fun `an offer without a display request asks for no mode`() {
         val plain = StreamOffer(ADDRESS, null)
 
-        assertEquals("ws://$ADDRESS/ws", plain.url())
+        assertNull(plain.target().request)
     }
 
     @Test
@@ -93,8 +94,21 @@ class ADecoderThatKeepsFailingOnHevcIsOfferedAvcInsteadTest {
         none.codecConfigured(HEVC_CODEC)
         none.decoderFailed()
 
-        assertEquals("ws://$ADDRESS/ws?width=$WIDTH&height=$HEIGHT&fps=$FPS", none.url())
+        val request = requireNotNull(none.target().request)
+        assertEquals(listOf(WIDTH, HEIGHT, FPS), listOf(request.width, request.height, request.fps))
+        assertEquals(emptyList<String>(), request.codecs)
     }
+
+    @Test
+    fun `dropping a codec keeps the requested mode`() {
+        hevcFails()
+        hevcFails()
+
+        val request = requireNotNull(offer.target().request)
+        assertEquals(listOf(WIDTH, HEIGHT, FPS), listOf(request.width, request.height, request.fps))
+    }
+
+    private fun codecsOnOffer(): List<String>? = offer.target().request?.codecs
 
     private fun hevcFails() {
         offer.codecConfigured(HEVC_CODEC)
@@ -105,9 +119,6 @@ class ADecoderThatKeepsFailingOnHevcIsOfferedAvcInsteadTest {
         offer.codecConfigured(AVC_CODEC)
         offer.decoderFailed()
     }
-
-    private fun urlWithCodecs(codecs: String): String =
-        "ws://$ADDRESS/ws?width=$WIDTH&height=$HEIGHT&fps=$FPS&codecs=$codecs"
 
     private companion object {
         const val ADDRESS = "192.168.0.10:3278"

@@ -75,6 +75,8 @@ cargo run
 
 ## Клиент (Google TV / Android TV)
 
+Приложение принимает поток по UDP-протоколу через свою нативную библиотеку `libfastcast_native.so`: она сама шлёт Hello, собирает кадры из шардов с FEC и отвечает Feedback, а Kotlin отдаёт готовые кадры декодеру.
+
 Нужны JDK 17 и Android SDK: переменные `JAVA_HOME` и `ANDROID_HOME`. Нативную библиотеку приложения Gradle собирает сам: для этого нужны ещё Rust-цели `aarch64-linux-android` и `armv7-linux-androideabi`, а также Android NDK 27.3.13750724.
 
 ```powershell

@@ -1,8 +1,9 @@
 package dev.fastcast.client.player
 
 import dev.fastcast.client.decoder.SupportedCodecs
+import dev.fastcast.client.discovery.DiscoveryProtocol
 import dev.fastcast.client.stream.StreamRequest
-import dev.fastcast.client.stream.StreamUrl
+import dev.fastcast.client.stream.StreamTarget
 
 class StreamOffer(
     private val address: String,
@@ -14,7 +15,11 @@ class StreamOffer(
     private var failures = 0
 
     @Synchronized
-    fun url(): String = StreamUrl.build(address, request?.let { StreamRequest(it.width, it.height, it.fps, codecs) })
+    fun target(): StreamTarget = StreamTarget(
+        host = address.substringBeforeLast(HOST_PORT_SEPARATOR),
+        port = portOfAddress(),
+        request = request?.let { StreamRequest(it.width, it.height, it.fps, codecs) },
+    )
 
     @Synchronized
     fun codecConfigured(codec: String) {
@@ -36,7 +41,15 @@ class StreamOffer(
         failures = 0
     }
 
+    private fun portOfAddress(): Int =
+        address.substringAfterLast(HOST_PORT_SEPARATOR, "").toIntOrNull()
+            ?.takeIf { it in FIRST_PORT..LAST_PORT }
+            ?: DiscoveryProtocol.PORT
+
     private companion object {
         const val FAILURES_BEFORE_DROP = 2
+        const val HOST_PORT_SEPARATOR = ':'
+        const val FIRST_PORT = 1
+        const val LAST_PORT = 65_535
     }
 }
