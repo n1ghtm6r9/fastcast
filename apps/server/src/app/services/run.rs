@@ -1,7 +1,7 @@
 use crate::app::{
     AppError, init_dotenv, init_logger, log_ffmpeg, log_stream_address, shutdown_signal,
 };
-use crate::capture::{FfmpegBackend, supervise_capture};
+use crate::capture::{FfmpegBackend, NativeBackend, SwitchingBackend, supervise_capture};
 use crate::hub::Hub;
 use crate::settings::load_settings;
 use crate::stream::{
@@ -26,7 +26,11 @@ pub async fn run() -> Result<(), AppError> {
         hub.clone(),
         EndpointOptions::new(settings.server_name.clone(), settings.capture_fps),
     )?;
-    let backend = Arc::new(FfmpegBackend::new(settings));
+    let backend = Arc::new(SwitchingBackend::new(
+        settings.capture_backend,
+        Arc::new(NativeBackend::new(settings.clone())),
+        Arc::new(FfmpegBackend::new(settings)),
+    ));
     let supervisor = tokio::spawn(supervise_capture(hub, backend));
 
     shutdown_signal().await;

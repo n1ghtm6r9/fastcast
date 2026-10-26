@@ -80,7 +80,10 @@ pub async fn supervise_capture<B: CaptureBackend>(hub: Arc<Hub>, backend: Arc<B>
                 release_screen(Some(screen)).await;
             }
             WatchOutcome::Finished(Ok(report)) => {
-                warn!("ffmpeg stopped after {} frames, restarting", report.frames);
+                warn!(
+                    "the capture stopped after {} frames, restarting",
+                    report.frames
+                );
                 kept = Some(screen);
                 sleep(RESTART_DELAY).await;
             }
