@@ -1,0 +1,1 @@
+pub const FALLBACK_STREAM_FPS: u32 = 60;

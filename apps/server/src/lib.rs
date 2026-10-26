@@ -9,6 +9,7 @@ pub mod discovery;
 pub mod display;
 pub mod hub;
 pub mod settings;
+pub mod stream;
 pub mod web;
 
 #[cfg(test)]
