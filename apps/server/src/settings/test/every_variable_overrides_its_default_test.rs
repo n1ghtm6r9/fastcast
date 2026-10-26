@@ -4,8 +4,6 @@ use crate::settings::{EncoderChoice, Settings, VideoEncoder, settings_from};
 #[test]
 fn every_variable_overrides_its_default() {
     let environment = environment_with(&[
-        ("WEB_HOST", "127.0.0.1"),
-        ("WEB_PORT", "8080"),
         ("SERVER_NAME", "Living room PC"),
         ("FFMPEG_PATH", r"C:\tools\ffmpeg.exe"),
         ("VIDEO_ENCODER", "qsv"),
@@ -21,8 +19,6 @@ fn every_variable_overrides_its_default() {
     assert_eq!(
         settings,
         Settings {
-            web_host: "127.0.0.1".to_string(),
-            web_port: 8080,
             server_name: "Living room PC".to_string(),
             ffmpeg_path: r"C:\tools\ffmpeg.exe".to_string(),
             video_encoder: EncoderChoice::Fixed(VideoEncoder::Qsv),

@@ -1,10 +1,14 @@
-use crate::app::{AppError, init_dotenv, init_logger, log_ffmpeg, log_urls, shutdown_signal};
+use crate::app::{
+    AppError, init_dotenv, init_logger, log_ffmpeg, log_stream_address, shutdown_signal,
+};
 use crate::capture::{FfmpegBackend, supervise_capture};
-use crate::discovery::{DISCOVERY_PORT, discovery_address, run_discovery};
 use crate::hub::Hub;
 use crate::settings::load_settings;
-use crate::web::{bind_listener, serve_web};
+use crate::stream::{
+    EndpointOptions, STREAM_PORT, StreamEndpoint, bind_stream_socket, stream_address,
+};
 use std::sync::Arc;
+use tracing::warn;
 
 pub async fn run() -> Result<(), AppError> {
     init_dotenv()?;
@@ -12,27 +16,27 @@ pub async fn run() -> Result<(), AppError> {
 
     let settings = load_settings()?;
     let hub = Arc::new(Hub::new());
-    let listener = bind_listener(&settings.web_host, settings.web_port).await?;
+    let socket = bind_stream_socket(stream_address(STREAM_PORT))?;
 
-    log_urls(&settings.web_host, settings.web_port);
+    log_stream_address(STREAM_PORT);
     log_ffmpeg(&settings.ffmpeg_path);
 
-    let responder = tokio::spawn(run_discovery(
-        discovery_address(DISCOVERY_PORT),
-        settings.server_name.clone(),
-        settings.web_port,
-    ));
+    let endpoint = StreamEndpoint::start(
+        socket,
+        hub.clone(),
+        EndpointOptions::new(settings.server_name.clone(), settings.capture_fps),
+    )?;
     let backend = Arc::new(FfmpegBackend::new(settings));
-    let supervisor = tokio::spawn(supervise_capture(hub.clone(), backend));
-    let served = serve_web(listener, hub, shutdown_signal()).await;
+    let supervisor = tokio::spawn(supervise_capture(hub, backend));
+
+    shutdown_signal().await;
 
     supervisor.abort();
     let _ = supervisor.await;
 
-    responder.abort();
-    let _ = responder.await;
-
-    served?;
+    if let Err(error) = tokio::task::spawn_blocking(move || endpoint.stop()).await {
+        warn!("the stream endpoint did not stop cleanly: {error}");
+    }
 
     Ok(())
 }

@@ -8,8 +8,6 @@ fn nothing_set_gives_the_documented_defaults() {
     assert_eq!(
         settings,
         Settings {
-            web_host: "0.0.0.0".to_string(),
-            web_port: 3278,
             server_name: "fastcast".to_string(),
             ffmpeg_path: "ffmpeg".to_string(),
             video_encoder: EncoderChoice::Auto,

@@ -1,6 +1,6 @@
 use crate::app::DotenvError;
 use crate::settings::SettingsError;
-use crate::web::WebError;
+use crate::stream::StreamError;
 use std::error::Error;
 use std::fmt;
 
@@ -8,7 +8,7 @@ use std::fmt;
 pub enum AppError {
     Dotenv(DotenvError),
     Settings(SettingsError),
-    Web(WebError),
+    Stream(StreamError),
 }
 
 impl fmt::Display for AppError {
@@ -16,7 +16,7 @@ impl fmt::Display for AppError {
         match self {
             Self::Dotenv(error) => write!(formatter, "{error}"),
             Self::Settings(error) => write!(formatter, "invalid settings: {error}"),
-            Self::Web(error) => write!(formatter, "{error}"),
+            Self::Stream(error) => write!(formatter, "{error}"),
         }
     }
 }
@@ -26,7 +26,7 @@ impl Error for AppError {
         match self {
             Self::Dotenv(error) => Some(error),
             Self::Settings(error) => Some(error),
-            Self::Web(error) => Some(error),
+            Self::Stream(error) => Some(error),
         }
     }
 }
@@ -43,8 +43,8 @@ impl From<SettingsError> for AppError {
     }
 }
 
-impl From<WebError> for AppError {
-    fn from(error: WebError) -> Self {
-        Self::Web(error)
+impl From<StreamError> for AppError {
+    fn from(error: StreamError) -> Self {
+        Self::Stream(error)
     }
 }
