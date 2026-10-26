@@ -1,3 +1,5 @@
+mod an_hevc_key_frame;
+mod annex_b_of;
 mod capture_target;
 mod default_settings;
 #[cfg(windows)]
@@ -30,6 +32,7 @@ mod fake_run;
 mod flv_stream;
 mod flv_video_tag;
 mod frame_tag;
+mod hvcc_parameter_sets_of;
 mod kill_counter;
 #[cfg(windows)]
 mod next_fake_ffmpeg_id;
@@ -38,6 +41,8 @@ mod scripted_probe_calls;
 mod scripted_probe_probe;
 mod sequence_header_tag;
 mod settle;
+pub use an_hevc_key_frame::*;
+pub use annex_b_of::*;
 pub use capture_target::*;
 pub use default_settings::*;
 #[cfg(windows)]
@@ -54,6 +59,7 @@ pub use fake_run::*;
 pub use flv_stream::*;
 pub use flv_video_tag::*;
 pub use frame_tag::*;
+pub use hvcc_parameter_sets_of::*;
 pub use kill_counter::*;
 #[cfg(windows)]
 pub use next_fake_ffmpeg_id::*;
@@ -67,8 +73,11 @@ mod a_configured_ffmpeg_path_that_does_not_exist_is_refused_test;
 mod a_configured_ffmpeg_path_that_is_a_directory_is_refused_test;
 #[cfg(windows)]
 mod a_configured_ffmpeg_path_that_is_a_file_is_used_as_it_is_test;
+mod a_delta_frame_after_a_key_frame_shares_its_config_test;
+mod a_delta_frame_before_any_key_frame_is_not_published_test;
 #[cfg(windows)]
 mod a_desktop_error_is_shown_as_it_is_and_kept_as_the_source_test;
+mod a_duplication_that_cannot_be_reopened_yet_is_retried_test;
 mod a_failed_preparation_does_not_open_the_screen_test;
 mod a_failed_preparation_is_not_retried_once_the_viewers_have_left_test;
 mod a_failed_preparation_is_retried_after_five_seconds_test;
@@ -85,7 +94,10 @@ mod a_fixed_x264_is_never_offered_for_hevc_test;
 mod a_forgotten_encoder_whose_probe_fails_moves_the_pick_on_test;
 mod a_forgotten_encoder_whose_probe_still_passes_is_picked_again_test;
 mod a_kept_screen_is_given_back_when_the_next_preparation_fails_test;
+mod a_key_frame_whose_parameter_sets_cannot_be_described_is_refused_test;
 mod a_key_frame_without_parameter_sets_is_described_test;
+mod a_key_frame_without_parameter_sets_is_refused_test;
+mod a_late_picture_starts_a_new_turn_from_itself_test;
 mod a_missing_ffmpeg_is_reported_with_the_install_hint_test;
 mod a_missing_ffmpeg_keeps_the_supervisor_alive_and_retrying_test;
 mod a_missing_output_is_named_by_its_index_test;
@@ -100,6 +112,8 @@ mod a_native_run_that_fails_before_its_first_frame_hands_over_to_ffmpeg_test;
 mod a_new_request_ends_the_wait_before_a_retry_test;
 mod a_new_request_opens_a_new_screen_and_restarts_the_capture_test;
 mod a_new_request_while_ffmpeg_is_prepared_restarts_the_preparation_test;
+mod a_picture_arriving_at_twice_the_frame_rate_waits_for_its_turn_test;
+mod a_picture_slightly_before_its_turn_may_be_encoded_test;
 #[cfg(windows)]
 mod a_pipeline_that_exits_before_the_first_frame_does_not_disable_its_encoder_test;
 mod a_preparation_nobody_waits_for_is_dropped_after_the_grace_and_reported_idle_test;
@@ -108,6 +122,8 @@ mod a_preparation_that_succeeds_is_reported_ready_test;
 #[cfg(windows)]
 mod a_prepared_pipeline_holds_the_ffmpeg_the_encoder_and_the_codec_that_passed_test;
 mod a_probe_error_stops_the_pick_and_marks_nothing_test;
+mod a_reopened_duplication_of_another_size_restarts_the_capture_test;
+mod a_reopened_duplication_of_the_same_size_resumes_the_capture_test;
 mod a_repeated_identical_sequence_header_keeps_the_gop_test;
 mod a_request_without_a_mode_captures_the_configured_monitor_test;
 #[cfg(windows)]
@@ -125,6 +141,8 @@ mod a_stream_that_is_not_flv_is_a_demux_error_test;
 mod a_stream_with_no_frames_reports_zero_frames_test;
 mod a_switched_off_virtual_display_captures_the_configured_monitor_test;
 mod a_viewer_returning_within_the_grace_keeps_ffmpeg_running_test;
+mod an_early_picture_does_not_move_the_next_turn_earlier_test;
+mod an_encoded_key_frame_describes_the_stream_before_it_is_published_test;
 #[cfg(windows)]
 mod an_encoder_error_is_shown_as_it_is_and_kept_as_the_source_test;
 mod an_encoder_marked_failed_is_skipped_by_the_next_pick_test;
@@ -138,6 +156,7 @@ mod arguments_are_split_on_any_whitespace_test;
 mod auto_falls_back_to_x264_when_no_hardware_encoder_passes_test;
 mod auto_takes_the_first_encoder_whose_probe_passes_test;
 mod auto_walks_the_encoders_in_order_until_one_passes_test;
+mod before_any_picture_the_wait_is_one_interval_test;
 mod every_encoder_has_its_own_ffmpeg_codec_name_test;
 mod every_hevc_encoder_is_tried_before_falling_back_to_avc_test;
 mod ffmpeg_is_stopped_five_seconds_after_the_last_viewer_leaves_test;
@@ -161,12 +180,14 @@ mod the_default_ffmpeg_comes_from_the_first_directory_that_has_it_test;
 #[cfg(windows)]
 mod the_default_ffmpeg_that_no_directory_has_is_reported_missing_test;
 mod the_ffmpeg_choice_never_prepares_the_native_backend_test;
+mod the_first_picture_may_be_encoded_at_once_test;
 mod the_first_viewer_starts_ffmpeg_test;
 mod the_folder_of_the_server_executable_is_searched_for_ffmpeg_first_test;
 mod the_hevc_nvenc_pipeline_captures_the_target_output_with_the_documented_arguments_test;
 mod the_hub_is_cleared_when_ffmpeg_exits_by_itself_test;
 mod the_hub_is_cleared_when_the_last_viewer_has_left_and_ffmpeg_is_stopped_test;
 mod the_keyframe_interval_is_the_rate_times_the_seconds_test;
+mod the_last_picture_is_repeated_one_interval_after_it_was_encoded_test;
 mod the_no_encoder_error_names_every_encoder_tried_test;
 mod the_nvenc_pipeline_uses_the_documented_arguments_test;
 mod the_output_and_the_rate_come_from_the_target_and_the_bitrate_from_the_settings_test;

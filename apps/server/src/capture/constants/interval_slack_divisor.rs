@@ -1,0 +1,1 @@
+pub const INTERVAL_SLACK_DIVISOR: u32 = 4;

@@ -9,6 +9,7 @@ mod ffmpeg_install_hint;
 mod hevc_encoder_order;
 mod hevc_profile_args;
 mod idle_grace;
+mod interval_slack_divisor;
 #[cfg(windows)]
 mod longest_environment_value;
 mod nvenc_args;
@@ -37,6 +38,7 @@ pub use ffmpeg_install_hint::*;
 pub use hevc_encoder_order::*;
 pub use hevc_profile_args::*;
 pub use idle_grace::*;
+pub use interval_slack_divisor::*;
 #[cfg(windows)]
 pub use longest_environment_value::*;
 pub use nvenc_args::*;
