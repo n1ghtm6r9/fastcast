@@ -6,17 +6,12 @@ use crate::gf::{
 
 pub fn mul_add_slice(coefficient: u8, source: &[u8], target: &mut [u8]) {
     #[cfg(target_arch = "x86_64")]
-    {
-        match MUL_ADD_KERNEL.get_or_init(select_mul_add_kernel) {
-            MulAddKernel::Avx2 => {
-                return unsafe { mul_add_slice_avx2(coefficient, source, target) };
-            }
-            MulAddKernel::Ssse3 => {
-                return unsafe { mul_add_slice_ssse3(coefficient, source, target) };
-            }
-            MulAddKernel::Scalar => {}
-        }
+    match MUL_ADD_KERNEL.get_or_init(select_mul_add_kernel) {
+        MulAddKernel::Avx2 => unsafe { mul_add_slice_avx2(coefficient, source, target) },
+        MulAddKernel::Ssse3 => unsafe { mul_add_slice_ssse3(coefficient, source, target) },
+        MulAddKernel::Scalar => mul_add_slice_scalar(coefficient, source, target),
     }
 
+    #[cfg(not(target_arch = "x86_64"))]
     mul_add_slice_scalar(coefficient, source, target);
 }
