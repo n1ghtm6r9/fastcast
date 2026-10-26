@@ -3,14 +3,19 @@ use crate::annexb::{
     AccessUnit, NalUnitKind, annex_b_units, length_prefixed_units, nal_unit_kind_of,
     record_from_parameter_sets,
 };
+use crate::av1::split_temporal_unit;
 
-pub fn split_access_unit(codec: VideoCodec, annex_b: &[u8]) -> AccessUnit {
+pub fn split_access_unit(codec: VideoCodec, frame: &[u8]) -> AccessUnit {
+    if codec == VideoCodec::Av1 {
+        return split_temporal_unit(frame);
+    }
+
     let mut vps = None;
     let mut sps = None;
     let mut pps = None;
     let mut payload_units = Vec::new();
 
-    for unit in annex_b_units(annex_b) {
+    for unit in annex_b_units(frame) {
         match nal_unit_kind_of(codec, unit) {
             NalUnitKind::Vps => {
                 vps.get_or_insert(unit);

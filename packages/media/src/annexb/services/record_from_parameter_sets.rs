@@ -11,5 +11,6 @@ pub fn record_from_parameter_sets(
     match codec {
         VideoCodec::Avc => avcc_from_parameter_sets(sps?, pps?),
         VideoCodec::Hevc => hvcc_from_parameter_sets(vps?, sps?, pps?),
+        VideoCodec::Av1 => None,
     }
 }

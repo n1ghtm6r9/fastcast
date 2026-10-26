@@ -1,0 +1,1 @@
+pub const PROFESSIONAL_PROFILE: u8 = 2;

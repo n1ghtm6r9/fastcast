@@ -1,11 +1,12 @@
 use crate::encoder::{EncoderCodec, EncoderSettings};
-use crate::ffi::{FC_CODEC_H264, FC_CODEC_HEVC, FcSettings};
+use crate::ffi::{FC_CODEC_AV1, FC_CODEC_H264, FC_CODEC_HEVC, FcSettings};
 
 pub fn fc_settings_of(settings: &EncoderSettings) -> FcSettings {
     FcSettings {
         codec: match settings.codec {
             EncoderCodec::Avc => FC_CODEC_H264,
             EncoderCodec::Hevc => FC_CODEC_HEVC,
+            EncoderCodec::Av1 => FC_CODEC_AV1,
         },
         width: settings.width,
         height: settings.height,

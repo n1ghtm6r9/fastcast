@@ -3,6 +3,7 @@ use media::VideoCodec;
 
 pub fn tuning_args_of(encoder: VideoEncoder, codec: VideoCodec) -> &'static str {
     match (encoder, codec) {
+        (_, VideoCodec::Av1) => unreachable!("ffmpeg never encodes AV1"),
         (VideoEncoder::Nvenc, _) => NVENC_ARGS,
         (VideoEncoder::Amf, _) => AMF_ARGS,
         (VideoEncoder::Qsv, VideoCodec::Avc) => QSV_ARGS,

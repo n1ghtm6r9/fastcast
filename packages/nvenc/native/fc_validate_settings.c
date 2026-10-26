@@ -6,7 +6,7 @@ fc_result fc_validate_settings(const void* owner, const fc_settings* settings)
         return fc_result_of(FC_INVALID_SETTINGS, FC_CALL_NONE);
     }
 
-    if ((settings->codec == FC_CODEC_H264 || settings->codec == FC_CODEC_HEVC)
+    if ((settings->codec == FC_CODEC_H264 || settings->codec == FC_CODEC_HEVC || settings->codec == FC_CODEC_AV1)
         && settings->width >= FC_MIN_DIMENSION && settings->width <= FC_MAX_DIMENSION
         && settings->width % 2u == 0u
         && settings->height >= FC_MIN_DIMENSION && settings->height <= FC_MAX_DIMENSION

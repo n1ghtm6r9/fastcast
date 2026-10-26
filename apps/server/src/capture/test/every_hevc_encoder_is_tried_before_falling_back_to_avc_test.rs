@@ -14,8 +14,9 @@ async fn every_hevc_encoder_is_tried_before_falling_back_to_avc() {
     let chosen = pick_codec_and_encoder(
         &[VideoCodec::Hevc, VideoCodec::Avc],
         |codec| match codec {
-            VideoCodec::Avc => &avc,
-            VideoCodec::Hevc => &hevc,
+            VideoCodec::Avc => Some(&avc),
+            VideoCodec::Hevc => Some(&hevc),
+            VideoCodec::Av1 => None,
         },
         |encoder, codec| {
             calls

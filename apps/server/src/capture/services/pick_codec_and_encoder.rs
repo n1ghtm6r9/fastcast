@@ -9,14 +9,18 @@ pub async fn pick_codec_and_encoder<'a, S, P, F>(
     probe: P,
 ) -> Result<(VideoEncoder, VideoCodec), CaptureError>
 where
-    S: Fn(VideoCodec) -> &'a EncoderPicker,
+    S: Fn(VideoCodec) -> Option<&'a EncoderPicker>,
     P: Fn(VideoEncoder, VideoCodec) -> F,
     F: Future<Output = Result<bool, CaptureError>>,
 {
     let mut tried = Vec::new();
 
     for &codec in codecs {
-        match pick_encoder(picker_for(codec), |encoder| probe(encoder, codec)).await {
+        let Some(picker) = picker_for(codec) else {
+            continue;
+        };
+
+        match pick_encoder(picker, |encoder| probe(encoder, codec)).await {
             Ok(encoder) => return Ok((encoder, codec)),
             Err(CaptureError::NoEncoderAvailable { tried: unusable }) => {
                 warn!("no {codec:?} encoder works on this machine");

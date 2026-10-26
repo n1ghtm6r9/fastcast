@@ -61,7 +61,9 @@ impl CaptureBackend for FfmpegBackend {
             warn!(
                 "ffmpeg stopped before the first frame with {encoder_name}, the encoder is checked again before the next start"
             );
-            self.picker_for(pipeline.codec).forget_resolved();
+            if let Some(picker) = self.picker_for(pipeline.codec) {
+                picker.forget_resolved();
+            }
         }
 
         result

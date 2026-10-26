@@ -7,6 +7,7 @@ impl CodecChoice {
             CodecChoice::Auto => None,
             CodecChoice::Avc => Some(VideoCodec::Avc),
             CodecChoice::Hevc => Some(VideoCodec::Hevc),
+            CodecChoice::Av1 => Some(VideoCodec::Av1),
         }
     }
 }

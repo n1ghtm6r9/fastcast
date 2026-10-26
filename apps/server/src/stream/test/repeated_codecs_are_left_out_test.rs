@@ -3,7 +3,7 @@ use media::VideoCodec;
 use wire::{Codec, CodecSupport};
 
 #[test]
-fn av1_and_repeated_codecs_are_left_out() {
+fn repeated_codecs_are_left_out() {
     let listed = [
         CodecSupport {
             codec: Codec::Av1,
@@ -23,5 +23,8 @@ fn av1_and_repeated_codecs_are_left_out() {
         },
     ];
 
-    assert_eq!(codecs_of(&listed), vec![VideoCodec::Hevc, VideoCodec::Avc]);
+    assert_eq!(
+        codecs_of(&listed),
+        vec![VideoCodec::Av1, VideoCodec::Hevc, VideoCodec::Avc]
+    );
 }

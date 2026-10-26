@@ -2,4 +2,5 @@
 pub enum VideoCodec {
     Avc,
     Hevc,
+    Av1,
 }

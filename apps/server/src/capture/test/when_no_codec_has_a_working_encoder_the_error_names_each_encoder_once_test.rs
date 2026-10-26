@@ -12,8 +12,9 @@ async fn when_no_codec_has_a_working_encoder_the_error_names_each_encoder_once()
     let failure = pick_codec_and_encoder(
         &[VideoCodec::Hevc, VideoCodec::Avc],
         |codec| match codec {
-            VideoCodec::Avc => &avc,
-            VideoCodec::Hevc => &hevc,
+            VideoCodec::Avc => Some(&avc),
+            VideoCodec::Hevc => Some(&hevc),
+            VideoCodec::Av1 => None,
         },
         |_encoder, _codec| async { Ok::<_, CaptureError>(false) },
     )

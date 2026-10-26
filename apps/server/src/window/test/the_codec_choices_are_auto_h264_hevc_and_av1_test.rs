@@ -4,7 +4,7 @@ use eframe::egui::Role;
 use egui_kittest::kittest::Queryable;
 
 #[test]
-fn the_codec_choices_are_auto_h264_and_hevc() {
+fn the_codec_choices_are_auto_h264_hevc_and_av1() {
     let (window, _probe) = test_window(SavedSettings::default(), running_status(), saving_works);
     let mut harness = window_harness(window);
 
@@ -13,7 +13,7 @@ fn the_codec_choices_are_auto_h264_and_hevc() {
         .click();
     harness.run();
 
-    for option in ["Авто", "H.264", "HEVC"] {
+    for option in ["Авто", "H.264", "HEVC", "AV1"] {
         harness.get_by_role_and_label(Role::Button, option);
     }
 }

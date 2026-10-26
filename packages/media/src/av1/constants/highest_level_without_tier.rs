@@ -1,0 +1,1 @@
+pub const HIGHEST_LEVEL_WITHOUT_TIER: u32 = 7;

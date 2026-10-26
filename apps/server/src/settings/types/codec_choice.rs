@@ -7,4 +7,5 @@ pub enum CodecChoice {
     Auto,
     Avc,
     Hevc,
+    Av1,
 }

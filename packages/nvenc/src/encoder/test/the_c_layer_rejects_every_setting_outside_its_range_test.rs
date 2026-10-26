@@ -63,7 +63,7 @@ fn the_c_layer_rejects_every_setting_outside_its_range() {
         );
     }
 
-    for codec in [0, 3] {
+    for codec in [0, 4] {
         let settings = FcSettings {
             codec,
             ..fc_settings_of(&valid)

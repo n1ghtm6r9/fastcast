@@ -12,8 +12,9 @@ async fn hevc_is_picked_when_the_viewer_lists_it_first_and_an_encoder_for_it_wor
     let chosen = pick_codec_and_encoder(
         &[VideoCodec::Hevc, VideoCodec::Avc],
         |codec| match codec {
-            VideoCodec::Avc => &avc,
-            VideoCodec::Hevc => &hevc,
+            VideoCodec::Avc => Some(&avc),
+            VideoCodec::Hevc => Some(&hevc),
+            VideoCodec::Av1 => None,
         },
         |encoder, _codec| async move { Ok::<_, CaptureError>(encoder == VideoEncoder::Nvenc) },
     )

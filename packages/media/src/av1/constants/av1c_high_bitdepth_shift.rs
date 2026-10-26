@@ -1,0 +1,1 @@
+pub const AV1C_HIGH_BITDEPTH_SHIFT: u8 = 6;

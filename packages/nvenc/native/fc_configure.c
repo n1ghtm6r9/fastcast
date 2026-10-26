@@ -27,7 +27,9 @@ fc_result fc_configure(fc_encoder* encoder)
     config->frameIntervalP = 1;
     fc_set_rate_control(&config->rcParams, settings->bitrate_kbps, settings->fps);
 
-    if (settings->codec == FC_CODEC_HEVC) {
+    if (settings->codec == FC_CODEC_AV1) {
+        fc_configure_av1(&config->encodeCodecConfig.av1Config, settings->bit_depth);
+    } else if (settings->codec == FC_CODEC_HEVC) {
         fc_configure_hevc(&config->encodeCodecConfig.hevcConfig, settings->bit_depth);
     } else {
         fc_configure_h264(&config->encodeCodecConfig.h264Config, settings->bit_depth);

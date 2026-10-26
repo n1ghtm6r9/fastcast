@@ -2,4 +2,5 @@
 pub enum EncoderCodec {
     Avc,
     Hevc,
+    Av1,
 }

@@ -27,6 +27,6 @@ fn a_codec_offered_with_eight_bits_is_no_ten_bit_codec() {
 
     assert_eq!(
         viewer_request_of(&hello, 60).ten_bit_codecs,
-        vec![VideoCodec::Avc]
+        vec![VideoCodec::Avc, VideoCodec::Av1]
     );
 }

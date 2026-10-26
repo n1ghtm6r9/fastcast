@@ -5,5 +5,6 @@ pub fn profile_args_of(codec: VideoCodec) -> &'static str {
     match codec {
         VideoCodec::Avc => AVC_PROFILE_ARGS,
         VideoCodec::Hevc => HEVC_PROFILE_ARGS,
+        VideoCodec::Av1 => unreachable!("ffmpeg never encodes AV1"),
     }
 }

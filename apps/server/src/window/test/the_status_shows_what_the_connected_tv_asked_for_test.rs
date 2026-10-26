@@ -16,8 +16,8 @@ fn the_status_shows_what_the_connected_tv_asked_for() {
                 height: 2160,
                 refresh_hz: 120,
             }),
-            codecs: vec![VideoCodec::Hevc, VideoCodec::Avc],
-            ten_bit_codecs: vec![VideoCodec::Hevc],
+            codecs: vec![VideoCodec::Av1, VideoCodec::Hevc, VideoCodec::Avc],
+            ten_bit_codecs: vec![VideoCodec::Av1, VideoCodec::Hevc],
         },
         ..running_status()
     };
@@ -25,5 +25,6 @@ fn the_status_shows_what_the_connected_tv_asked_for() {
 
     let harness = window_harness(window);
 
-    harness.get_by_label("ТВ просит 3840×2160 при 120 Гц, декодирует HEVC 10 бит, H.264");
+    harness
+        .get_by_label("ТВ просит 3840×2160 при 120 Гц, декодирует AV1 10 бит, HEVC 10 бит, H.264");
 }

@@ -25,7 +25,7 @@ typedef struct fc_packet {
     uint32_t keyframe;
 } fc_packet;
 
-enum { FC_CODEC_H264 = 1, FC_CODEC_HEVC = 2 };
+enum { FC_CODEC_H264 = 1, FC_CODEC_HEVC = 2, FC_CODEC_AV1 = 3 };
 
 enum {
     FC_LIBRARY_MISSING = -1,

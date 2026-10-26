@@ -68,3 +68,4 @@ void fc_set_rate_control(NV_ENC_RC_PARAMS* rate_control, uint32_t bitrate_kbps, 
 void fc_set_vui(NV_ENC_CONFIG_H264_VUI_PARAMETERS* vui);
 void fc_configure_h264(NV_ENC_CONFIG_H264* h264, uint32_t bit_depth);
 void fc_configure_hevc(NV_ENC_CONFIG_HEVC* hevc, uint32_t bit_depth);
+void fc_configure_av1(NV_ENC_CONFIG_AV1* av1, uint32_t bit_depth);

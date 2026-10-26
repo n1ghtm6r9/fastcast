@@ -27,5 +27,6 @@ pub fn nal_unit_kind_of(codec: VideoCodec, unit: &[u8]) -> NalUnitKind {
             HEVC_ACCESS_UNIT_DELIMITER_NAL_UNIT_TYPE => NalUnitKind::AccessUnitDelimiter,
             _ => NalUnitKind::Other,
         },
+        VideoCodec::Av1 => NalUnitKind::Other,
     }
 }
