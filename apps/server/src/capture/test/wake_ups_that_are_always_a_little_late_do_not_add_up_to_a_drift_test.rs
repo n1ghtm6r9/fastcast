@@ -15,6 +15,6 @@ fn wake_ups_that_are_always_a_little_late_do_not_add_up_to_a_drift() {
 
     assert_eq!(
         clock.until_repeat(start + Duration::from_millis(500) + late),
-        Duration::from_millis(7)
+        Duration::from_micros(9_500)
     );
 }

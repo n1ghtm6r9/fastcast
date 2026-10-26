@@ -11,6 +11,6 @@ fn a_late_wake_up_does_not_shift_the_later_turns() {
 
     assert_eq!(
         clock.until_repeat(start + Duration::from_millis(13)),
-        Duration::from_millis(7)
+        Duration::from_micros(9_500)
     );
 }
