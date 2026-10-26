@@ -1,5 +1,7 @@
 use crate::hub::Hub;
-use crate::stream::{EndpointOptions, RECEIVE_BUFFER_BYTES, ReceiverState};
+use crate::stream::{
+    EndpointOptions, RECEIVE_BUFFER_BYTES, ReceiverState, is_quiet_read_error, read_datagram,
+};
 use std::io::ErrorKind;
 use std::net::UdpSocket;
 use std::sync::Arc;
@@ -17,13 +19,10 @@ pub fn run_receiver(
     let mut buffer = [0u8; RECEIVE_BUFFER_BYTES];
 
     while !stop.load(Ordering::Acquire) {
-        match socket.recv_from(&mut buffer) {
+        match read_datagram(&socket, &mut buffer) {
             Ok((length, peer)) => state.handle(&buffer[..length], peer, Instant::now()),
             Err(error)
-                if matches!(
-                    error.kind(),
-                    ErrorKind::WouldBlock | ErrorKind::TimedOut | ErrorKind::ConnectionReset
-                ) => {}
+                if is_quiet_read_error(&error) || error.kind() == ErrorKind::ConnectionReset => {}
             Err(error) => debug!("could not read a stream datagram: {error}"),
         }
 
