@@ -1,8 +1,14 @@
 mod annex_b_units;
 mod length_prefixed_units;
+mod nal_unit_kind_of;
+mod record_from_parameter_sets;
+mod split_access_unit;
 mod start_code_position;
 mod without_trailing_zeros;
 pub use annex_b_units::*;
 pub use length_prefixed_units::*;
+pub use nal_unit_kind_of::*;
+pub use record_from_parameter_sets::*;
+pub use split_access_unit::*;
 pub use start_code_position::*;
 pub use without_trailing_zeros::*;

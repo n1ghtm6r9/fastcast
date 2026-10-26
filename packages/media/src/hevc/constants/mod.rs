@@ -1,3 +1,4 @@
+mod hevc_access_unit_delimiter_nal_unit_type;
 mod hevc_nal_header_length;
 mod hevc_nal_unit_type_mask;
 mod hevc_nal_unit_type_shift;
@@ -33,6 +34,7 @@ mod max_sub_layers;
 mod profile_tier_level_level_bits;
 mod profile_tier_level_profile_bits;
 mod sub_layer_padding_bits;
+pub use hevc_access_unit_delimiter_nal_unit_type::*;
 pub use hevc_nal_header_length::*;
 pub use hevc_nal_unit_type_mask::*;
 pub use hevc_nal_unit_type_shift::*;

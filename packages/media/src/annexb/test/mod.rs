@@ -1,4 +1,11 @@
+mod annex_b_of;
+pub use annex_b_of::*;
+
+mod a_frame_without_parameter_sets_has_no_record_test;
+mod an_avc_key_frame_gives_its_record_and_keeps_only_the_other_units_test;
 mod an_empty_unit_between_start_codes_is_skipped_test;
+mod an_hevc_key_frame_gives_its_record_and_keeps_only_the_other_units_test;
+mod an_sps_without_a_pps_gives_no_record_test;
 mod bytes_before_the_first_start_code_are_ignored_test;
 mod data_without_a_start_code_has_no_units_test;
 mod units_are_split_on_three_and_four_byte_start_codes_test;
