@@ -82,6 +82,10 @@ impl CaptureBackend for FakeBackend {
                     adapter: "a fake adapter".to_owned(),
                 },
             }),
+            FakeRun::FailsNativelyTemporarily { frames } => Err(CaptureError::Native {
+                frames,
+                cause: NativeError::WorkerGone,
+            }),
         };
 
         kill_counter.disarm();

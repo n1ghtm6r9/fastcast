@@ -56,11 +56,7 @@ impl<N: CaptureBackend, F: CaptureBackend> CaptureBackend for SwitchingBackend<N
                     Err(CaptureError::Native { frames: 0, cause })
                         if self.choice == BackendChoice::Auto =>
                     {
-                        self.remember_failure_for(request);
-
-                        warn!(
-                            "native capture failed before its first frame ({cause}), using ffmpeg for this picture"
-                        );
+                        self.note_native_failure(request, &cause);
 
                         let pipeline = self.ffmpeg.prepare(request).await?;
 

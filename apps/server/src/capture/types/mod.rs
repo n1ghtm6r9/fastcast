@@ -45,6 +45,7 @@ mod native_capture_run;
 #[cfg(windows)]
 mod native_capture_stopped;
 mod native_error;
+mod native_error_is_lasting;
 mod native_pipeline;
 mod picker_state;
 mod pipeline;
@@ -57,6 +58,7 @@ mod switched_pipeline;
 mod switching_backend;
 mod switching_backend_has_failed_for;
 mod switching_backend_lock_failure;
+mod switching_backend_note_native_failure;
 mod switching_backend_remember_failure_for;
 mod switching_backend_run;
 #[cfg(windows)]

@@ -6,4 +6,5 @@ pub enum FakeRun {
     EndsAfter { delay: Duration, frames: u64 },
     Fails { delay: Duration },
     FailsNatively { frames: u64 },
+    FailsNativelyTemporarily { frames: u64 },
 }
