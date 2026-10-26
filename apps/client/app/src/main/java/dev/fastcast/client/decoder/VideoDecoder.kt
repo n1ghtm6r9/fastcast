@@ -25,7 +25,9 @@ class VideoDecoder(
     private var codec: MediaCodec? = null
     private var nalLengthSize = 0
     private var inputCapacity = 0
+    private var configured: ConfigMessage? = null
     private var pending: VideoSample? = null
+    private var codecRendered = false
     private var firstFrameRendered = false
 
     @Volatile
@@ -84,7 +86,7 @@ class VideoDecoder(
     private fun prepareNextSample() {
         while (pending == null) {
             when (val packet = backlog.next() ?: return) {
-                is Packet.Config -> startCodec(packet.config)
+                is Packet.Config -> configure(packet.config)
                 is Packet.Frame -> pending = prepare(packet.frame)
             }
         }
@@ -105,10 +107,15 @@ class VideoDecoder(
         return null
     }
 
+    private fun configure(config: ConfigMessage) {
+        firstFrameRendered = false
+        if (ConfigChange.needsNewDecoder(configured, codecRendered, config)) startCodec(config) else codec?.flush()
+        events.onConfigured()
+    }
+
     private fun startCodec(config: ConfigMessage) {
         releaseCodec()
         pending = null
-        firstFrameRendered = false
         val mime = VideoMime.forCodec(config.codec)
             ?: throw UnsupportedStreamException("Unsupported codec ${config.codec}")
         val parameters = CodecConfigurationParser.parse(mime, config.description)
@@ -118,6 +125,7 @@ class VideoDecoder(
         val format = VideoFormatFactory.create(mime, config, parameters, choice)
         val started = createCodec(choice.name, format, config.fps)
         codec = started
+        configured = config
         nalLengthSize = parameters.nalLengthSize
         inputCapacity = inputCapacityOf(started, format)
         stats.decoderName = choice.name
@@ -125,7 +133,6 @@ class VideoDecoder(
         stats.outputColor = OutputColor.NONE
         Log.i(TAG, "Decoder ${choice.name} for ${config.codec} ${config.width}x${config.height}@${config.fps}")
         events.onVideoSize(config.width, config.height)
-        events.onConfigured()
     }
 
     private fun createCodec(name: String, format: MediaFormat, fps: Int): MediaCodec {
@@ -193,6 +200,7 @@ class VideoDecoder(
 
     private fun render(active: MediaCodec, index: Int) {
         active.releaseOutputBuffer(index, true)
+        codecRendered = true
         stats.framesRendered.incrementAndGet()
         if (!firstFrameRendered) {
             firstFrameRendered = true
@@ -222,6 +230,8 @@ class VideoDecoder(
     private fun releaseCodec() {
         val active = codec ?: return
         codec = null
+        configured = null
+        codecRendered = false
         runQuietly(active::stop)
         runQuietly(active::release)
     }
