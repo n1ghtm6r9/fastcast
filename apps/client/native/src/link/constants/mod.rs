@@ -1,4 +1,5 @@
 mod closed_by_server;
+mod default_bit_depth;
 mod event_config;
 mod event_connected;
 mod event_ended;
@@ -13,6 +14,7 @@ mod socket_buffer_request_bytes;
 mod socket_level;
 mod stats_limit;
 pub use closed_by_server::*;
+pub(crate) use default_bit_depth::*;
 pub use event_config::*;
 pub use event_connected::*;
 pub use event_ended::*;
