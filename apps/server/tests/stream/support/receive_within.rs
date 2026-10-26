@@ -1,4 +1,4 @@
-use app::stream::RECEIVE_BUFFER_BYTES;
+use app::stream::{RECEIVE_BUFFER_BYTES, read_datagram};
 use std::io::ErrorKind;
 use std::net::{SocketAddr, UdpSocket};
 use std::time::{Duration, Instant};
@@ -16,7 +16,7 @@ pub fn receive_within(socket: &UdpSocket, timeout: Duration) -> Option<(Vec<u8>,
             .set_read_timeout(Some(remaining))
             .expect("a read timeout is accepted");
 
-        match socket.recv_from(&mut buffer) {
+        match read_datagram(socket, &mut buffer) {
             Ok((length, sender)) => return Some((buffer[..length].to_vec(), sender)),
             Err(error) if matches!(error.kind(), ErrorKind::WouldBlock | ErrorKind::TimedOut) => {
                 return None;

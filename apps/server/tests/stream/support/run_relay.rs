@@ -1,4 +1,4 @@
-use app::stream::RECEIVE_BUFFER_BYTES;
+use app::stream::{RECEIVE_BUFFER_BYTES, read_datagram};
 use std::net::{SocketAddr, UdpSocket};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -9,7 +9,7 @@ pub fn run_relay(socket: UdpSocket, server: SocketAddr, drop_every: usize, stop:
     let mut from_server = 0usize;
 
     while !stop.load(Ordering::Acquire) {
-        let Ok((length, source)) = socket.recv_from(&mut buffer) else {
+        let Ok((length, source)) = read_datagram(&socket, &mut buffer) else {
             continue;
         };
 
