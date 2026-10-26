@@ -162,7 +162,7 @@ The TV broadcasts `{"type":"discover","version":1}` to UDP 3278; the server answ
 - `apps/server/src/stream` — the UDP endpoint replacing `web` and `discovery`: one `std::net::UdpSocket` on `0.0.0.0:3278`, a receive thread, a sender thread per session, Bye on shutdown. `WEB_HOST` and `WEB_PORT` settings are removed; the port is fixed like discovery.
 - `packages/desktop` (Windows) — output enumeration, D3D11 device on the output's adapter, Desktop Duplication, pointer shape, own HLSL conversion.
 - `packages/nvenc` (Windows) — encoder session on a D3D11 device. A small C layer of our own, compiled by `cc` against the vendored `nvEncodeAPI.h` (nv-codec-headers 13.0, MIT), talks to `nvEncodeAPI64.dll`; Rust calls that layer through a handful of plain functions. Every NVENC struct is filled in C against the real header, so no struct layout is transcribed by hand.
-- Capture backend `native` in `apps/server/src/capture` — Duplication → Converter → Encoder → Annex B to length-prefixed AU + avcC/hvcC record → hub; keyframe requests from the hub force an IDR. The ffmpeg backend stays and is used when no NVIDIA adapter drives the captured output or when `CAPTURE_BACKEND=ffmpeg`.
+- Capture backend `native` in `apps/server/src/capture` — Duplication → Converter → Encoder → Annex B to length-prefixed AU + avcC/hvcC record → hub; keyframe requests from the hub force an IDR. The ffmpeg backend stays: it is used when `CAPTURE_BACKEND=ffmpeg`, when `VIDEO_ENCODER` names `amf`, `qsv` or `x264`, when no NVIDIA adapter drives the captured output, and when native capture fails before its first frame.
 
 ### Colour conversion
 
