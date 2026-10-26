@@ -32,6 +32,7 @@ fn a_hello_with_a_mode_asks_for_that_mode_and_its_codecs() {
                 refresh_hz: 120,
             }),
             codecs: vec![VideoCodec::Hevc, VideoCodec::Avc],
+            ten_bit_codecs: vec![VideoCodec::Hevc],
         }
     );
 }

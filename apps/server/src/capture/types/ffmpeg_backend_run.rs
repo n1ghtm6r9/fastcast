@@ -1,7 +1,7 @@
 use crate::capture::{
     CaptureBackend, CaptureError, CaptureReport, CaptureTarget, FfmpegBackend, Pipeline, Screen,
     codec_name_of, codecs_or_avc, ended_before_the_first_frame, locate_ffmpeg, open_screen,
-    pick_codec_and_encoder, probe_encoder, run_ffmpeg,
+    pick_codec_and_encoder, probe_encoder, run_ffmpeg, stream_bitrate_kbps,
 };
 use crate::hub::{Hub, ViewerRequest};
 use std::sync::Arc;
@@ -44,7 +44,7 @@ impl CaptureBackend for FfmpegBackend {
             encoder_name,
             pipeline.ffmpeg_path,
             target.fps,
-            self.settings.video_bitrate_kbps
+            stream_bitrate_kbps(self.settings.video_bitrate_kbps, target.fps)
         );
 
         let result = run_ffmpeg(

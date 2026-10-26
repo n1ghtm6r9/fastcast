@@ -14,6 +14,7 @@ mod run_session;
 mod send_paced;
 mod server_reply_json;
 mod stream_address;
+mod ten_bit_codecs_of;
 #[cfg(windows)]
 mod tune_stream_socket;
 #[cfg(not(windows))]
@@ -36,6 +37,7 @@ pub use run_session::*;
 pub use send_paced::*;
 pub use server_reply_json::*;
 pub use stream_address::*;
+pub use ten_bit_codecs_of::*;
 #[cfg(windows)]
 pub use tune_stream_socket::*;
 #[cfg(not(windows))]

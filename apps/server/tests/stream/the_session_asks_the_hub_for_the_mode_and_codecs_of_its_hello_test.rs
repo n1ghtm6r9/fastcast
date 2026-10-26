@@ -22,6 +22,7 @@ fn the_session_asks_the_hub_for_the_mode_and_codecs_of_its_hello() {
                 refresh_hz: 120,
             }),
             codecs: vec![VideoCodec::Hevc, VideoCodec::Avc],
+            ten_bit_codecs: Vec::new(),
         },
     );
 }

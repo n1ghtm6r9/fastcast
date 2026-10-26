@@ -1,6 +1,6 @@
 use super::{capture_target, default_settings, frame_while_running, hold_gpu_slot};
 use crate::capture::{CaptureBackend, NativeBackend, NativePipeline};
-use crate::hub::Hub;
+use crate::hub::{EIGHT_BIT_DEPTH, Hub};
 use media::VideoCodec;
 use std::sync::Arc;
 use std::time::Duration;
@@ -14,6 +14,7 @@ async fn a_cancelled_native_run_publishes_nothing_once_it_has_returned() {
     let hub = Arc::new(Hub::new());
     let pipeline = NativePipeline {
         codec: VideoCodec::Hevc,
+        bit_depth: EIGHT_BIT_DEPTH,
     };
     let target = capture_target();
     let mut subscription = hub.join();

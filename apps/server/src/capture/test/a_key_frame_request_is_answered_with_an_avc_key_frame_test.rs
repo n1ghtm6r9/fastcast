@@ -3,7 +3,7 @@ use super::{
     hold_gpu_slot,
 };
 use crate::capture::{CaptureBackend, MIN_KEY_FRAME_INTERVAL, NativeBackend, NativePipeline};
-use crate::hub::Hub;
+use crate::hub::{EIGHT_BIT_DEPTH, Hub};
 use media::VideoCodec;
 use std::sync::Arc;
 
@@ -15,6 +15,7 @@ async fn a_key_frame_request_is_answered_with_an_avc_key_frame() {
     let hub = Arc::new(Hub::new());
     let pipeline = NativePipeline {
         codec: VideoCodec::Avc,
+        bit_depth: EIGHT_BIT_DEPTH,
     };
     let target = capture_target();
     let mut subscription = hub.join();

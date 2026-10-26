@@ -18,6 +18,7 @@ async fn a_new_request_ends_the_wait_before_a_retry() {
             refresh_hz: 60,
         }),
         codecs: vec![VideoCodec::Hevc, VideoCodec::Avc],
+        ten_bit_codecs: Vec::new(),
     };
 
     settle().await;

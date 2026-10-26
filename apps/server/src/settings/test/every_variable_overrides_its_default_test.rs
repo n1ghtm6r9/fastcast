@@ -12,6 +12,7 @@ fn every_variable_overrides_its_default() {
         ("CAPTURE_OUTPUT", "1"),
         ("CAPTURE_FPS", "30"),
         ("VIDEO_BITRATE_KBPS", "8000"),
+        ("VIDEO_TEN_BIT", "off"),
         ("KEYFRAME_INTERVAL_SECONDS", "4"),
     ]);
 
@@ -28,6 +29,7 @@ fn every_variable_overrides_its_default() {
             capture_output: 1,
             capture_fps: 30,
             video_bitrate_kbps: 8000,
+            ten_bit_video: false,
             keyframe_interval_seconds: 4,
         }
     );

@@ -1,10 +1,14 @@
 mod args_of;
+mod bit_depth_for;
 mod capture_fps_for;
 mod codec_name_of;
 mod codecs_or_avc;
+#[cfg(windows)]
+mod converter_depth_of;
 mod encoder_args;
 #[cfg(windows)]
 mod encoder_codec_of;
+mod encoder_preset_for;
 mod ended_before_the_first_frame;
 mod ensure_native_encoder;
 mod ffmpeg_args;
@@ -51,18 +55,23 @@ mod spawn_capture_worker;
 mod spawn_error_of;
 mod spawn_ffmpeg;
 mod spin_until;
+mod stream_bitrate_kbps;
 mod supervise_capture;
 mod tuning_args_of;
 mod viewers_gone_for;
 mod wait_before_retry;
 mod wait_for_exit;
 pub use args_of::*;
+pub use bit_depth_for::*;
 pub use capture_fps_for::*;
 pub use codec_name_of::*;
 pub use codecs_or_avc::*;
+#[cfg(windows)]
+pub use converter_depth_of::*;
 pub use encoder_args::*;
 #[cfg(windows)]
 pub use encoder_codec_of::*;
+pub use encoder_preset_for::*;
 pub use ended_before_the_first_frame::*;
 pub use ensure_native_encoder::*;
 pub use ffmpeg_args::*;
@@ -109,6 +118,7 @@ pub use spawn_capture_worker::*;
 pub use spawn_error_of::*;
 pub use spawn_ffmpeg::*;
 pub use spin_until::*;
+pub use stream_bitrate_kbps::*;
 pub use supervise_capture::*;
 pub use tuning_args_of::*;
 pub use viewers_gone_for::*;

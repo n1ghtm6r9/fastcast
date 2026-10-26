@@ -17,6 +17,7 @@ async fn the_screen_is_opened_for_what_the_viewer_asked() {
             refresh_hz: 60,
         }),
         codecs: vec![VideoCodec::Hevc],
+        ten_bit_codecs: Vec::new(),
     };
 
     hub.request(request.clone());

@@ -10,5 +10,6 @@ pub fn another_request() -> ViewerRequest {
             refresh_hz: 60,
         }),
         codecs: vec![VideoCodec::Hevc, VideoCodec::Avc],
+        ten_bit_codecs: Vec::new(),
     }
 }

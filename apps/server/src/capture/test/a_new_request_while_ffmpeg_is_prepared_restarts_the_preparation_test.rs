@@ -24,6 +24,7 @@ async fn a_new_request_while_ffmpeg_is_prepared_restarts_the_preparation() {
             refresh_hz: 60,
         }),
         codecs: vec![VideoCodec::Hevc, VideoCodec::Avc],
+        ten_bit_codecs: Vec::new(),
     };
 
     settle().await;

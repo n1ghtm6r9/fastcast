@@ -1,5 +1,6 @@
 use crate::capture::{
     CaptureTarget, OUTPUT_ARGS, args_of, encoder_args, input_args, keyframe_interval_in_frames,
+    stream_bitrate_kbps,
 };
 use crate::settings::{Settings, VideoEncoder};
 use media::VideoCodec;
@@ -16,7 +17,7 @@ pub fn ffmpeg_args(
     args.extend(encoder_args(
         encoder,
         codec,
-        settings.video_bitrate_kbps,
+        stream_bitrate_kbps(settings.video_bitrate_kbps, target.fps),
         gop,
     ));
     args.extend(args_of(OUTPUT_ARGS));
