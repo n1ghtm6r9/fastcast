@@ -30,6 +30,7 @@ tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
 windows = "0.62.2"
 
 desktop = { path = "packages/desktop" }
+fastcast-native = { path = "apps/client/native" }
 media = { path = "packages/media" }
 nvenc = { path = "packages/nvenc" }
 wire = { path = "packages/wire" }

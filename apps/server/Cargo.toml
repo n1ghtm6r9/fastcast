@@ -45,4 +45,5 @@ windows = { workspace = true, features = [
 embed-resource = { workspace = true }
 
 [dev-dependencies]
+fastcast-native = { workspace = true }
 tokio = { workspace = true, features = ["test-util"] }
