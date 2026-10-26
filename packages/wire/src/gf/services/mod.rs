@@ -8,6 +8,8 @@ mod field_product;
 mod gf_inv;
 mod gf_mul;
 mod mul_add_slice;
+#[cfg(target_arch = "x86_64")]
+mod mul_add_slice_avx2;
 mod mul_add_slice_scalar;
 #[cfg(target_arch = "x86_64")]
 mod mul_add_slice_ssse3;
@@ -26,6 +28,8 @@ pub use field_product::*;
 pub use gf_inv::*;
 pub use gf_mul::*;
 pub use mul_add_slice::*;
+#[cfg(target_arch = "x86_64")]
+pub(crate) use mul_add_slice_avx2::*;
 pub(crate) use mul_add_slice_scalar::*;
 #[cfg(target_arch = "x86_64")]
 pub(crate) use mul_add_slice_ssse3::*;

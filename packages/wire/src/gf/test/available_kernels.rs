@@ -1,4 +1,6 @@
 #[cfg(target_arch = "x86_64")]
+use crate::gf::mul_add_slice_avx2;
+#[cfg(target_arch = "x86_64")]
 use crate::gf::mul_add_slice_ssse3;
 use crate::gf::test::KernelFunction;
 use crate::gf::{mul_add_slice, mul_add_slice_scalar};
@@ -12,6 +14,8 @@ pub fn available_kernels() -> Vec<(&'static str, KernelFunction)> {
             is_x86_feature_detected!("ssse3"),
             mul_add_slice_ssse3,
         ),
+        #[cfg(target_arch = "x86_64")]
+        ("avx2", is_x86_feature_detected!("avx2"), mul_add_slice_avx2),
         ("mul_add_slice", true, mul_add_slice),
     ];
 

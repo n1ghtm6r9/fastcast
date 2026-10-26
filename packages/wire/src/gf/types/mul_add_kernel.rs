@@ -2,4 +2,5 @@
 pub enum MulAddKernel {
     Scalar,
     Ssse3,
+    Avx2,
 }
