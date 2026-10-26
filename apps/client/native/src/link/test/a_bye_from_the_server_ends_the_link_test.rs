@@ -14,8 +14,8 @@ fn a_bye_from_the_server_ends_the_link() {
     );
 
     let asked_at = Instant::now();
-    assert_eq!(link.next_event(TEST_WAIT), None);
-    assert!(asked_at.elapsed() < Duration::from_millis(500));
+    assert_eq!(link.next_event(TEST_WAIT * 2), None);
+    assert!(asked_at.elapsed() < TEST_WAIT);
 
     link.close();
 

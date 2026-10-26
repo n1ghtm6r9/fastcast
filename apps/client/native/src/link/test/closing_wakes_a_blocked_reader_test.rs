@@ -1,4 +1,5 @@
 use crate::link::EventQueue;
+use crate::link::test::TEST_WAIT;
 use std::sync::Arc;
 use std::thread;
 use std::time::{Duration, Instant};
@@ -16,5 +17,5 @@ fn closing_wakes_a_blocked_reader() {
     queue.close();
 
     assert_eq!(reader.join().unwrap(), None);
-    assert!(closed_at.elapsed() < Duration::from_millis(500));
+    assert!(closed_at.elapsed() < TEST_WAIT);
 }
