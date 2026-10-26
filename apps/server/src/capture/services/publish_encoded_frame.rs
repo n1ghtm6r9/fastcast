@@ -9,7 +9,11 @@ pub fn publish_encoded_frame(
     keyframe: bool,
     annex_b: &[u8],
     timestamp_ms: u32,
-) -> Result<(), NativeError> {
+) -> Result<bool, NativeError> {
+    if annex_b.is_empty() {
+        return Ok(false);
+    }
+
     let access_unit = split_access_unit(codec, annex_b);
 
     let config = access_unit
@@ -26,5 +30,5 @@ pub fn publish_encoded_frame(
 
     hub.publish(keyframe, timestamp_ms, &access_unit.payload);
 
-    Ok(())
+    Ok(true)
 }

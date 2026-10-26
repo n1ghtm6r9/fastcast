@@ -19,7 +19,7 @@ impl NativeCapture<'_> {
 
         let timestamp_ms = at.saturating_duration_since(self.started).as_millis() as u32;
 
-        publish_encoded_frame(
+        let published = publish_encoded_frame(
             self.hub,
             self.codec,
             self.fps,
@@ -28,7 +28,10 @@ impl NativeCapture<'_> {
             timestamp_ms,
         )?;
         self.clock.encoded(at);
-        self.frames += 1;
+
+        if published {
+            self.frames += 1;
+        }
 
         Ok(())
     }
