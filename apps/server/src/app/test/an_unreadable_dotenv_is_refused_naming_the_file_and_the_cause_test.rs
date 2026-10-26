@@ -1,5 +1,5 @@
-use super::TemporaryDirectory;
 use crate::app::{DotenvError, load_dotenv_file};
+use crate::fixtures::TemporaryDirectory;
 use std::fs;
 
 #[test]

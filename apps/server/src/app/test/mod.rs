@@ -1,6 +1,4 @@
-mod temporary_directory;
 mod utf16_bytes;
-pub use temporary_directory::*;
 pub use utf16_bytes::*;
 
 mod a_directory_named_dotenv_is_not_a_dotenv_file_test;
@@ -21,6 +19,7 @@ mod an_unclosed_quote_is_blamed_on_the_line_that_opened_it_test;
 mod an_unreadable_dotenv_error_names_the_file_and_the_cause_test;
 mod an_unreadable_dotenv_is_refused_naming_the_file_and_the_cause_test;
 mod bytes_that_are_not_text_are_not_decoded_test;
+mod the_data_directory_is_fastcast_in_appdata_or_in_the_temporary_directory_test;
 mod the_documented_single_quoted_values_are_read_as_written_test;
 mod the_dotenv_next_to_the_executable_is_loaded_after_the_one_in_the_current_directory_test;
 mod the_first_line_that_cannot_be_parsed_is_found_test;

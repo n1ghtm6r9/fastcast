@@ -1,5 +1,5 @@
-use super::TemporaryDirectory;
 use crate::app::load_dotenv_file;
+use crate::fixtures::TemporaryDirectory;
 
 #[test]
 fn a_missing_dotenv_file_is_not_an_error() {

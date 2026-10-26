@@ -1,3 +1,5 @@
+mod data_directory;
+mod data_directory_from;
 mod decode_dotenv_text;
 mod decode_utf16_text;
 mod find_dotenv_file;
@@ -14,6 +16,8 @@ mod run;
 mod shutdown_signal;
 mod unparsable_line_error;
 mod with_a_final_line_break;
+pub use data_directory::*;
+pub use data_directory_from::*;
 pub use decode_dotenv_text::*;
 pub use decode_utf16_text::*;
 pub use find_dotenv_file::*;

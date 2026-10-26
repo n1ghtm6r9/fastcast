@@ -1,5 +1,5 @@
-use super::TemporaryDirectory;
 use crate::app::{DotenvError, load_dotenv_file};
+use crate::fixtures::TemporaryDirectory;
 
 #[test]
 fn a_value_with_spaces_or_a_windows_path_is_refused_without_quotes() {

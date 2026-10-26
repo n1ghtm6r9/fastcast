@@ -1,5 +1,5 @@
-use super::TemporaryDirectory;
 use crate::app::{DotenvError, load_dotenv_file};
+use crate::fixtures::TemporaryDirectory;
 
 #[test]
 fn a_dotenv_that_is_not_text_is_refused_naming_the_file() {

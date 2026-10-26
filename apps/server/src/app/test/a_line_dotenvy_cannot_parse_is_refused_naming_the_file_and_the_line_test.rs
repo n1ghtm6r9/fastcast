@@ -1,5 +1,5 @@
-use super::TemporaryDirectory;
 use crate::app::{DotenvError, load_dotenv_file};
+use crate::fixtures::TemporaryDirectory;
 
 #[test]
 fn a_line_dotenvy_cannot_parse_is_refused_naming_the_file_and_the_line() {

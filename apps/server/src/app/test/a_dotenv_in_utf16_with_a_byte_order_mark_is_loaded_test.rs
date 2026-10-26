@@ -1,5 +1,6 @@
-use super::{TemporaryDirectory, utf16_bytes};
+use super::utf16_bytes;
 use crate::app::{UTF16_LE_BYTE_ORDER_MARK, load_dotenv_file};
+use crate::fixtures::TemporaryDirectory;
 use std::env;
 
 #[test]
