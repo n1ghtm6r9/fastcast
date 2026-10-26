@@ -1,5 +1,6 @@
 use crate::link::{LinkShared, LinkState, LinkTarget, send_packet};
 use std::net::UdpSocket;
+use std::sync::atomic::Ordering;
 use std::time::Instant;
 use wire::{FEEDBACK_INTERVAL, Feedback, Packet};
 
@@ -26,7 +27,9 @@ pub(crate) fn send_feedback(
         highest_sequence: state.counters.highest_sequence,
         lost_frames,
         recovered_shards: state.receiver.recovered_shards(),
-        keyframe_needed: state.receiver.keyframe_needed() || shared.queue.needs_key_frame(),
+        keyframe_needed: state.receiver.keyframe_needed()
+            || shared.queue.needs_key_frame()
+            || shared.key_frame_requested.load(Ordering::Acquire),
     };
 
     send_packet(socket, target.server, shared, Packet::Feedback(feedback));

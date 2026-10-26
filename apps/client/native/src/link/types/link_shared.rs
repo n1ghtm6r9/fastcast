@@ -7,4 +7,5 @@ pub struct LinkShared {
     pub session: AtomicU32,
     pub next_sequence: AtomicU32,
     pub stop: AtomicBool,
+    pub key_frame_requested: AtomicBool,
 }
