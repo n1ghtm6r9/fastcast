@@ -1,0 +1,1 @@
+pub const SOCKET_BUFFER_REQUEST_BYTES: u32 = 4 * 1024 * 1024;

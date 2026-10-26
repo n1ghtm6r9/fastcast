@@ -1,4 +1,7 @@
-use crate::link::{LINK_TICK, Link, LinkShared, LinkTarget, run_link, unspecified_address_for};
+use crate::link::{
+    LINK_TICK, Link, LinkShared, LinkTarget, SOCKET_BUFFER_REQUEST_BYTES, receive_buffer_of,
+    request_receive_buffer, run_link, unspecified_address_for,
+};
 use std::io;
 use std::net::UdpSocket;
 use std::sync::{Arc, Mutex};
@@ -9,6 +12,9 @@ impl Link {
         let socket = UdpSocket::bind(unspecified_address_for(&target.server))?;
         socket.set_read_timeout(Some(LINK_TICK))?;
 
+        request_receive_buffer(&socket, SOCKET_BUFFER_REQUEST_BYTES);
+
+        let receive_buffer_bytes = receive_buffer_of(&socket);
         let socket = Arc::new(socket);
         let shared = Arc::new(LinkShared::default());
         let server = target.server;
@@ -24,6 +30,7 @@ impl Link {
             socket,
             server,
             shared,
+            receive_buffer_bytes,
             thread: Mutex::new(Some(thread)),
         })
     }

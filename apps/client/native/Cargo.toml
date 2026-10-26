@@ -10,3 +10,6 @@ doctest = false
 [dependencies]
 jni-sys = { workspace = true }
 wire = { workspace = true }
+
+[target.'cfg(any(unix, windows))'.dependencies]
+libc = { workspace = true }

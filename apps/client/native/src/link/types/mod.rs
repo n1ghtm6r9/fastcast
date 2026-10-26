@@ -18,6 +18,7 @@ mod link_event_payload;
 mod link_flow;
 mod link_next_event;
 mod link_open;
+mod link_receive_buffer_bytes;
 mod link_send_stats;
 mod link_shared;
 mod link_state;
