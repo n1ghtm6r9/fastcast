@@ -21,5 +21,5 @@ pub(crate) fn send_hello(
         Packet::Hello(target.hello.clone()),
     );
 
-    state.next_hello += HELLO_INTERVAL;
+    state.next_hello = now + HELLO_INTERVAL;
 }
