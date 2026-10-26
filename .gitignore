@@ -27,3 +27,4 @@ keystore.properties
 
 /*.md
 !/README.md
+!/PLAN.md
