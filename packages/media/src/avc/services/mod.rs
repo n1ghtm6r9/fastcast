@@ -1,4 +1,6 @@
 mod avc_codec_string;
+mod avc_sample_format;
+mod avcc_from_parameter_sets;
 mod first_sps_of_avcc;
 mod parse_sps_fields;
 mod read_frame_crop;
@@ -11,6 +13,8 @@ mod video_size_from_avcc;
 mod video_size_from_sps;
 mod video_size_from_sps_fields;
 pub use avc_codec_string::*;
+pub use avc_sample_format::*;
+pub use avcc_from_parameter_sets::*;
 pub use first_sps_of_avcc::*;
 pub use parse_sps_fields::*;
 pub use read_frame_crop::*;

@@ -1,0 +1,1 @@
+pub const AVCC_BIT_DEPTH_RESERVED_BITS: u8 = 0xF8;
