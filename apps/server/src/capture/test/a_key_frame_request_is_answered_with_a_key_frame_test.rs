@@ -1,5 +1,8 @@
-use super::{capture_target, default_settings, frame_while_running, hold_gpu_slot};
-use crate::capture::{CaptureBackend, NativeBackend, NativePipeline};
+use super::{
+    capture_target, default_settings, frame_while_running, frames_within_while_running,
+    hold_gpu_slot,
+};
+use crate::capture::{CaptureBackend, MIN_KEY_FRAME_INTERVAL, NativeBackend, NativePipeline};
 use crate::hub::Hub;
 use media::VideoCodec;
 use std::sync::Arc;
@@ -28,17 +31,9 @@ async fn a_key_frame_request_is_answered_with_a_key_frame() {
 
     hub.request_key_frame();
 
-    let mut answered = false;
+    let answered =
+        frames_within_while_running(run.as_mut(), &mut subscription, MIN_KEY_FRAME_INTERVAL * 2)
+            .await;
 
-    for _ in 0..5 {
-        if frame_while_running(run.as_mut(), &mut subscription)
-            .await
-            .key
-        {
-            answered = true;
-            break;
-        }
-    }
-
-    assert!(answered);
+    assert!(answered.iter().any(|frame| frame.key));
 }

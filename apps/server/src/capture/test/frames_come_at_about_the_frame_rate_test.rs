@@ -23,7 +23,9 @@ async fn frames_come_at_about_the_frame_rate() {
 
     frame_while_running(run.as_mut(), &mut subscription).await;
     let frames =
-        frames_within_while_running(run.as_mut(), &mut subscription, Duration::from_secs(1)).await;
+        frames_within_while_running(run.as_mut(), &mut subscription, Duration::from_secs(1))
+            .await
+            .len();
 
     println!(
         "frames in the second after the first, at {} fps: {frames}",

@@ -1,13 +1,17 @@
-use crate::capture::{NativeCapture, NativeError, publish_encoded_frame};
+use crate::capture::{NativeCapture, NativeError, key_frame_wanted, publish_encoded_frame};
 use std::time::Instant;
 
 impl NativeCapture<'_> {
     pub(crate) fn encode_and_publish(&mut self, at: Instant) -> Result<(), NativeError> {
-        let force = self.hub.take_key_frame_request();
+        let force = key_frame_wanted(&self.key_frames, self.hub, at);
         let encoded = self
             .encoder
             .encode(self.converter.output(), force)
             .map_err(NativeError::Encoder)?;
+
+        if encoded.keyframe {
+            self.key_frames.forced(at);
+        }
 
         if self.stopped() {
             return Ok(());

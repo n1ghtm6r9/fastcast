@@ -10,6 +10,7 @@ mod ffmpeg_command;
 mod ffmpeg_search_dirs;
 mod forward_stderr;
 mod input_args;
+mod key_frame_wanted;
 mod keyframe_interval_in_frames;
 mod locate_ffmpeg;
 #[cfg(windows)]
@@ -62,6 +63,7 @@ pub use ffmpeg_command::*;
 pub use ffmpeg_search_dirs::*;
 pub use forward_stderr::*;
 pub use input_args::*;
+pub use key_frame_wanted::*;
 pub use keyframe_interval_in_frames::*;
 pub use locate_ffmpeg::*;
 #[cfg(windows)]

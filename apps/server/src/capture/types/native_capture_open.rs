@@ -1,6 +1,6 @@
 use crate::capture::{
-    CaptureTarget, FrameClock, NATIVE_ENCODER_PRESET, NativeCapture, NativeError, encoder_codec_of,
-    nvidia_output_for,
+    CaptureTarget, FrameClock, KeyFrameGate, NATIVE_ENCODER_PRESET, NativeCapture, NativeError,
+    encoder_codec_of, nvidia_output_for,
 };
 use crate::hub::Hub;
 use desktop::{BitDepth, Converter, Duplication, GpuDevice, list_outputs};
@@ -50,6 +50,7 @@ impl<'a> NativeCapture<'a> {
             output,
             size,
             clock: FrameClock::new(target.fps),
+            key_frames: KeyFrameGate::default(),
             started: Instant::now(),
             has_picture: false,
             frames: 0,

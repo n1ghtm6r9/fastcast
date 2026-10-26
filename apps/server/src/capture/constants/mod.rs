@@ -14,6 +14,7 @@ mod idle_grace;
 mod interval_slack_divisor;
 #[cfg(windows)]
 mod longest_environment_value;
+mod min_key_frame_interval;
 mod native_encoder_preset;
 mod nvenc_args;
 mod output_args;
@@ -48,6 +49,7 @@ pub use idle_grace::*;
 pub use interval_slack_divisor::*;
 #[cfg(windows)]
 pub use longest_environment_value::*;
+pub use min_key_frame_interval::*;
 pub use native_encoder_preset::*;
 pub use nvenc_args::*;
 pub use output_args::*;

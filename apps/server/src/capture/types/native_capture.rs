@@ -1,4 +1,4 @@
-use crate::capture::FrameClock;
+use crate::capture::{FrameClock, KeyFrameGate};
 use crate::hub::Hub;
 use desktop::{Converter, Duplication, GpuDevice, OutputInfo};
 use media::VideoCodec;
@@ -18,6 +18,7 @@ pub struct NativeCapture<'a> {
     pub(crate) output: OutputInfo,
     pub(crate) size: (u32, u32),
     pub(crate) clock: FrameClock,
+    pub(crate) key_frames: KeyFrameGate,
     pub(crate) started: Instant,
     pub(crate) has_picture: bool,
     pub(crate) frames: u64,

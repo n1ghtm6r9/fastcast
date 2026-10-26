@@ -21,6 +21,9 @@ mod frame_clock;
 mod frame_clock_encoded;
 mod frame_clock_may_encode;
 mod frame_clock_until_repeat;
+mod key_frame_gate;
+mod key_frame_gate_forced;
+mod key_frame_gate_may_force;
 mod native_backend;
 mod native_backend_keep_worker;
 mod native_backend_run;
@@ -68,6 +71,7 @@ pub use capture_target::*;
 pub use encoder_picker::*;
 pub use ffmpeg_backend::*;
 pub use frame_clock::*;
+pub use key_frame_gate::*;
 pub use native_backend::*;
 #[cfg(windows)]
 pub use native_capture::*;
