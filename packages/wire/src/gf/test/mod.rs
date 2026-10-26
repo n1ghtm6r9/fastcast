@@ -1,8 +1,24 @@
+mod assert_kernels_agree;
+mod available_kernels;
+mod kernel_function;
+pub use assert_kernels_agree::*;
+pub use available_kernels::*;
+pub use kernel_function::*;
+
+mod every_available_kernel_agrees_with_the_scalar_kernel_on_unaligned_slices_test;
+mod every_available_kernel_agrees_with_the_scalar_kernel_test;
+mod every_available_kernel_agrees_with_the_scalar_kernel_when_the_lengths_differ_test;
 mod every_non_zero_element_times_its_inverse_is_one_test;
 mod mul_add_slice_agrees_with_gf_mul_for_every_byte_test;
+#[cfg(target_arch = "x86_64")]
+mod mul_add_slice_remembers_the_selected_kernel_test;
 mod mul_add_slice_xors_the_scaled_source_into_the_target_test;
 mod multiplication_distributes_over_xor_test;
 mod multiplying_by_zero_gives_zero_test;
+#[cfg(target_arch = "x86_64")]
+mod the_best_kernel_the_cpu_has_is_selected_test;
 mod the_generator_two_has_order_255_test;
+#[cfg(target_arch = "x86_64")]
+mod the_nibble_tables_hold_the_product_of_every_coefficient_with_every_nibble_test;
 mod the_scalar_kernel_agrees_with_gf_mul_for_every_coefficient_and_byte_test;
 mod two_times_128_wraps_through_the_field_polynomial_test;
