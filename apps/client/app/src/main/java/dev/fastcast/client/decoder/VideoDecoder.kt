@@ -18,7 +18,7 @@ class VideoDecoder(
 ) {
 
     private val mailbox = LinkedBlockingQueue<Packet>()
-    private val backlog = PacketBacklog(MAX_QUEUED_PACKETS, stats.framesDropped)
+    private val backlog = PacketBacklog(MAX_QUEUED_PACKETS, stats.framesDropped, events::onKeyframeNeeded)
     private val bufferInfo = MediaCodec.BufferInfo()
 
     private var thread: Thread? = null

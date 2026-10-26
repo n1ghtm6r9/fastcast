@@ -8,5 +8,7 @@ interface DecoderEvents {
 
     fun onFirstFrame()
 
+    fun onKeyframeNeeded()
+
     fun onFailure(message: String)
 }

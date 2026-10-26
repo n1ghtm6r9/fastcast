@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicLong
 class PacketBacklog(
     private val limit: Int,
     val droppedFrames: AtomicLong = AtomicLong(),
+    private val onKeyframeNeeded: () -> Unit = {},
 ) {
 
     private val packets = ArrayDeque<Packet>()
@@ -26,13 +27,17 @@ class PacketBacklog(
         }
     }
 
-    fun awaitKeyframe() {
-        awaitingKeyframe = true
-    }
+    fun awaitKeyframe() = startWaiting()
 
     fun clear() {
         replaceWith(emptyList())
+        startWaiting()
+    }
+
+    private fun startWaiting() {
+        val wasWaiting = awaitingKeyframe
         awaitingKeyframe = true
+        if (!wasWaiting) onKeyframeNeeded()
     }
 
     private fun accepts(packet: Packet): Boolean = when (packet) {

@@ -80,6 +80,8 @@ class PlayerSession(
 
     override fun onFirstFrame() = postStatus(PlayerStatus.Playing)
 
+    override fun onKeyframeNeeded() = stream.requestKeyFrame()
+
     override fun onFailure(message: String) {
         offer.decoderFailed()
         postStatus(PlayerStatus.DecoderError(message))
