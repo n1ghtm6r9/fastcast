@@ -1,3 +1,4 @@
+use crate::link::read_datagram;
 use crate::link::test::{FakeServer, ReceivedPacket, received_packet_of};
 use std::io::ErrorKind;
 use std::net::SocketAddr;
@@ -16,7 +17,7 @@ impl FakeServer {
                 .max(SMALLEST_READ_TIMEOUT);
             self.socket.set_read_timeout(Some(remaining)).unwrap();
 
-            match self.socket.recv_from(&mut buffer) {
+            match read_datagram(&self.socket, &mut buffer) {
                 Ok((length, from)) => {
                     if let Some(packet) = received_packet_of(&buffer[..length]) {
                         return Some((packet, from));
