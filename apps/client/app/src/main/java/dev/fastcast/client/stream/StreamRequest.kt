@@ -5,4 +5,5 @@ class StreamRequest(
     val height: Int,
     val fps: Int,
     val codecs: List<String>,
+    val tenBitCodecs: Set<String> = emptySet(),
 )

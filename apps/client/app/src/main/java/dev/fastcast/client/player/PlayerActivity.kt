@@ -53,6 +53,7 @@ class PlayerActivity : Activity(), PlayerSessionListener {
     private var lastError: String? = null
     private var statsVisible = false
     private var controlsHintShown = false
+    private var modeSummary = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -154,19 +155,29 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         val chosen = DisplayModeChooser.choose(modes) { hardwareCodecsAt(it).isNotEmpty() }
         chosen?.let { PreferredDisplayMode.apply(window, it) }
         val mode = chosen ?: DisplayModes.active(display)
-        return StreamRequest(mode.width, mode.height, mode.fps, hardwareCodecsAt(mode))
+        val codecs = hardwareCodecsAt(mode)
+        val tenBit = tenBitCodecsAt(mode)
+        modeSummary = ModeSummary.of(modes, mode, codecs, tenBit)
+        return StreamRequest(mode.width, mode.height, mode.fps, codecs, tenBit)
     }
 
     private fun hardwareCodecsAt(mode: DisplayModeOption): List<String> = SupportedCodecs.among { mime ->
         DecoderSelector.canDecodeInHardware(mime, mode.width, mode.height, mode.fps)
     }
 
+    private fun tenBitCodecsAt(mode: DisplayModeOption): Set<String> = SupportedCodecs.among { mime ->
+        DecoderSelector.canDecodeTenBitInHardware(mime, mode.width, mode.height, mode.fps)
+    }.toSet()
+
     private fun activeDisplayLabel(): String = screen?.let { DisplayModes.active(it).label }.orEmpty()
+
+    private fun reportedDisplayLabel(): String =
+        listOf(activeDisplayLabel(), modeSummary).filter { it.isNotEmpty() }.joinToString(REPORT_SEPARATOR)
 
     private fun startSession(surface: Surface) {
         stopSession()
         showStatus(PlayerStatus.Connecting)
-        session = PlayerSession(offer, surface, this, ::activeDisplayLabel).also { it.start() }
+        session = PlayerSession(offer, surface, this, ::reportedDisplayLabel).also { it.start() }
     }
 
     private fun stopSession() {
@@ -237,6 +248,7 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         private const val CONTROLS_HINT_MS = 4_000L
         private const val MILLISECONDS_PER_SECOND = 1_000.0
         private const val NO_DECODER = "-"
+        private const val REPORT_SEPARATOR = "; "
 
         fun createIntent(context: Context, server: DiscoveredServer): Intent =
             Intent(context, PlayerActivity::class.java)

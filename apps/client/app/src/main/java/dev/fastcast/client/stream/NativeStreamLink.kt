@@ -16,7 +16,7 @@ object NativeStreamLink : StreamLink {
                 request?.width ?: NO_MODE,
                 request?.height ?: NO_MODE,
                 request?.fps ?: NO_MODE,
-                request?.let { HelloCodecs.of(it.codecs) } ?: IntArray(0),
+                request?.let { HelloCodecs.of(it.codecs, it.tenBitCodecs) } ?: IntArray(0),
             )
         } catch (e: LinkageError) {
             NativeLink.NO_HANDLE

@@ -21,7 +21,10 @@ object DecoderSelector {
     }
 
     fun canDecodeInHardware(mime: String, width: Int, height: Int, fps: Int): Boolean =
-        decodersFor(mime).any { !isSoftware(it) && supportsSizeAndRate(it, mime, width, height, fps) }
+        decodersFor(mime).any { sustainsInHardware(it, mime, width, height, fps) }
+
+    fun canDecodeTenBitInHardware(mime: String, width: Int, height: Int, fps: Int): Boolean =
+        decodersFor(mime).any { sustainsInHardware(it, mime, width, height, fps) && hasTenBitProfile(it, mime) }
 
     private fun decodersFor(mime: String): List<MediaCodecInfo> =
         MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos.filter { isDecoderFor(it, mime) }
@@ -44,6 +47,14 @@ object DecoderSelector {
 
     private fun supportsFormat(info: MediaCodecInfo, mime: String, probe: MediaFormat): Boolean =
         withCapabilities(info, mime, false) { it.isFormatSupported(probe) }
+
+    private fun sustainsInHardware(info: MediaCodecInfo, mime: String, width: Int, height: Int, fps: Int): Boolean =
+        !isSoftware(info) && supportsSizeAndRate(info, mime, width, height, fps)
+
+    private fun hasTenBitProfile(info: MediaCodecInfo, mime: String): Boolean =
+        withCapabilities(info, mime, false) { capabilities ->
+            TenBitProfiles.includes(mime, capabilities.profileLevels.map { it.profile })
+        }
 
     private fun supportsSizeAndRate(info: MediaCodecInfo, mime: String, width: Int, height: Int, fps: Int): Boolean =
         withCapabilities(info, mime, false) { capabilities ->
