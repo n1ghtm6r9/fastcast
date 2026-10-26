@@ -4,3 +4,7 @@ leak-timeout = "1s"
 fail-fast = false
 failure-output = "immediate-final"
 final-status-level = "flaky"
+
+[[profile.default.overrides]]
+filter = "test(a_link_loses_no_datagram_to_its_read_timeout) | test(reading_a_datagram_never_loses_one_to_the_timeout)"
+threads-required = "num-cpus"
