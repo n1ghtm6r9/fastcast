@@ -28,7 +28,6 @@ impl FrameReceiver {
         let rebuilt = frame.store(shard, now);
 
         self.recovered_shards = self.recovered_shards.saturating_add(rebuilt as u32);
-        self.highest = self.highest.max(header.frame);
         self.enforce_pending_limit();
     }
 }

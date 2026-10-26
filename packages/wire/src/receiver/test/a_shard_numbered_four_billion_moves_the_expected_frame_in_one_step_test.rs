@@ -25,7 +25,7 @@ fn a_shard_numbered_four_billion_moves_the_expected_frame_in_one_step() {
     receiver.accept(&shard, t0);
 
     assert_eq!(receiver.lost_frames(), 3_999_999_937);
-    assert_eq!(receiver.highest_frame(), 4_000_000_000);
+    assert_eq!(receiver.highest_frame(), 3_999_999_936);
 
     let numbers: Vec<u32> = deliveries(&mut receiver, t0 + ms(5))
         .iter()
@@ -33,4 +33,5 @@ fn a_shard_numbered_four_billion_moves_the_expected_frame_in_one_step() {
         .collect();
     assert_eq!(numbers, [4_000_000_000]);
     assert_eq!(receiver.lost_frames(), 4_000_000_000);
+    assert_eq!(receiver.highest_frame(), 4_000_000_000);
 }

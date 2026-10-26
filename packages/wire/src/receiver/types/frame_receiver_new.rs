@@ -5,7 +5,6 @@ impl FrameReceiver {
     pub fn new() -> FrameReceiver {
         FrameReceiver {
             expected: 0,
-            highest: 0,
             pending: BTreeMap::new(),
             waiting_for_keyframe: true,
             video_lost_while_waiting: false,
