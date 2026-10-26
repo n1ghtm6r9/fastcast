@@ -17,6 +17,9 @@ impl ReceiverState {
 
         entry.last_seen = now;
 
-        info!("viewer report: {}", clipped(text, VIEWER_REPORT_LIMIT));
+        let report = clipped(text, VIEWER_REPORT_LIMIT);
+
+        info!("viewer report: {report}");
+        self.hub.report(report.to_owned());
     }
 }

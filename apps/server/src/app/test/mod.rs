@@ -1,2 +1,1 @@
-mod a_stream_error_is_reported_as_it_is_test;
 mod the_data_directory_is_fastcast_in_appdata_or_in_the_temporary_directory_test;
