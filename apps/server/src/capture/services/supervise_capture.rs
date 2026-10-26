@@ -51,7 +51,7 @@ pub async fn supervise_capture<B: CaptureBackend>(hub: Arc<Hub>, backend: Arc<B>
         };
 
         let screen = match kept.take() {
-            Some(screen) if screen.request == request => screen,
+            Some(screen) if screen.request.mode == request.mode => screen,
             stale => {
                 release_screen(stale).await;
                 backend.open_screen(&request).await
@@ -77,7 +77,7 @@ pub async fn supervise_capture<B: CaptureBackend>(hub: Arc<Hub>, backend: Arc<B>
             }
             WatchOutcome::Changed => {
                 info!("a viewer asked for another picture, restarting the capture");
-                release_screen(Some(screen)).await;
+                kept = Some(screen);
             }
             WatchOutcome::Finished(Ok(report)) => {
                 warn!(
