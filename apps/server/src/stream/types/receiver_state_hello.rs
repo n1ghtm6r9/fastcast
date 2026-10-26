@@ -1,6 +1,7 @@
-use crate::stream::ReceiverState;
+use crate::stream::{MAX_SESSIONS, ReceiverState};
 use std::net::SocketAddr;
 use std::time::Instant;
+use tracing::warn;
 use wire::Hello;
 
 impl ReceiverState {
@@ -10,6 +11,12 @@ impl ReceiverState {
         {
             entry.last_seen = now;
             entry.control.want_welcome();
+
+            return;
+        }
+
+        if self.sessions.len() >= MAX_SESSIONS && !self.sessions.contains_key(&peer) {
+            warn!(%peer, "refused a hello: {MAX_SESSIONS} sessions are live");
 
             return;
         }
