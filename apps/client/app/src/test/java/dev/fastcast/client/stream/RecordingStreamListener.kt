@@ -9,6 +9,7 @@ class RecordingStreamListener : StreamListener {
     private val configs = LinkedBlockingQueue<ConfigMessage>()
     private val frames = LinkedBlockingQueue<FrameMessage>()
     private val retryDelays = LinkedBlockingQueue<Long>()
+    private val reasons = LinkedBlockingQueue<String>()
 
     override fun onConnecting() {
         events.add(CONNECTING)
@@ -34,6 +35,7 @@ class RecordingStreamListener : StreamListener {
 
     override fun onDisconnected(retryInMs: Long, reason: String) {
         retryDelays.add(retryInMs)
+        reasons.add(reason)
         events.add(DISCONNECTED)
     }
 
@@ -50,6 +52,8 @@ class RecordingStreamListener : StreamListener {
     fun nextFrame(): FrameMessage = await(frames)
 
     fun nextRetryDelay(): Long = await(retryDelays)
+
+    fun nextReason(): String = await(reasons)
 
     private fun <T : Any> await(queue: LinkedBlockingQueue<T>): T =
         queue.poll(TIMEOUT_SECONDS, TimeUnit.SECONDS) ?: error("Timed out waiting for a stream event")
