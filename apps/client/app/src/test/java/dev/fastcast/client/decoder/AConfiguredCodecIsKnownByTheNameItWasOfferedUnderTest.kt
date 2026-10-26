@@ -17,6 +17,11 @@ class AConfiguredCodecIsKnownByTheNameItWasOfferedUnderTest {
     }
 
     @Test
+    fun `an av1 codec string is known as av1`() {
+        assertEquals("av1", SupportedCodecs.nameFor("av01.0.14M.10"))
+    }
+
+    @Test
     fun `a codec that was never offered has no name`() {
         assertNull(SupportedCodecs.nameFor("vp09.00.10.08"))
     }

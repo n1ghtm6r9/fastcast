@@ -19,14 +19,21 @@ class TheCodecStringSelectsTheMimeTypeTest {
     }
 
     @Test
+    fun `av01 codecs are av1 video`() {
+        assertEquals("video/av01", VideoMime.forCodec("av01.0.14M.10"))
+        assertEquals("video/av01", VideoMime.forCodec("av01.0.08M.08"))
+    }
+
+    @Test
     fun `the prefix is matched without regard to case`() {
         assertEquals(VideoMime.AVC, VideoMime.forCodec("AVC1.64002A"))
         assertEquals(VideoMime.HEVC, VideoMime.forCodec("HVC1.1.6.L93.B0"))
+        assertEquals(VideoMime.AV1, VideoMime.forCodec("AV01.0.14M.10"))
     }
 
     @Test
     fun `other codecs have no mime type`() {
-        listOf("", "vp09.00.10.08", "av01.0.08M.08", "mp4a.40.2", "xavc1.64002a").forEach { codec ->
+        listOf("", "vp09.00.10.08", "mp4a.40.2", "xavc1.64002a", "xav01.0.14M.10").forEach { codec ->
             assertNull("\"$codec\"", VideoMime.forCodec(codec))
         }
     }

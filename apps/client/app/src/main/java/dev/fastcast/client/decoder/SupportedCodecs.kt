@@ -2,7 +2,9 @@ package dev.fastcast.client.decoder
 
 object SupportedCodecs {
 
-    private val BEST_FIRST = listOf(VideoMime.HEVC to "hevc", VideoMime.AVC to "avc")
+    const val AV1 = "av1"
+
+    private val BEST_FIRST = listOf(VideoMime.AV1 to AV1, VideoMime.HEVC to "hevc", VideoMime.AVC to "avc")
 
     fun among(canDecode: (mime: String) -> Boolean): List<String> =
         BEST_FIRST.filter { (mime, _) -> canDecode(mime) }.map { (_, name) -> name }

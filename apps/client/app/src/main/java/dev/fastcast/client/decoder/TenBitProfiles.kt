@@ -12,6 +12,16 @@ object TenBitProfiles {
         CodecProfileLevel.HEVCProfileMain10HDR10Plus,
     )
 
-    fun includes(mime: String, profiles: List<Int>): Boolean =
-        mime.equals(VideoMime.HEVC, ignoreCase = true) && profiles.any { it in HEVC_MAIN_TEN }
+    @SuppressLint("InlinedApi")
+    private val AV1_MAIN_TEN = setOf(
+        CodecProfileLevel.AV1ProfileMain10,
+        CodecProfileLevel.AV1ProfileMain10HDR10,
+        CodecProfileLevel.AV1ProfileMain10HDR10Plus,
+    )
+
+    fun includes(mime: String, profiles: List<Int>): Boolean = when {
+        mime.equals(VideoMime.HEVC, ignoreCase = true) -> profiles.any { it in HEVC_MAIN_TEN }
+        mime.equals(VideoMime.AV1, ignoreCase = true) -> profiles.any { it in AV1_MAIN_TEN }
+        else -> false
+    }
 }

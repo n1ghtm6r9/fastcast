@@ -1,5 +1,6 @@
 package dev.fastcast.client.decoder
 
+import dev.fastcast.client.testing.RealAv1ConfigurationRecord
 import dev.fastcast.client.testing.RealAvcConfigurationRecord
 import dev.fastcast.client.testing.RealHevcConfigurationRecord
 import org.junit.Assert.assertArrayEquals
@@ -34,6 +35,14 @@ class TheConfigurationParserPicksTheRecordFormatByMimeTypeTest {
     }
 
     @Test
+    fun `an av1 description is handed over whole as one buffer`() {
+        val configuration =
+            requireNotNull(CodecConfigurationParser.parse(VideoMime.AV1, RealAv1ConfigurationRecord.BYTES))
+
+        assertArrayEquals(RealAv1ConfigurationRecord.BYTES, configuration.csdBuffers.single())
+    }
+
+    @Test
     fun `both record formats report the nal length size of the stream`() {
         val avc = requireNotNull(CodecConfigurationParser.parse(VideoMime.AVC, RealAvcConfigurationRecord.BYTES))
         val hevc = requireNotNull(CodecConfigurationParser.parse(VideoMime.HEVC, RealHevcConfigurationRecord.BYTES))
@@ -53,14 +62,20 @@ class TheConfigurationParserPicksTheRecordFormatByMimeTypeTest {
     }
 
     @Test
+    fun `an avc description is not accepted as av1`() {
+        assertNull(CodecConfigurationParser.parse(VideoMime.AV1, RealAvcConfigurationRecord.BYTES))
+    }
+
+    @Test
     fun `an unknown mime type has no parser`() {
         assertNull(CodecConfigurationParser.parse("video/x-vnd.on2.vp9", RealAvcConfigurationRecord.BYTES))
         assertNull(CodecConfigurationParser.parse("", RealHevcConfigurationRecord.BYTES))
     }
 
     @Test
-    fun `an empty description is rejected for both formats`() {
+    fun `an empty description is rejected for every format`() {
         assertNull(CodecConfigurationParser.parse(VideoMime.AVC, ByteArray(0)))
         assertNull(CodecConfigurationParser.parse(VideoMime.HEVC, ByteArray(0)))
+        assertNull(CodecConfigurationParser.parse(VideoMime.AV1, ByteArray(0)))
     }
 }

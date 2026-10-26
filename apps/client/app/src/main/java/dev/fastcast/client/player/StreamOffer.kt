@@ -30,7 +30,7 @@ class StreamOffer(
     @Synchronized
     fun decoderFailed() {
         val failed = configuredCodec ?: return
-        if (failed != codecs.firstOrNull() || !hasFallbackFor(failed)) return
+        if (!isFirstChoice(failed) || !hasFallbackFor(failed)) return
         failures++
         if (failures < FAILURES_BEFORE_DROP) return
         if (failed in tenBitCodecs) tenBitCodecs = tenBitCodecs - failed else codecs = codecs - failed
@@ -42,7 +42,12 @@ class StreamOffer(
         failures = 0
     }
 
-    private fun hasFallbackFor(codec: String): Boolean = codec in tenBitCodecs || codecs.size > 1
+    private fun isFirstChoice(codec: String): Boolean =
+        if (codec == SupportedCodecs.AV1) codec in codecs else codec == autoCodecs().firstOrNull()
+
+    private fun hasFallbackFor(codec: String): Boolean = codec in tenBitCodecs || autoCodecs().any { it != codec }
+
+    private fun autoCodecs(): List<String> = codecs - SupportedCodecs.AV1
 
     private fun portOfAddress(): Int =
         address.substringAfterLast(HOST_PORT_SEPARATOR, "").toIntOrNull()

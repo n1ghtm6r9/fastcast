@@ -9,6 +9,7 @@ object AnnexBConverter {
     private const val BYTE_MASK = 0xFF
 
     fun convert(frame: FrameMessage, nalLengthSize: Int): VideoSample? {
+        if (nalLengthSize == CodecConfiguration.NO_NAL_LENGTHS) return sampleOf(frame)
         val nalCount = countNalUnits(frame, nalLengthSize)
         if (nalCount == INVALID) return null
         return if (nalLengthSize == START_CODE.size) {
@@ -40,8 +41,11 @@ object AnnexBConverter {
             START_CODE.copyInto(data, position)
             position += START_CODE.size + length
         }
-        return VideoSample(data, frame.payloadOffset, frame.payloadSize, frame.presentationTimeUs, frame.keyframe)
+        return sampleOf(frame)
     }
+
+    private fun sampleOf(frame: FrameMessage): VideoSample =
+        VideoSample(frame.data, frame.payloadOffset, frame.payloadSize, frame.presentationTimeUs, frame.keyframe)
 
     private fun rewriteIntoNewArray(frame: FrameMessage, lengthSize: Int, nalCount: Int): VideoSample {
         val data = frame.data

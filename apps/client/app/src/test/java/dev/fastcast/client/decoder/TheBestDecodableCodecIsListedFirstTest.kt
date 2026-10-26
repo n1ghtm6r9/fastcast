@@ -6,8 +6,18 @@ import org.junit.Test
 class TheBestDecodableCodecIsListedFirstTest {
 
     @Test
-    fun `hevc comes before avc when both can be decoded`() {
-        assertEquals(listOf("hevc", "avc"), SupportedCodecs.among { true })
+    fun `av1 comes first and hevc comes before avc when all can be decoded`() {
+        assertEquals(listOf("av1", "hevc", "avc"), SupportedCodecs.among { true })
+    }
+
+    @Test
+    fun `hevc comes before avc when av1 cannot be decoded`() {
+        assertEquals(listOf("hevc", "avc"), SupportedCodecs.among { mime -> mime != VideoMime.AV1 })
+    }
+
+    @Test
+    fun `av1 alone is listed when only av1 can be decoded`() {
+        assertEquals(listOf("av1"), SupportedCodecs.among { mime -> mime == VideoMime.AV1 })
     }
 
     @Test
@@ -26,7 +36,7 @@ class TheBestDecodableCodecIsListedFirstTest {
     }
 
     @Test
-    fun `each codec is asked about by its mime type and hevc is asked first`() {
+    fun `each codec is asked about by its mime type and av1 is asked first`() {
         val asked = mutableListOf<String>()
 
         SupportedCodecs.among { mime ->
@@ -34,6 +44,6 @@ class TheBestDecodableCodecIsListedFirstTest {
             true
         }
 
-        assertEquals(listOf("video/hevc", "video/avc"), asked)
+        assertEquals(listOf("video/av01", "video/hevc", "video/avc"), asked)
     }
 }

@@ -22,7 +22,14 @@ class HelloCodecsAreTheWireIdsInPreferenceOrderTest {
 
     @Test
     fun `only unknown names give no codecs`() {
-        assertArrayEquals(IntArray(0), HelloCodecs.of(listOf("vp9", "av1")))
+        assertArrayEquals(IntArray(0), HelloCodecs.of(listOf("vp9", "vvc")))
+    }
+
+    @Test
+    fun `av1 is wire id three and keeps its place in the order`() {
+        val wire = HelloCodecs.of(listOf("av1", "hevc", "avc"), setOf("av1", "hevc"))
+
+        assertArrayEquals(intArrayOf(3, 10, 2, 10, 1, 8), wire)
     }
 
     @Test

@@ -4,8 +4,10 @@ object HelloCodecs {
 
     private const val AVC = "avc"
     private const val HEVC = "hevc"
+    private const val AV1 = "av1"
     private const val AVC_ID = 1
     private const val HEVC_ID = 2
+    private const val AV1_ID = 3
     private const val EIGHT_BITS = 8
     private const val TEN_BITS = 10
 
@@ -15,6 +17,7 @@ object HelloCodecs {
     private fun idsOf(name: String, bitDepth: Int): List<Int> = when (name) {
         AVC -> listOf(AVC_ID, bitDepth)
         HEVC -> listOf(HEVC_ID, bitDepth)
+        AV1 -> listOf(AV1_ID, bitDepth)
         else -> emptyList()
     }
 }
