@@ -1,10 +1,8 @@
 use crate::link::read_datagram;
-use crate::link::test::{FakeServer, ReceivedPacket, received_packet_of};
+use crate::link::test::{FakeServer, ReceivedPacket, SMALLEST_READ_TIMEOUT, received_packet_of};
 use std::io::ErrorKind;
 use std::net::SocketAddr;
 use std::time::{Duration, Instant};
-
-const SMALLEST_READ_TIMEOUT: Duration = Duration::from_millis(1);
 
 impl FakeServer {
     pub(crate) fn next_packet(&self, timeout: Duration) -> Option<(ReceivedPacket, SocketAddr)> {
