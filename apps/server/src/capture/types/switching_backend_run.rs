@@ -3,7 +3,6 @@ use crate::capture::{
     SwitchingBackend,
 };
 use crate::hub::{Hub, ViewerRequest};
-use crate::settings::BackendChoice;
 use std::sync::Arc;
 use tracing::warn;
 
@@ -11,13 +10,7 @@ impl<N: CaptureBackend, F: CaptureBackend> CaptureBackend for SwitchingBackend<N
     type Pipeline = SwitchedPipeline<N::Pipeline, F::Pipeline>;
 
     async fn prepare(&self, request: &ViewerRequest) -> Result<Self::Pipeline, CaptureError> {
-        let native_is_wanted = match self.choice {
-            BackendChoice::Ffmpeg => false,
-            BackendChoice::Native => true,
-            BackendChoice::Auto => !self.has_failed_for(request),
-        };
-
-        if !native_is_wanted {
+        if self.has_failed_for(request) {
             return Ok(SwitchedPipeline::Ffmpeg(
                 self.ffmpeg.prepare(request).await?,
             ));
@@ -28,14 +21,13 @@ impl<N: CaptureBackend, F: CaptureBackend> CaptureBackend for SwitchingBackend<N
                 pipeline,
                 request: request.clone(),
             }),
-            Err(failure) if self.choice == BackendChoice::Auto => {
+            Err(failure) => {
                 warn!("native capture is not available ({failure}), using ffmpeg");
 
                 Ok(SwitchedPipeline::Ffmpeg(
                     self.ffmpeg.prepare(request).await?,
                 ))
             }
-            Err(failure) => Err(failure),
         }
     }
 
@@ -53,9 +45,7 @@ impl<N: CaptureBackend, F: CaptureBackend> CaptureBackend for SwitchingBackend<N
             SwitchedPipeline::Ffmpeg(pipeline) => self.ffmpeg.run(hub, pipeline, target).await,
             SwitchedPipeline::Native { pipeline, request } => {
                 match self.native.run(hub, pipeline, target).await {
-                    Err(CaptureError::Native { frames: 0, cause })
-                        if self.choice == BackendChoice::Auto =>
-                    {
+                    Err(CaptureError::Native { frames: 0, cause }) => {
                         self.note_native_failure(request, &cause);
 
                         let pipeline = self.ffmpeg.prepare(request).await?;

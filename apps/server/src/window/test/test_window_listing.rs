@@ -1,7 +1,7 @@
 use crate::journal::{JOURNAL_LINE_LIMIT, JournalLines};
 use crate::server::ServerStatus;
 use crate::settings::{SavedSettings, SettingsFileError};
-use crate::window::test::{TEST_COMPUTER_NAME, TEST_JOURNAL_FILE, WindowProbe};
+use crate::window::test::{TEST_JOURNAL_FILE, WindowProbe};
 use crate::window::{JournalView, Monitor, ServerLink, ServerWindow, SettingsForm};
 use std::cell::RefCell;
 use std::path::PathBuf;
@@ -29,7 +29,7 @@ pub fn test_window_listing(
     let window = ServerWindow::new(
         link,
         JournalView::new(lines.clone(), PathBuf::from(TEST_JOURNAL_FILE)),
-        SettingsForm::new(saved, TEST_COMPUTER_NAME.to_owned(), list_monitors),
+        SettingsForm::new(saved, list_monitors),
     );
 
     (

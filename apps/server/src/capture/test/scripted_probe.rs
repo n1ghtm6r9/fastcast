@@ -1,4 +1,4 @@
-use crate::settings::VideoEncoder;
+use crate::capture::VideoEncoder;
 use std::sync::{Arc, Mutex};
 
 pub struct ScriptedProbe {

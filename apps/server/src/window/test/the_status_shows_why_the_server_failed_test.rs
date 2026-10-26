@@ -15,5 +15,6 @@ fn the_status_shows_why_the_server_failed() {
 
     let harness = window_harness(window);
 
-    harness.get_by_label("Сервер не запустился: udp 0.0.0.0:3278 is busy");
+    harness.get_by_label("Не запустился");
+    harness.get_by_label("udp 0.0.0.0:3278 is busy");
 }

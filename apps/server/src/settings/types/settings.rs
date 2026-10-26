@@ -1,15 +1,11 @@
-use crate::settings::{BackendChoice, EncoderChoice};
+use crate::settings::{CodecChoice, FrameRate};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Settings {
     pub server_name: String,
-    pub ffmpeg_path: String,
-    pub video_encoder: EncoderChoice,
-    pub capture_backend: BackendChoice,
     pub virtual_display: bool,
     pub capture_output: u32,
-    pub capture_fps: u32,
+    pub frame_rate: FrameRate,
+    pub video_codec: CodecChoice,
     pub video_bitrate_kbps: u32,
-    pub ten_bit_video: bool,
-    pub keyframe_interval_seconds: u32,
 }

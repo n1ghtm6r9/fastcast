@@ -1,18 +1,12 @@
-use super::{FakeFfmpeg, default_settings};
-use crate::capture::{CaptureBackend, FfmpegBackend};
+use super::{FakeFfmpeg, ffmpeg_backend_for};
+use crate::capture::CaptureBackend;
 use crate::hub::ViewerRequest;
-use crate::settings::Settings;
 use media::VideoCodec;
 
 #[tokio::test]
 async fn a_request_without_codecs_is_prepared_for_avc() {
     let ffmpeg = FakeFfmpeg::exiting_at_once();
-    let settings = Settings {
-        ffmpeg_path: ffmpeg.path(),
-        ..default_settings()
-    };
-
-    let pipeline = FfmpegBackend::new(settings)
+    let pipeline = ffmpeg_backend_for(&ffmpeg)
         .prepare(&ViewerRequest::default())
         .await
         .expect("the fake ffmpeg passes its probe");

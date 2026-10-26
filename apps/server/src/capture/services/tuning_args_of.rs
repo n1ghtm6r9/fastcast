@@ -1,5 +1,4 @@
-use crate::capture::{AMF_ARGS, NVENC_ARGS, QSV_ARGS, QSV_HEVC_ARGS, X264_ARGS};
-use crate::settings::VideoEncoder;
+use crate::capture::{AMF_ARGS, NVENC_ARGS, QSV_ARGS, QSV_HEVC_ARGS, VideoEncoder, X264_ARGS};
 use media::VideoCodec;
 
 pub fn tuning_args_of(encoder: VideoEncoder, codec: VideoCodec) -> &'static str {

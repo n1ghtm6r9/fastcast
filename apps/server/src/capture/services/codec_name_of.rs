@@ -1,4 +1,4 @@
-use crate::settings::VideoEncoder;
+use crate::capture::VideoEncoder;
 use media::VideoCodec;
 
 pub fn codec_name_of(encoder: VideoEncoder, codec: VideoCodec) -> &'static str {

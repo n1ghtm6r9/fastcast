@@ -1,5 +1,5 @@
 use crate::app::apply_saved_settings;
-use crate::app::test::{TEST_COMPUTER_NAME, idle_journal_level, start_recording_control};
+use crate::app::test::{idle_journal_level, start_recording_control};
 use crate::fixtures::TemporaryDirectory;
 use crate::settings::{LogLevel, SavedSettings, read_saved_settings};
 
@@ -14,13 +14,7 @@ async fn applied_settings_are_written_to_the_settings_file() {
         ..SavedSettings::default()
     };
 
-    let written = apply_saved_settings(
-        &control,
-        &idle_journal_level(),
-        &path,
-        &saved,
-        TEST_COMPUTER_NAME,
-    );
+    let written = apply_saved_settings(&control, &idle_journal_level(), &path, &saved);
 
     assert!(written.is_ok(), "{written:?}");
     assert_eq!(read_saved_settings(&path).expect("the file reads"), saved);

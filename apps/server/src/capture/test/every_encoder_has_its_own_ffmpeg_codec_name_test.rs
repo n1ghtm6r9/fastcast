@@ -1,5 +1,4 @@
-use crate::capture::codec_name_of;
-use crate::settings::VideoEncoder;
+use crate::capture::{VideoEncoder, codec_name_of};
 use media::VideoCodec;
 
 #[test]

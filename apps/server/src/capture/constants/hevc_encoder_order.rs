@@ -1,4 +1,4 @@
-use crate::settings::VideoEncoder;
+use crate::capture::VideoEncoder;
 
 pub const HEVC_ENCODER_ORDER: [VideoEncoder; 3] =
     [VideoEncoder::Nvenc, VideoEncoder::Amf, VideoEncoder::Qsv];

@@ -1,10 +1,9 @@
 use crate::capture::{
     CaptureBackend, CaptureError, CaptureReport, CaptureTarget, NativeBackend, NativeError,
-    NativePipeline, Screen, StopOnDrop, bit_depth_for, ensure_native_encoder, open_screen,
-    run_native_capture, spawn_capture_worker, stream_bitrate_kbps,
+    NativePipeline, Screen, StopOnDrop, bit_depth_for, monitor_refresh_hz, native_codec_for,
+    open_screen, run_native_capture, spawn_capture_worker,
 };
 use crate::hub::{Hub, ViewerRequest};
-use media::VideoCodec;
 use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
 use tokio::sync::oneshot;
@@ -14,22 +13,16 @@ impl CaptureBackend for NativeBackend {
     type Pipeline = NativePipeline;
 
     async fn prepare(&self, request: &ViewerRequest) -> Result<NativePipeline, CaptureError> {
-        ensure_native_encoder(self.settings.video_encoder)?;
-
-        let codec = if request.codecs.contains(&VideoCodec::Hevc) {
-            VideoCodec::Hevc
-        } else {
-            VideoCodec::Avc
-        };
+        let codec = native_codec_for(self.settings.video_codec, &request.codecs);
 
         Ok(NativePipeline {
             codec,
-            bit_depth: bit_depth_for(self.settings.ten_bit_video, codec, request),
+            bit_depth: bit_depth_for(codec, request),
         })
     }
 
     async fn open_screen(&self, request: &ViewerRequest) -> Screen {
-        open_screen(&self.settings, request).await
+        open_screen(&self.settings, request, monitor_refresh_hz).await
     }
 
     async fn run(
@@ -38,7 +31,7 @@ impl CaptureBackend for NativeBackend {
         pipeline: &NativePipeline,
         target: &CaptureTarget,
     ) -> Result<CaptureReport, CaptureError> {
-        let bitrate_kbps = stream_bitrate_kbps(self.settings.video_bitrate_kbps, target.fps);
+        let bitrate_kbps = self.settings.video_bitrate_kbps;
 
         info!(
             "starting native capture of output {} with NVENC {:?} {}-bit at {} fps, {} kbps",

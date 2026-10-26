@@ -1,4 +1,4 @@
-use crate::settings::VideoEncoder;
+use crate::capture::VideoEncoder;
 use media::VideoCodec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

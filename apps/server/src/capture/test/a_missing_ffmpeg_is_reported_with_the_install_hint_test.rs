@@ -9,11 +9,8 @@ async fn a_missing_ffmpeg_is_reported_with_the_install_hint() {
         &failure,
         CaptureError::FfmpegNotFound { path } if path == "fastcast-no-such-ffmpeg"
     ));
-    assert!(failure.to_string().contains("winget install Gyan.FFmpeg"));
-    assert!(
-        failure
-            .to_string()
-            .ends_with("or put the full path of ffmpeg.exe into «Путь к ffmpeg»"),
-        "{failure}"
+    assert_eq!(
+        failure.to_string(),
+        "fastcast-no-such-ffmpeg was not found: install ffmpeg with `winget install Gyan.FFmpeg` or put ffmpeg.exe next to FastCast.exe"
     );
 }

@@ -1,6 +1,6 @@
 use crate::settings::SavedSettings;
 use crate::window::test::{
-    press_button, running_status, saving_works, test_window, window_harness,
+    open_journal, running_status, saving_works, test_window, window_harness,
 };
 use egui_kittest::kittest::Queryable;
 
@@ -12,7 +12,7 @@ fn the_journal_shows_its_lines() {
         .push("12:00:00.000  INFO fastcast is listening on udp 192.168.0.10:3278".to_owned());
     let mut harness = window_harness(window);
 
-    press_button(&mut harness, "Журнал");
+    open_journal(&mut harness);
 
     harness.get_by_label("12:00:00.000  INFO fastcast is listening on udp 192.168.0.10:3278");
 }

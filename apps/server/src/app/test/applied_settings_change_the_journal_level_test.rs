@@ -1,5 +1,5 @@
 use crate::app::apply_saved_settings;
-use crate::app::test::{TEST_COMPUTER_NAME, start_recording_control};
+use crate::app::test::start_recording_control;
 use crate::fixtures::TemporaryDirectory;
 use crate::journal::{JournalLines, JournalSink, journal_subscriber};
 use crate::settings::{LogLevel, SavedSettings};
@@ -24,7 +24,6 @@ async fn applied_settings_change_the_journal_level() {
             &level,
             &directory.path().join("settings.json"),
             &saved,
-            TEST_COMPUTER_NAME,
         );
         debug!("a detail");
     });

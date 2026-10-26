@@ -1,10 +1,9 @@
 use super::ScriptedProbe;
-use crate::capture::{EncoderPicker, pick_encoder};
-use crate::settings::{EncoderChoice, VideoEncoder};
+use crate::capture::{EncoderPicker, VideoEncoder, pick_encoder};
 
 #[tokio::test]
 async fn auto_walks_the_encoders_in_order_until_one_passes() {
-    let picker = EncoderPicker::new(EncoderChoice::Auto);
+    let picker = EncoderPicker::default();
     let probe = ScriptedProbe::passing(&[VideoEncoder::Qsv, VideoEncoder::X264]);
 
     let chosen = pick_encoder(&picker, |encoder| probe.probe(encoder))

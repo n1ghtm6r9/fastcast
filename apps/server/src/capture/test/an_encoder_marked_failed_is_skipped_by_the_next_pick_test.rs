@@ -1,10 +1,9 @@
 use super::ScriptedProbe;
-use crate::capture::{EncoderPicker, pick_encoder};
-use crate::settings::{EncoderChoice, VideoEncoder};
+use crate::capture::{EncoderPicker, VideoEncoder, pick_encoder};
 
 #[tokio::test]
 async fn an_encoder_marked_failed_is_skipped_by_the_next_pick() {
-    let picker = EncoderPicker::new(EncoderChoice::Auto);
+    let picker = EncoderPicker::default();
     let probe = ScriptedProbe::passing(&[
         VideoEncoder::Nvenc,
         VideoEncoder::Amf,

@@ -1,14 +1,14 @@
 use crate::capture::{
-    AUTO_ENCODER_ORDER, CaptureError, EncoderPicker, HEVC_ENCODER_ORDER, pick_codec_and_encoder,
+    AUTO_ENCODER_ORDER, CaptureError, EncoderPicker, HEVC_ENCODER_ORDER, VideoEncoder,
+    pick_codec_and_encoder,
 };
-use crate::settings::{EncoderChoice, VideoEncoder};
 use media::VideoCodec;
 use std::sync::Mutex;
 
 #[tokio::test]
 async fn every_hevc_encoder_is_tried_before_falling_back_to_avc() {
-    let avc = EncoderPicker::ordered(EncoderChoice::Auto, &AUTO_ENCODER_ORDER);
-    let hevc = EncoderPicker::ordered(EncoderChoice::Auto, &HEVC_ENCODER_ORDER);
+    let avc = EncoderPicker::ordered(&AUTO_ENCODER_ORDER);
+    let hevc = EncoderPicker::ordered(&HEVC_ENCODER_ORDER);
     let calls = Mutex::new(Vec::new());
 
     let chosen = pick_codec_and_encoder(

@@ -1,7 +1,7 @@
 use crate::capture::{
-    CaptureError, PROBE_TIMEOUT, codec_name_of, ffmpeg_command, probe_args, spawn_error_of,
+    CaptureError, PROBE_TIMEOUT, VideoEncoder, codec_name_of, ffmpeg_command, probe_args,
+    spawn_error_of,
 };
-use crate::settings::VideoEncoder;
 use media::VideoCodec;
 use std::process::Stdio;
 use tokio::time::timeout;

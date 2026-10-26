@@ -1,6 +1,6 @@
 use crate::settings::SavedSettings;
 use crate::window::test::{
-    press_button, running_status, saving_works, test_window, window_harness,
+    open_journal, running_status, saving_works, test_window, window_harness,
 };
 use eframe::egui::{OutputCommand, Role};
 use egui_kittest::kittest::Queryable;
@@ -12,7 +12,7 @@ fn copying_the_journal_puts_its_lines_on_the_clipboard() {
     probe.lines.push("second line".to_owned());
     let mut harness = window_harness(window);
 
-    press_button(&mut harness, "Журнал");
+    open_journal(&mut harness);
     harness
         .get_by_role_and_label(Role::Button, "Копировать")
         .click();

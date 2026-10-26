@@ -1,5 +1,4 @@
-use crate::capture::probe_args;
-use crate::settings::VideoEncoder;
+use crate::capture::{VideoEncoder, probe_args};
 use media::VideoCodec;
 
 #[test]

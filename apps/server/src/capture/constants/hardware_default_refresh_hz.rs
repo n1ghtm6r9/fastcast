@@ -1,0 +1,1 @@
+pub const HARDWARE_DEFAULT_REFRESH_HZ: u32 = 1;

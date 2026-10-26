@@ -1,10 +1,9 @@
 use super::ScriptedProbe;
-use crate::capture::{EncoderPicker, pick_encoder};
-use crate::settings::{EncoderChoice, VideoEncoder};
+use crate::capture::{EncoderPicker, VideoEncoder, pick_encoder};
 
 #[tokio::test]
 async fn a_forgotten_encoder_whose_probe_still_passes_is_picked_again() {
-    let picker = EncoderPicker::new(EncoderChoice::Auto);
+    let picker = EncoderPicker::default();
     let probe = ScriptedProbe::passing(&[VideoEncoder::Nvenc, VideoEncoder::Amf]);
 
     picker.remember(VideoEncoder::Nvenc);

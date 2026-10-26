@@ -20,5 +20,5 @@ fn a_tv_without_a_screen_mode_asks_for_the_set_picture() {
 
     let harness = window_harness(window);
 
-    harness.get_by_label("ТВ просит картинку по настройкам, декодирует AVC");
+    harness.get_by_label("ТВ просит картинку по настройкам, декодирует H.264");
 }

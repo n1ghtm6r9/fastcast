@@ -1,0 +1,1 @@
+pub const KEYFRAME_INTERVAL_SECONDS: u32 = 1;

@@ -21,7 +21,7 @@ async fn a_switched_off_virtual_display_captures_the_configured_monitor() {
         ten_bit_codecs: Vec::new(),
     };
 
-    let screen = open_screen(&settings, &request).await;
+    let screen = open_screen(&settings, &request, |_| Some(60)).await;
 
     assert_eq!(screen.target, CaptureTarget { output: 0, fps: 60 });
     assert!(screen.display.is_none());

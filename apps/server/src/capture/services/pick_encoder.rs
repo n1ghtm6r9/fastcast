@@ -1,5 +1,4 @@
-use crate::capture::{CaptureError, EncoderPicker};
-use crate::settings::VideoEncoder;
+use crate::capture::{CaptureError, EncoderPicker, VideoEncoder};
 use std::future::Future;
 use tracing::{info, warn};
 

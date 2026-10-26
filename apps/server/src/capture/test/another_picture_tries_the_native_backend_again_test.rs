@@ -1,7 +1,6 @@
 use super::{FakeBackend, FakeRun, capture_target};
 use crate::capture::{CaptureBackend, SwitchedPipeline, SwitchingBackend};
 use crate::hub::{Hub, ViewerRequest};
-use crate::settings::BackendChoice;
 use media::VideoCodec;
 use std::sync::Arc;
 use std::time::Duration;
@@ -13,7 +12,7 @@ async fn another_picture_tries_the_native_backend_again() {
         delay: Duration::ZERO,
         frames: 3,
     }]);
-    let backend = SwitchingBackend::new(BackendChoice::Auto, native.clone(), ffmpeg.clone());
+    let backend = SwitchingBackend::new(native.clone(), ffmpeg.clone());
     let hub = Arc::new(Hub::new());
 
     let first = backend

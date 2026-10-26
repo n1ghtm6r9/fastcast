@@ -8,7 +8,6 @@ use media::VideoCodec;
 async fn a_request_without_a_mode_captures_the_configured_monitor() {
     let settings = Settings {
         capture_output: 2,
-        capture_fps: 144,
         ..default_settings()
     };
     let request = ViewerRequest {
@@ -17,7 +16,7 @@ async fn a_request_without_a_mode_captures_the_configured_monitor() {
         ten_bit_codecs: Vec::new(),
     };
 
-    let screen = open_screen(&settings, &request).await;
+    let screen = open_screen(&settings, &request, |output| (output == 2).then_some(144)).await;
 
     assert_eq!(
         screen.target,

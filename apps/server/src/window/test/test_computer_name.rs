@@ -1,1 +1,0 @@
-pub const TEST_COMPUTER_NAME: &str = "DESKTOP-TEST";

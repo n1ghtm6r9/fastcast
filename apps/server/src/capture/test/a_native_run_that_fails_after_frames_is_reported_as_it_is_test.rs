@@ -1,14 +1,13 @@
 use super::{FakeBackend, FakeRun, capture_target};
 use crate::capture::{CaptureBackend, CaptureError, SwitchedPipeline, SwitchingBackend};
 use crate::hub::{Hub, ViewerRequest};
-use crate::settings::BackendChoice;
 use std::sync::Arc;
 
 #[tokio::test(start_paused = true)]
 async fn a_native_run_that_fails_after_frames_is_reported_as_it_is() {
     let native = FakeBackend::scripted(vec![FakeRun::FailsNatively { frames: 5 }]);
     let ffmpeg = FakeBackend::scripted(vec![]);
-    let backend = SwitchingBackend::new(BackendChoice::Auto, native.clone(), ffmpeg.clone());
+    let backend = SwitchingBackend::new(native.clone(), ffmpeg.clone());
     let hub = Arc::new(Hub::new());
     let request = ViewerRequest::default();
 

@@ -13,5 +13,5 @@ fn the_status_shows_that_the_server_is_starting() {
 
     let harness = window_harness(window);
 
-    harness.get_by_label("Сервер запускается…");
+    harness.get_by_label("Запускается…");
 }

@@ -2,7 +2,7 @@ use media::VideoCodec;
 
 pub fn codec_text(codec: VideoCodec, ten_bit: bool) -> String {
     let name = match codec {
-        VideoCodec::Avc => "AVC",
+        VideoCodec::Avc => "H.264",
         VideoCodec::Hevc => "HEVC",
     };
 

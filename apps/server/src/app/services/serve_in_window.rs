@@ -4,7 +4,7 @@ use crate::app::{
 };
 use crate::journal::Journal;
 use crate::server::ServerControl;
-use crate::settings::{SavedSettings, computer_name, settings_of};
+use crate::settings::{SavedSettings, settings_of};
 use crate::window::{JournalView, ServerLink, ServerWindow, SettingsForm, list_monitors};
 use std::path::Path;
 use tokio::runtime::Runtime;
@@ -17,21 +17,14 @@ pub fn serve_in_window(
     settings_file: &Path,
     journal_file: &Path,
 ) {
-    let computer_name = computer_name();
-    let control = ServerControl::start(runtime.handle(), settings_of(&saved, &computer_name));
+    let control = ServerControl::start(runtime.handle(), settings_of(&saved));
     let link = ServerLink::new(control.watch_status(), |edited| {
-        apply_saved_settings(
-            &control,
-            &journal.level,
-            settings_file,
-            edited,
-            &computer_name,
-        )
+        apply_saved_settings(&control, &journal.level, settings_file, edited)
     });
     let window = ServerWindow::new(
         link,
         JournalView::new(journal.lines.clone(), journal_file.to_owned()),
-        SettingsForm::new(saved, computer_name.clone(), list_monitors),
+        SettingsForm::new(saved, list_monitors),
     );
 
     if let Err(problem) = eframe::run_native(

@@ -1,5 +1,4 @@
-use crate::capture::{CaptureError, probe_encoder};
-use crate::settings::VideoEncoder;
+use crate::capture::{CaptureError, VideoEncoder, probe_encoder};
 use media::VideoCodec;
 
 #[tokio::test]

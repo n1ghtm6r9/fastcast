@@ -6,6 +6,7 @@ use egui_kittest::kittest::Queryable;
 #[test]
 fn a_monitor_that_is_not_connected_is_named_by_its_number() {
     let saved = SavedSettings {
+        virtual_display: false,
         capture_output: 3,
         ..SavedSettings::default()
     };
@@ -15,7 +16,7 @@ fn a_monitor_that_is_not_connected_is_named_by_its_number() {
 
     assert_eq!(
         harness
-            .get_by_role_and_label(Role::ComboBox, "Монитор")
+            .get_by_role_and_label(Role::ComboBox, "Экран")
             .value(),
         Some("3: не подключён".to_owned())
     );

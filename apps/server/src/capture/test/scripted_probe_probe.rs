@@ -1,6 +1,5 @@
 use super::ScriptedProbe;
-use crate::capture::CaptureError;
-use crate::settings::VideoEncoder;
+use crate::capture::{CaptureError, VideoEncoder};
 
 impl ScriptedProbe {
     pub async fn probe(&self, encoder: VideoEncoder) -> Result<bool, CaptureError> {

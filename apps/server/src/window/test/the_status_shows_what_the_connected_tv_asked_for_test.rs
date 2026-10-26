@@ -25,5 +25,5 @@ fn the_status_shows_what_the_connected_tv_asked_for() {
 
     let harness = window_harness(window);
 
-    harness.get_by_label("ТВ просит 3840×2160 при 120 Гц, декодирует HEVC 10 бит, AVC");
+    harness.get_by_label("ТВ просит 3840×2160 при 120 Гц, декодирует HEVC 10 бит, H.264");
 }

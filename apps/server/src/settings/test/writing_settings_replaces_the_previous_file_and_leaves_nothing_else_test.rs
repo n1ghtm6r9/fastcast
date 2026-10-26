@@ -1,5 +1,5 @@
 use crate::fixtures::TemporaryDirectory;
-use crate::settings::{SavedSettings, read_saved_settings, write_saved_settings};
+use crate::settings::{FrameRate, SavedSettings, read_saved_settings, write_saved_settings};
 use std::fs;
 
 #[test]
@@ -7,11 +7,11 @@ fn writing_settings_replaces_the_previous_file_and_leaves_nothing_else() {
     let directory = TemporaryDirectory::new("replaced-settings");
     let path = directory.path().join("settings.json");
     let first = SavedSettings {
-        capture_fps: 30,
+        frame_rate: FrameRate::Fps30,
         ..SavedSettings::default()
     };
     let second = SavedSettings {
-        capture_fps: 120,
+        frame_rate: FrameRate::Fps120,
         ..SavedSettings::default()
     };
 

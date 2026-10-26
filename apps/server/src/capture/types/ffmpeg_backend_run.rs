@@ -1,7 +1,7 @@
 use crate::capture::{
     CaptureBackend, CaptureError, CaptureReport, CaptureTarget, FfmpegBackend, Pipeline, Screen,
-    codec_name_of, codecs_or_avc, ended_before_the_first_frame, locate_ffmpeg, open_screen,
-    pick_codec_and_encoder, probe_encoder, run_ffmpeg, stream_bitrate_kbps,
+    codec_name_of, codecs_to_try, ended_before_the_first_frame, monitor_refresh_hz, open_screen,
+    pick_codec_and_encoder, probe_encoder, run_ffmpeg,
 };
 use crate::hub::{Hub, ViewerRequest};
 use std::sync::Arc;
@@ -11,9 +11,9 @@ impl CaptureBackend for FfmpegBackend {
     type Pipeline = Pipeline;
 
     async fn prepare(&self, request: &ViewerRequest) -> Result<Pipeline, CaptureError> {
-        let ffmpeg_path = locate_ffmpeg(&self.settings.ffmpeg_path, &(self.search_dirs)())?;
+        let ffmpeg_path = (self.locate)()?;
         let (encoder, codec) = pick_codec_and_encoder(
-            &codecs_or_avc(&request.codecs),
+            &codecs_to_try(self.settings.video_codec, &request.codecs),
             |codec| self.picker_for(codec),
             |encoder, codec| probe_encoder(&ffmpeg_path, encoder, codec),
         )
@@ -27,7 +27,7 @@ impl CaptureBackend for FfmpegBackend {
     }
 
     async fn open_screen(&self, request: &ViewerRequest) -> Screen {
-        open_screen(&self.settings, request).await
+        open_screen(&self.settings, request, monitor_refresh_hz).await
     }
 
     async fn run(
@@ -44,7 +44,7 @@ impl CaptureBackend for FfmpegBackend {
             encoder_name,
             pipeline.ffmpeg_path,
             target.fps,
-            stream_bitrate_kbps(self.settings.video_bitrate_kbps, target.fps)
+            self.settings.video_bitrate_kbps
         );
 
         let result = run_ffmpeg(

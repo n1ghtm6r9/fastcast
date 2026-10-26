@@ -1,10 +1,9 @@
 use super::ScriptedProbe;
-use crate::capture::{EncoderPicker, pick_encoder};
-use crate::settings::{EncoderChoice, VideoEncoder};
+use crate::capture::{EncoderPicker, VideoEncoder, pick_encoder};
 
 #[tokio::test]
 async fn a_resolved_encoder_is_remembered_between_picks() {
-    let picker = EncoderPicker::new(EncoderChoice::Auto);
+    let picker = EncoderPicker::default();
     let probe = ScriptedProbe::passing(&[VideoEncoder::Amf]);
 
     let first = pick_encoder(&picker, |encoder| probe.probe(encoder)).await;

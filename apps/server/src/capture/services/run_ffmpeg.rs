@@ -1,9 +1,9 @@
 use crate::capture::{
-    CaptureError, CaptureReport, CaptureTarget, STDERR_FLUSH_TIMEOUT, ffmpeg_args, forward_stderr,
-    pump_frames, spawn_ffmpeg, wait_for_exit,
+    CaptureError, CaptureReport, CaptureTarget, STDERR_FLUSH_TIMEOUT, VideoEncoder, ffmpeg_args,
+    forward_stderr, pump_frames, spawn_ffmpeg, wait_for_exit,
 };
 use crate::hub::Hub;
-use crate::settings::{Settings, VideoEncoder};
+use crate::settings::Settings;
 use media::VideoCodec;
 use tokio::time::timeout;
 use tracing::warn;

@@ -1,5 +1,5 @@
 use super::ScriptedProbe;
-use crate::settings::VideoEncoder;
+use crate::capture::VideoEncoder;
 
 impl ScriptedProbe {
     pub fn calls(&self) -> Vec<VideoEncoder> {

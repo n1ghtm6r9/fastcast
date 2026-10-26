@@ -1,5 +1,4 @@
-use crate::capture::{FFMPEG_INSTALL_HINT, NativeError};
-use crate::settings::VideoEncoder;
+use crate::capture::{FFMPEG_INSTALL_HINT, NativeError, VideoEncoder};
 use media::FlvError;
 use std::error::Error;
 use std::{fmt, io};
@@ -11,7 +10,6 @@ pub enum CaptureError {
     MissingPipe,
     Demux(FlvError),
     NoEncoderAvailable { tried: Vec<VideoEncoder> },
-    EncoderNotNative { encoder: VideoEncoder },
     Native { frames: u64, cause: NativeError },
 }
 
@@ -20,7 +18,7 @@ impl fmt::Display for CaptureError {
         match self {
             Self::FfmpegNotFound { path } => write!(
                 formatter,
-                "ffmpeg was not found at \"{path}\": install it with `{FFMPEG_INSTALL_HINT}` or put the full path of ffmpeg.exe into «Путь к ffmpeg»"
+                "{path} was not found: install ffmpeg with `{FFMPEG_INSTALL_HINT}` or put ffmpeg.exe next to FastCast.exe"
             ),
             Self::Spawn { path, source } => {
                 write!(formatter, "could not start \"{path}\": {source}")
@@ -39,10 +37,6 @@ impl fmt::Display for CaptureError {
                     names.join(", ")
                 )
             }
-            Self::EncoderNotNative { encoder } => write!(
-                formatter,
-                "the encoder is set to {encoder}, but native capture encodes with NVENC only"
-            ),
             Self::Native { frames, cause } => write!(
                 formatter,
                 "native capture failed after {frames} frames: {cause}"

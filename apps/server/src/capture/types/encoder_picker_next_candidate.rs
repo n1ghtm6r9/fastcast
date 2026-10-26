@@ -1,5 +1,4 @@
-use crate::capture::EncoderPicker;
-use crate::settings::VideoEncoder;
+use crate::capture::{EncoderPicker, VideoEncoder};
 
 impl EncoderPicker {
     pub fn next_candidate(&self) -> Option<VideoEncoder> {
@@ -8,7 +7,6 @@ impl EncoderPicker {
         self.order
             .iter()
             .copied()
-            .filter(|&encoder| self.allows(encoder))
             .find(|encoder| !state.unusable.contains(encoder))
     }
 }

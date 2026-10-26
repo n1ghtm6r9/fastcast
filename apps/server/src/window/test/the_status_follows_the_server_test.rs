@@ -15,5 +15,5 @@ fn the_status_follows_the_server() {
     probe.status.send_replace(running_status());
     harness.run();
 
-    harness.get_by_label("Сервер работает на 192.168.0.10:3278");
+    harness.get_by_label("Ждёт ТВ");
 }

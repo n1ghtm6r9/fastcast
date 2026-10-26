@@ -1,14 +1,8 @@
-mod computer_name;
-mod computer_name_from;
-mod encoder_choice_named;
 mod read_saved_settings;
 mod settings_of;
 mod temporary_path_beside;
 mod trimmed_or;
 mod write_saved_settings;
-pub use computer_name::*;
-pub use computer_name_from::*;
-pub use encoder_choice_named::*;
 pub use read_saved_settings::*;
 pub use settings_of::*;
 pub use temporary_path_beside::*;

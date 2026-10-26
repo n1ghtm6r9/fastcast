@@ -1,13 +1,13 @@
 use crate::capture::{
-    AUTO_ENCODER_ORDER, CaptureError, EncoderPicker, HEVC_ENCODER_ORDER, pick_codec_and_encoder,
+    AUTO_ENCODER_ORDER, CaptureError, EncoderPicker, HEVC_ENCODER_ORDER, VideoEncoder,
+    pick_codec_and_encoder,
 };
-use crate::settings::{EncoderChoice, VideoEncoder};
 use media::VideoCodec;
 
 #[tokio::test]
 async fn when_no_codec_has_a_working_encoder_the_error_names_each_encoder_once() {
-    let avc = EncoderPicker::ordered(EncoderChoice::Auto, &AUTO_ENCODER_ORDER);
-    let hevc = EncoderPicker::ordered(EncoderChoice::Auto, &HEVC_ENCODER_ORDER);
+    let avc = EncoderPicker::ordered(&AUTO_ENCODER_ORDER);
+    let hevc = EncoderPicker::ordered(&HEVC_ENCODER_ORDER);
 
     let failure = pick_codec_and_encoder(
         &[VideoCodec::Hevc, VideoCodec::Avc],

@@ -1,5 +1,6 @@
 use crate::capture::capture_fps_for;
 use crate::display::DisplayMode;
+use crate::settings::FrameRate;
 
 #[test]
 fn a_display_shown_faster_than_requested_is_captured_at_the_requested_rate() {
@@ -14,5 +15,5 @@ fn a_display_shown_faster_than_requested_is_captured_at_the_requested_rate() {
         refresh_hz: 240,
     };
 
-    assert_eq!(capture_fps_for(requested, shown), 120);
+    assert_eq!(capture_fps_for(requested, shown, FrameRate::Unlimited), 120);
 }

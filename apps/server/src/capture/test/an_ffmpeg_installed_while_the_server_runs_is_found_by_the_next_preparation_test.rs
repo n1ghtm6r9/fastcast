@@ -1,5 +1,7 @@
 use super::{FakeFfmpeg, default_settings};
-use crate::capture::{CaptureBackend, CaptureError, FFMPEG_FILE_NAME, FfmpegBackend};
+use crate::capture::{
+    CaptureBackend, CaptureError, FFMPEG_FILE_NAME, FfmpegBackend, locate_ffmpeg,
+};
 use crate::hub::ViewerRequest;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
@@ -8,15 +10,10 @@ use std::sync::{Arc, Mutex};
 async fn an_ffmpeg_installed_while_the_server_runs_is_found_by_the_next_preparation() {
     let installed = FakeFfmpeg::installed();
     let search_dirs = Arc::new(Mutex::new(Vec::<PathBuf>::new()));
-    let backend = FfmpegBackend::with_search_dirs(default_settings(), {
+    let backend = FfmpegBackend::with_locator(default_settings(), {
         let search_dirs = search_dirs.clone();
 
-        move || {
-            search_dirs
-                .lock()
-                .expect("the directories are readable")
-                .clone()
-        }
+        move || locate_ffmpeg(&search_dirs.lock().expect("the directories are readable"))
     });
     let request = ViewerRequest::default();
 

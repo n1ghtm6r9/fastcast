@@ -1,4 +1,4 @@
-use crate::settings::VideoEncoder;
+use crate::capture::VideoEncoder;
 
 #[derive(Debug, Default)]
 pub struct PickerState {

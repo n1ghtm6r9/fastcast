@@ -1,11 +1,10 @@
-use crate::window::{JournalView, REPAINT_INTERVAL, ServerLink, SettingsForm, WindowTab};
+use crate::window::{JournalView, REPAINT_INTERVAL, ServerLink, SettingsForm};
 use eframe::egui::Ui;
 
 pub struct ServerWindow<'a> {
     pub(crate) link: ServerLink<'a>,
     pub(crate) journal: JournalView,
     pub(crate) form: SettingsForm,
-    pub(crate) tab: WindowTab,
 }
 
 impl<'a> ServerWindow<'a> {
@@ -14,7 +13,6 @@ impl<'a> ServerWindow<'a> {
             link,
             journal,
             form,
-            tab: WindowTab::default(),
         }
     }
 }

@@ -8,9 +8,8 @@ pub fn apply_saved_settings(
     level: &JournalLevel,
     path: &Path,
     saved: &SavedSettings,
-    computer_name: &str,
 ) -> Result<(), SettingsFileError> {
-    control.apply(settings_of(saved, computer_name));
+    control.apply(settings_of(saved));
     level.set(saved.log_level);
 
     write_saved_settings(path, saved)

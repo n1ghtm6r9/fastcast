@@ -1,5 +1,4 @@
-use crate::capture::EncoderPicker;
-use crate::settings::VideoEncoder;
+use crate::capture::{EncoderPicker, VideoEncoder};
 
 impl EncoderPicker {
     pub fn unusable(&self) -> Vec<VideoEncoder> {

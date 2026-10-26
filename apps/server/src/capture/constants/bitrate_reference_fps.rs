@@ -1,1 +1,0 @@
-pub const BITRATE_REFERENCE_FPS: u32 = 60;

@@ -1,19 +1,21 @@
 mod amf_args;
 mod auto_encoder_order;
 mod avc_profile_args;
-mod bitrate_reference_fps;
 mod color_conversion_filter;
 mod create_no_window;
 mod exit_wait_timeout;
+mod fallback_capture_fps;
 mod fast_encoder_preset;
 mod ffmpeg_file_name;
 mod ffmpeg_install_hint;
 #[cfg(windows)]
 mod first_adapter_index;
+mod hardware_default_refresh_hz;
 mod hevc_encoder_order;
 mod hevc_profile_args;
 mod idle_grace;
 mod interval_slack_divisor;
+mod keyframe_interval_seconds;
 #[cfg(windows)]
 mod longest_environment_value;
 mod max_quality_preset_pixel_rate;
@@ -41,19 +43,21 @@ mod x264_args;
 pub use amf_args::*;
 pub use auto_encoder_order::*;
 pub use avc_profile_args::*;
-pub use bitrate_reference_fps::*;
 pub use color_conversion_filter::*;
 pub use create_no_window::*;
 pub use exit_wait_timeout::*;
+pub use fallback_capture_fps::*;
 pub use fast_encoder_preset::*;
 pub use ffmpeg_file_name::*;
 pub use ffmpeg_install_hint::*;
 #[cfg(windows)]
 pub use first_adapter_index::*;
+pub use hardware_default_refresh_hz::*;
 pub use hevc_encoder_order::*;
 pub use hevc_profile_args::*;
 pub use idle_grace::*;
 pub use interval_slack_divisor::*;
+pub use keyframe_interval_seconds::*;
 #[cfg(windows)]
 pub use longest_environment_value::*;
 pub use max_quality_preset_pixel_rate::*;

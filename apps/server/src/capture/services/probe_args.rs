@@ -1,5 +1,4 @@
-use crate::capture::{PROBE_INPUT_ARGS, PROBE_OUTPUT_ARGS, args_of, codec_name_of};
-use crate::settings::VideoEncoder;
+use crate::capture::{PROBE_INPUT_ARGS, PROBE_OUTPUT_ARGS, VideoEncoder, args_of, codec_name_of};
 use media::VideoCodec;
 
 pub fn probe_args(encoder: VideoEncoder, codec: VideoCodec) -> Vec<String> {

@@ -1,0 +1,1 @@
+pub const KILOBITS_PER_MEGABIT: u32 = 1000;

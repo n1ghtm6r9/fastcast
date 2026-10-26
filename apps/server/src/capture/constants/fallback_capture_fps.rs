@@ -1,0 +1,1 @@
+pub const FALLBACK_CAPTURE_FPS: u32 = 60;

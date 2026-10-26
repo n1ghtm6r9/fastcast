@@ -1,3 +1,4 @@
+use crate::window::FIELD_WIDTH;
 use eframe::egui::{ComboBox, Response, Ui};
 
 pub fn choice_combo<T: PartialEq + Copy>(
@@ -12,6 +13,7 @@ pub fn choice_combo<T: PartialEq + Copy>(
         .map_or("", |(_, name)| *name);
 
     ComboBox::from_id_salt(id_salt)
+        .width(FIELD_WIDTH)
         .selected_text(selected)
         .show_ui(ui, |ui| {
             for (choice, name) in choices {

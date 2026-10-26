@@ -1,5 +1,5 @@
 use crate::app::stop_server;
-use crate::app::test::{ANSWER_LIMIT, TEST_COMPUTER_NAME};
+use crate::app::test::ANSWER_LIMIT;
 use crate::journal::{JournalLines, JournalSink, journal_subscriber};
 use crate::server::ServerControl;
 use crate::settings::{LogLevel, SavedSettings, settings_of};
@@ -16,7 +16,7 @@ fn a_server_that_does_not_stop_is_written_to_the_journal() {
     let (subscriber, _level) =
         journal_subscriber(JournalSink::new(lines.clone(), None), LogLevel::Info);
     let runtime = Runtime::new().expect("the runtime starts");
-    let settings = settings_of(&SavedSettings::default(), TEST_COMPUTER_NAME);
+    let settings = settings_of(&SavedSettings::default());
     let control = ServerControl::start_with(runtime.handle(), settings, |_, _, _| {
         future::pending::<Result<(), StreamError>>()
     });

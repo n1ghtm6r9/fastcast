@@ -1,5 +1,7 @@
 use crate::fixtures::TemporaryDirectory;
-use crate::settings::{LogLevel, SavedSettings, read_saved_settings, write_saved_settings};
+use crate::settings::{
+    FrameRate, LogLevel, SavedSettings, read_saved_settings, write_saved_settings,
+};
 
 #[test]
 fn written_settings_are_read_back_unchanged() {
@@ -7,7 +9,7 @@ fn written_settings_are_read_back_unchanged() {
     let path = directory.path().join("settings.json");
     let saved = SavedSettings {
         server_name: "Gaming PC".to_owned(),
-        capture_fps: 120,
+        frame_rate: FrameRate::Fps120,
         log_level: LogLevel::Debug,
         ..SavedSettings::default()
     };

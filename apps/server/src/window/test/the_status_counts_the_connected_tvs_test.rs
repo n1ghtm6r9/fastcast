@@ -13,5 +13,5 @@ fn the_status_counts_the_connected_tvs() {
 
     let harness = window_harness(window);
 
-    harness.get_by_label("Подключено ТВ: 2");
+    harness.get_by_label("Транслирует на 2 ТВ");
 }

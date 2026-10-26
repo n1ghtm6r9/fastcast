@@ -10,8 +10,5 @@ fn a_viewer_without_ten_bit_decoding_gets_eight_bits() {
         ten_bit_codecs: Vec::new(),
     };
 
-    assert_eq!(
-        bit_depth_for(true, VideoCodec::Hevc, &request),
-        EIGHT_BIT_DEPTH
-    );
+    assert_eq!(bit_depth_for(VideoCodec::Hevc, &request), EIGHT_BIT_DEPTH);
 }

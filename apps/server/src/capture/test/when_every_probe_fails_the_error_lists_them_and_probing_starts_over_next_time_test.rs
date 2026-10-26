@@ -1,10 +1,9 @@
 use super::ScriptedProbe;
-use crate::capture::{CaptureError, EncoderPicker, pick_encoder};
-use crate::settings::{EncoderChoice, VideoEncoder};
+use crate::capture::{CaptureError, EncoderPicker, VideoEncoder, pick_encoder};
 
 #[tokio::test]
 async fn when_every_probe_fails_the_error_lists_them_and_probing_starts_over_next_time() {
-    let picker = EncoderPicker::new(EncoderChoice::Auto);
+    let picker = EncoderPicker::default();
     let probe = ScriptedProbe::passing(&[]);
 
     let failure = pick_encoder(&picker, |encoder| probe.probe(encoder))

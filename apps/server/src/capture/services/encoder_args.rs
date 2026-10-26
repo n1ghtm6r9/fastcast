@@ -1,8 +1,7 @@
 use crate::capture::{
-    COLOR_CONVERSION_FILTER, args_of, codec_name_of, profile_args_of, rate_control_args,
-    tuning_args_of,
+    COLOR_CONVERSION_FILTER, VideoEncoder, args_of, codec_name_of, profile_args_of,
+    rate_control_args, tuning_args_of,
 };
-use crate::settings::VideoEncoder;
 use media::VideoCodec;
 
 pub fn encoder_args(

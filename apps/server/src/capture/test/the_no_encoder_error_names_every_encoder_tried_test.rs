@@ -1,5 +1,4 @@
-use crate::capture::CaptureError;
-use crate::settings::VideoEncoder;
+use crate::capture::{CaptureError, VideoEncoder};
 
 #[test]
 fn the_no_encoder_error_names_every_encoder_tried() {

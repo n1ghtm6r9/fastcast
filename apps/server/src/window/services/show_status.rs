@@ -1,19 +1,27 @@
 use crate::server::{ServerState, ServerStatus};
-use crate::window::{request_text, state_text, viewers_text};
-use eframe::egui::{RichText, Ui};
+use crate::window::{request_text, show_failure, status_color, status_dot, status_headline};
+use eframe::egui::{Align, Layout, RichText, Ui};
 
-pub fn show_status(ui: &mut Ui, status: &ServerStatus) {
-    let state = RichText::new(state_text(&status.state)).strong();
+pub fn show_status(ui: &mut Ui, status: &ServerStatus) -> bool {
+    ui.horizontal(|ui| {
+        ui.label(RichText::new("FastCast").heading().strong());
+        ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+            ui.label(RichText::new(status_headline(status)).strong());
+            let color = status_color(&status.state, ui.visuals());
+            status_dot(ui, color);
+        });
+    });
 
-    match status.state {
-        ServerState::Failed { .. } => ui.colored_label(ui.visuals().error_fg_color, state),
-        _ => ui.label(state),
+    let retry = match &status.state {
+        ServerState::Failed { reason } => show_failure(ui, reason),
+        _ => false,
     };
-    ui.label(viewers_text(status.viewers));
     if status.viewers > 0 {
-        ui.label(request_text(&status.request));
+        ui.label(RichText::new(request_text(&status.request)).weak());
     }
     if let Some(report) = &status.report {
-        ui.label(format!("Отчёт ТВ: {report}"));
+        ui.label(RichText::new(format!("Отчёт ТВ: {report}")).weak());
     }
+
+    retry
 }
