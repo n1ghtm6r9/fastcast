@@ -6,7 +6,7 @@ pub fn assert_kernels_agree(
     source: &[u8],
     initial: &[u8],
     target_offset: usize,
-) -> usize {
+) -> Vec<&'static str> {
     let mut expected = initial.to_vec();
 
     mul_add_slice_scalar(coefficient, source, &mut expected);
@@ -28,5 +28,5 @@ pub fn assert_kernels_agree(
         );
     }
 
-    kernels.len()
+    kernels.into_iter().map(|(name, _)| name).collect()
 }
