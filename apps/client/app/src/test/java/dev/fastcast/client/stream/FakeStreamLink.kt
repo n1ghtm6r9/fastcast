@@ -68,6 +68,10 @@ class FakeStreamLink : StreamLink {
         return true
     }
 
+    override fun receiveBufferBytes(link: Long): Int = if (inboxes.containsKey(link)) receiveBufferOf(link) else 0
+
+    fun receiveBufferOf(handle: Long): Int = RECEIVE_BUFFER_BASE_BYTES + handle.toInt()
+
     override fun close(link: Long) {
         closedLinks.add(link)
         inboxes.remove(link)
@@ -80,6 +84,7 @@ class FakeStreamLink : StreamLink {
 
     private companion object {
         const val NO_HANDLE = 0L
+        const val RECEIVE_BUFFER_BASE_BYTES = 4_194_304
         const val ACCEPT_TIMEOUT_MS = 5_000L
         const val STATS_TIMEOUT_MS = 5_000L
     }

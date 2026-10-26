@@ -12,6 +12,7 @@ class StatsMessage(
     val mbps: Double,
     val dropped: Long,
     val display: String,
+    val receiveBuffer: Int? = null,
     val colorStandard: Int? = null,
     val colorRange: Int? = null,
     val colorTransfer: Int? = null,
@@ -29,6 +30,7 @@ class StatsMessage(
             .put(MBPS, roundedToTenths(mbps))
             .put(DROPPED, dropped)
             .put(DISPLAY, display)
+        receiveBuffer?.let { json.put(RECEIVE_BUFFER, it) }
         colorStandard?.let { json.put(COLOR_STANDARD, it) }
         colorRange?.let { json.put(COLOR_RANGE, it) }
         colorTransfer?.let { json.put(COLOR_TRANSFER, it) }
@@ -49,6 +51,7 @@ class StatsMessage(
         const val MBPS = "mbps"
         const val DROPPED = "dropped"
         const val DISPLAY = "display"
+        const val RECEIVE_BUFFER = "receiveBuffer"
         const val COLOR_STANDARD = "colorStandard"
         const val COLOR_RANGE = "colorRange"
         const val COLOR_TRANSFER = "colorTransfer"

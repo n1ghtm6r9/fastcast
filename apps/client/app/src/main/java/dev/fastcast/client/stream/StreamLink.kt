@@ -8,5 +8,7 @@ interface StreamLink {
 
     fun sendStats(link: Long, text: ByteArray): Boolean
 
+    fun receiveBufferBytes(link: Long): Int
+
     fun close(link: Long)
 }

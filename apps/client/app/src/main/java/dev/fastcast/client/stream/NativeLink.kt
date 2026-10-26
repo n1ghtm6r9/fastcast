@@ -34,5 +34,8 @@ object NativeLink {
     external fun sendStats(link: Long, text: ByteArray): Boolean
 
     @JvmStatic
+    external fun receiveBufferBytes(link: Long): Int
+
+    @JvmStatic
     external fun close(link: Long)
 }

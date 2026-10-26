@@ -11,4 +11,5 @@ class StatsSnapshot(
     val droppedFrames: Long,
     val mime: String,
     val color: OutputColor,
+    val receiveBufferBytes: Int = 0,
 )

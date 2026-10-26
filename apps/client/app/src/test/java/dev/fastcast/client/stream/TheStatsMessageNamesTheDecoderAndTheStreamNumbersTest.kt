@@ -16,6 +16,7 @@ class TheStatsMessageNamesTheDecoderAndTheStreamNumbersTest {
             mbps = 31.2,
             dropped = 4L,
             display = "3840x2160@60",
+            receiveBuffer = 8_388_608,
             colorStandard = 1,
             colorRange = 2,
             colorTransfer = 3,
@@ -56,6 +57,11 @@ class TheStatsMessageNamesTheDecoderAndTheStreamNumbersTest {
     }
 
     @Test
+    fun `the receive buffer of the link is given in bytes`() {
+        assertEquals(8_388_608, json.getInt("receiveBuffer"))
+    }
+
+    @Test
     fun `the output colors are whole numbers`() {
         assertEquals(1, json.getInt("colorStandard"))
         assertEquals(2, json.getInt("colorRange"))
@@ -66,7 +72,7 @@ class TheStatsMessageNamesTheDecoderAndTheStreamNumbersTest {
     fun `no other field is present`() {
         val expected = setOf(
             "type", "decoder", "mime", "width", "height", "fps", "mbps", "dropped", "display",
-            "colorStandard", "colorRange", "colorTransfer",
+            "receiveBuffer", "colorStandard", "colorRange", "colorTransfer",
         )
 
         assertEquals(expected, json.keys().asSequence().toSet())

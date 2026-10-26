@@ -12,6 +12,7 @@ fun aStatsSnapshot(
     droppedFrames: Long = 0L,
     mime: String = "video/hevc",
     color: OutputColor = OutputColor(standard = 1, range = 2, transfer = 3),
+    receiveBufferBytes: Int = 8_388_608,
 ): StatsSnapshot = StatsSnapshot(
     width = width,
     height = height,
@@ -21,4 +22,5 @@ fun aStatsSnapshot(
     droppedFrames = droppedFrames,
     mime = mime,
     color = color,
+    receiveBufferBytes = receiveBufferBytes,
 )

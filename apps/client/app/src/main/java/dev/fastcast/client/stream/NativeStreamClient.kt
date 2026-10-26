@@ -47,6 +47,10 @@ class NativeStreamClient(
         handle != NO_HANDLE && link.sendStats(handle, text.toByteArray(Charsets.UTF_8))
     }
 
+    fun receiveBufferBytes(): Int = synchronized(lock) {
+        if (handle == NO_HANDLE) UNKNOWN_BUFFER else link.receiveBufferBytes(handle)
+    }
+
     fun reconnect() {
         synchronized(lock) {
             if (!running) return
@@ -187,6 +191,7 @@ class NativeStreamClient(
 
     private companion object {
         const val NO_HANDLE = 0L
+        const val UNKNOWN_BUFFER = 0
         const val KIND_SIZE = 1
         const val RECEIVE_POLL_MS = 100
         const val THREAD_NAME = "fastcast-stream"

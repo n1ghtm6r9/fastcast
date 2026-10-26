@@ -9,6 +9,7 @@ import org.junit.Test
 class TheStatsMessageLeavesOutWhatIsUnknownTest {
 
     private fun messageWith(
+        receiveBuffer: Int? = null,
         colorStandard: Int? = null,
         colorRange: Int? = null,
         colorTransfer: Int? = null,
@@ -23,6 +24,7 @@ class TheStatsMessageLeavesOutWhatIsUnknownTest {
             mbps = 31.2,
             dropped = 0L,
             display = "3840x2160@60",
+            receiveBuffer = receiveBuffer,
             colorStandard = colorStandard,
             colorRange = colorRange,
             colorTransfer = colorTransfer,
@@ -55,6 +57,16 @@ class TheStatsMessageLeavesOutWhatIsUnknownTest {
         assertTrue(json.has("colorStandard"))
         assertTrue(json.has("colorRange"))
         assertTrue(json.has("colorTransfer"))
+    }
+
+    @Test
+    fun `a receive buffer that is not known is left out`() {
+        assertFalse(messageWith().has("receiveBuffer"))
+    }
+
+    @Test
+    fun `a known receive buffer is present`() {
+        assertEquals(8_388_608, messageWith(receiveBuffer = 8_388_608).getInt("receiveBuffer"))
     }
 
     @Test

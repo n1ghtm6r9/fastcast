@@ -97,6 +97,7 @@ class PlayerSession(
             droppedFrames = decoder.stats.framesDropped.get(),
             mime = decoder.stats.mime,
             color = decoder.stats.outputColor,
+            receiveBufferBytes = stream.receiveBufferBytes(),
         )
     }
 

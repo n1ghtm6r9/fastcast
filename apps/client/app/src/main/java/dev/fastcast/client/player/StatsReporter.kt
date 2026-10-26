@@ -56,6 +56,7 @@ class StatsReporter(
                 mbps = current.megabitsPerSecond,
                 dropped = current.droppedFrames,
                 display = display(),
+                receiveBuffer = current.receiveBufferBytes.takeIf { it > 0 },
                 colorStandard = current.color.standard,
                 colorRange = current.color.range,
                 colorTransfer = current.color.transfer,

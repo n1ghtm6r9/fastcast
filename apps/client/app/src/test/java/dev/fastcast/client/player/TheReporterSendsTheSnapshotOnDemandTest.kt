@@ -1,6 +1,7 @@
 package dev.fastcast.client.player
 
 import dev.fastcast.client.testing.aStatsSnapshot
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
 import org.junit.After
@@ -13,9 +14,10 @@ class TheReporterSendsTheSnapshotOnDemandTest {
 
     private val sink = RecordingStatsSink()
     private val dropped = AtomicLong(0L)
+    private val receiveBuffer = AtomicInteger(8_388_608)
     private val display = AtomicReference("3840x2160@60")
     private val reporter = StatsReporter(
-        snapshot = { aStatsSnapshot(droppedFrames = dropped.get()) },
+        snapshot = { aStatsSnapshot(droppedFrames = dropped.get(), receiveBufferBytes = receiveBuffer.get()) },
         display = display::get,
         send = sink::send,
         intervalMs = 60_000L,
@@ -52,6 +54,22 @@ class TheReporterSendsTheSnapshotOnDemandTest {
         assertEquals(1, json.getInt("colorStandard"))
         assertEquals(2, json.getInt("colorRange"))
         assertEquals(3, json.getInt("colorTransfer"))
+    }
+
+    @Test
+    fun `a report carries the receive buffer of the link`() {
+        reporter.reportNow()
+
+        assertEquals(8_388_608, sink.next().getInt("receiveBuffer"))
+    }
+
+    @Test
+    fun `a report leaves out a receive buffer that is not known`() {
+        receiveBuffer.set(0)
+
+        reporter.reportNow()
+
+        assertFalse(sink.next().has("receiveBuffer"))
     }
 
     @Test
