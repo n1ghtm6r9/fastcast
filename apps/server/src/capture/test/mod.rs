@@ -1,5 +1,7 @@
+mod an_avc_key_frame;
 mod an_hevc_key_frame;
 mod annex_b_of;
+mod avcc_parameter_sets_of;
 mod capture_target;
 mod default_settings;
 #[cfg(windows)]
@@ -60,8 +62,10 @@ mod settings_with_encoder;
 mod settle;
 #[cfg(windows)]
 mod try_lock_gpu_slot;
+pub use an_avc_key_frame::*;
 pub use an_hevc_key_frame::*;
 pub use annex_b_of::*;
+pub use avcc_parameter_sets_of::*;
 pub use capture_target::*;
 pub use default_settings::*;
 #[cfg(windows)]
@@ -149,6 +153,8 @@ mod a_key_frame_may_be_forced_once_the_minimum_interval_has_passed_test;
 mod a_key_frame_may_not_be_forced_right_after_another_test;
 #[cfg(windows)]
 mod a_key_frame_request_is_answered_with_a_key_frame_test;
+#[cfg(windows)]
+mod a_key_frame_request_is_answered_with_an_avc_key_frame_test;
 mod a_key_frame_request_is_taken_once_the_gate_is_open_test;
 mod a_key_frame_request_stays_in_the_hub_while_the_gate_is_closed_test;
 mod a_key_frame_whose_parameter_sets_cannot_be_described_is_refused_test;
@@ -223,6 +229,10 @@ mod a_target_without_an_output_is_reported_missing_test;
 mod a_viewer_returning_within_the_grace_keeps_ffmpeg_running_test;
 mod a_worker_starts_only_after_the_previous_one_has_finished_test;
 mod an_automatic_encoder_choice_is_fine_for_native_capture_test;
+mod an_avc_delta_frame_after_a_key_frame_shares_its_config_test;
+mod an_avc_delta_frame_before_any_key_frame_is_not_published_test;
+mod an_avc_key_frame_describes_the_stream_before_it_is_published_test;
+mod an_avc_key_frame_without_parameter_sets_is_refused_test;
 mod an_early_picture_does_not_move_the_next_turn_earlier_test;
 mod an_empty_packet_is_not_published_test;
 mod an_empty_packet_is_reported_as_not_published_test;
@@ -307,6 +317,8 @@ mod the_keyframe_interval_is_the_rate_times_the_seconds_test;
 mod the_last_picture_is_repeated_one_interval_after_it_was_encoded_test;
 mod the_native_backend_does_not_prepare_for_a_fixed_encoder_other_than_nvenc_test;
 mod the_native_backend_prefers_hevc_when_the_tv_decodes_it_test;
+#[cfg(windows)]
+mod the_native_backend_starts_with_a_described_avc_key_frame_test;
 #[cfg(windows)]
 mod the_native_backend_starts_with_a_described_key_frame_test;
 mod the_native_backend_uses_avc_when_the_tv_lists_no_hevc_test;
