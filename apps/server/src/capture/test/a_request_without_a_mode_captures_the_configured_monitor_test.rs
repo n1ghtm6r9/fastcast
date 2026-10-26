@@ -14,6 +14,7 @@ async fn a_request_without_a_mode_captures_the_configured_monitor() {
     let request = ViewerRequest {
         mode: None,
         codecs: vec![VideoCodec::Hevc],
+        ten_bit_codecs: Vec::new(),
     };
 
     let screen = open_screen(&settings, &request).await;

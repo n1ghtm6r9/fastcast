@@ -18,6 +18,7 @@ async fn a_new_request_opens_a_new_screen_and_restarts_the_capture() {
             refresh_hz: 60,
         }),
         codecs: vec![VideoCodec::Hevc, VideoCodec::Avc],
+        ten_bit_codecs: Vec::new(),
     };
 
     settle().await;

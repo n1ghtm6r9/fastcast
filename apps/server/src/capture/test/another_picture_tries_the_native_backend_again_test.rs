@@ -29,6 +29,7 @@ async fn another_picture_tries_the_native_backend_again() {
     let hevc = ViewerRequest {
         mode: None,
         codecs: vec![VideoCodec::Hevc],
+        ten_bit_codecs: Vec::new(),
     };
 
     let second = backend

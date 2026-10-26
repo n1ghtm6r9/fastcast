@@ -53,6 +53,7 @@ pub use wait_for_viewer_count::*;
 pub use woken_within_two_seconds::*;
 
 mod a_bind_failure_names_the_udp_address_and_the_cause_test;
+mod a_codec_offered_with_eight_bits_is_no_ten_bit_codec_test;
 mod a_cursor_is_waiting_until_a_key_frame_is_admitted_test;
 mod a_cursor_skips_delta_frames_until_the_first_key_frame_test;
 mod a_delta_frame_under_a_config_the_viewer_was_not_told_about_is_skipped_test;

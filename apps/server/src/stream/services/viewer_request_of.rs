@@ -1,6 +1,6 @@
 use crate::display::DisplayMode;
 use crate::hub::ViewerRequest;
-use crate::stream::{DISPLAY_RATE_RANGE, DISPLAY_SIDE_RANGE, codecs_of};
+use crate::stream::{DISPLAY_RATE_RANGE, DISPLAY_SIDE_RANGE, codecs_of, ten_bit_codecs_of};
 use wire::Hello;
 
 pub fn viewer_request_of(hello: &Hello, default_fps: u32) -> ViewerRequest {
@@ -23,5 +23,6 @@ pub fn viewer_request_of(hello: &Hello, default_fps: u32) -> ViewerRequest {
     ViewerRequest {
         mode,
         codecs: codecs_of(&hello.codecs),
+        ten_bit_codecs: ten_bit_codecs_of(&hello.codecs),
     }
 }
