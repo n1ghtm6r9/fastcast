@@ -20,6 +20,8 @@ impl NativeError {
             ),
             Self::NotNvidia { .. } | Self::UndescribableStream => true,
             Self::OutputMissing { .. } | Self::Spawn(_) | Self::WorkerGone => false,
+            #[cfg(windows)]
+            Self::ReopenGaveUp(_) => false,
             #[cfg(not(windows))]
             Self::Unsupported => true,
         }

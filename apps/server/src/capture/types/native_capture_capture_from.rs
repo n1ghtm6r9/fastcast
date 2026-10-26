@@ -1,6 +1,7 @@
 use crate::capture::{NativeCapture, NativeError};
 use desktop::{DesktopError, Duplication};
 use std::time::Instant;
+use tracing::info;
 
 impl NativeCapture<'_> {
     pub(crate) fn capture_from(&mut self, mut duplication: Duplication) -> Result<(), NativeError> {
@@ -26,7 +27,11 @@ impl NativeCapture<'_> {
 
                 self.repeat(arrived)
             }
-            Err(DesktopError::AccessLost) => Ok(()),
+            Err(DesktopError::AccessLost) => {
+                info!("access to the desktop was lost, opening the duplication again");
+
+                Ok(())
+            }
             Err(error) => Err(NativeError::Desktop(error)),
         }
     }

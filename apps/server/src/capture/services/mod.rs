@@ -16,6 +16,8 @@ mod locate_ffmpeg;
 #[cfg(windows)]
 mod native_output_for;
 #[cfg(windows)]
+mod note_failed_reopen;
+#[cfg(windows)]
 mod nvidia_output_for;
 mod open_screen;
 mod open_virtual_display;
@@ -68,6 +70,8 @@ pub use keyframe_interval_in_frames::*;
 pub use locate_ffmpeg::*;
 #[cfg(windows)]
 pub use native_output_for::*;
+#[cfg(windows)]
+pub use note_failed_reopen::*;
 #[cfg(windows)]
 pub use nvidia_output_for::*;
 pub use open_screen::*;

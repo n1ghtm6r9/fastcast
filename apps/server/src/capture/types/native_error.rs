@@ -1,3 +1,5 @@
+#[cfg(windows)]
+use crate::capture::REOPEN_GIVE_UP_AFTER;
 use std::error::Error;
 use std::{fmt, io};
 
@@ -7,6 +9,8 @@ pub enum NativeError {
     Desktop(desktop::DesktopError),
     #[cfg(windows)]
     Encoder(nvenc::NvencError),
+    #[cfg(windows)]
+    ReopenGaveUp(desktop::DesktopError),
     OutputMissing {
         index: u32,
     },
@@ -27,6 +31,12 @@ impl fmt::Display for NativeError {
             Self::Desktop(error) => write!(formatter, "{error}"),
             #[cfg(windows)]
             Self::Encoder(error) => write!(formatter, "{error}"),
+            #[cfg(windows)]
+            Self::ReopenGaveUp(error) => write!(
+                formatter,
+                "the desktop could not be duplicated again for {} seconds: {error}",
+                REOPEN_GIVE_UP_AFTER.as_secs()
+            ),
             Self::OutputMissing { index } => write!(
                 formatter,
                 "output {index} of the first graphics adapter is not there"
@@ -56,6 +66,8 @@ impl Error for NativeError {
             Self::Desktop(error) => Some(error),
             #[cfg(windows)]
             Self::Encoder(error) => Some(error),
+            #[cfg(windows)]
+            Self::ReopenGaveUp(error) => Some(error),
             Self::Spawn(source) => Some(source),
             _ => None,
         }
