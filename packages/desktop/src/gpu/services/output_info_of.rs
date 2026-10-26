@@ -1,7 +1,12 @@
 use crate::gpu::{OutputInfo, adapter_luid_of, desktop_extent, wide_to_string};
 use windows::Win32::Graphics::Dxgi::{DXGI_ADAPTER_DESC1, DXGI_OUTPUT_DESC};
 
-pub fn output_info_of(adapter: &DXGI_ADAPTER_DESC1, output: &DXGI_OUTPUT_DESC) -> OutputInfo {
+pub fn output_info_of(
+    adapter_index: u32,
+    output_index: u32,
+    adapter: &DXGI_ADAPTER_DESC1,
+    output: &DXGI_OUTPUT_DESC,
+) -> OutputInfo {
     let area = output.DesktopCoordinates;
 
     OutputInfo {
@@ -14,5 +19,7 @@ pub fn output_info_of(adapter: &DXGI_ADAPTER_DESC1, output: &DXGI_OUTPUT_DESC) -
         width: desktop_extent(area.left, area.right),
         height: desktop_extent(area.top, area.bottom),
         attached: output.AttachedToDesktop.as_bool(),
+        adapter_index,
+        output_index,
     }
 }

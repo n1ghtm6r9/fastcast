@@ -6,12 +6,15 @@ mod create_no_window;
 mod exit_wait_timeout;
 mod ffmpeg_file_name;
 mod ffmpeg_install_hint;
+#[cfg(windows)]
+mod first_adapter_index;
 mod hevc_encoder_order;
 mod hevc_profile_args;
 mod idle_grace;
 mod interval_slack_divisor;
 #[cfg(windows)]
 mod longest_environment_value;
+mod native_encoder_preset;
 mod nvenc_args;
 mod output_args;
 #[cfg(windows)]
@@ -26,6 +29,8 @@ mod qsv_hevc_args;
 mod restart_delay;
 mod retry_delay_after_failure;
 mod stderr_flush_timeout;
+#[cfg(windows)]
+mod timer_period_milliseconds;
 mod x264_args;
 pub use amf_args::*;
 pub use auto_encoder_order::*;
@@ -35,12 +40,15 @@ pub use create_no_window::*;
 pub use exit_wait_timeout::*;
 pub use ffmpeg_file_name::*;
 pub use ffmpeg_install_hint::*;
+#[cfg(windows)]
+pub use first_adapter_index::*;
 pub use hevc_encoder_order::*;
 pub use hevc_profile_args::*;
 pub use idle_grace::*;
 pub use interval_slack_divisor::*;
 #[cfg(windows)]
 pub use longest_environment_value::*;
+pub use native_encoder_preset::*;
 pub use nvenc_args::*;
 pub use output_args::*;
 #[cfg(windows)]
@@ -55,4 +63,6 @@ pub use qsv_hevc_args::*;
 pub use restart_delay::*;
 pub use retry_delay_after_failure::*;
 pub use stderr_flush_timeout::*;
+#[cfg(windows)]
+pub use timer_period_milliseconds::*;
 pub use x264_args::*;

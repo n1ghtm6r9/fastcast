@@ -2,6 +2,8 @@ mod args_of;
 mod codec_name_of;
 mod codecs_or_avc;
 mod encoder_args;
+#[cfg(windows)]
+mod encoder_codec_of;
 mod ended_before_the_first_frame;
 mod ffmpeg_args;
 mod ffmpeg_command;
@@ -10,6 +12,10 @@ mod forward_stderr;
 mod input_args;
 mod keyframe_interval_in_frames;
 mod locate_ffmpeg;
+#[cfg(windows)]
+mod native_output_for;
+#[cfg(windows)]
+mod nvidia_output_for;
 mod open_screen;
 mod open_virtual_display;
 mod pick_codec_and_encoder;
@@ -25,6 +31,10 @@ mod release_screen;
 mod reopen_step_of;
 mod request_changed;
 mod run_ffmpeg;
+#[cfg(windows)]
+mod run_native_capture;
+#[cfg(not(windows))]
+mod run_native_capture_unsupported;
 mod run_while_watched;
 #[cfg(windows)]
 mod saved_path_dirs;
@@ -32,6 +42,7 @@ mod saved_path_dirs;
 mod saved_path_dirs_unsupported;
 #[cfg(windows)]
 mod saved_path_of;
+mod spawn_capture_worker;
 mod spawn_error_of;
 mod spawn_ffmpeg;
 mod supervise_capture;
@@ -43,6 +54,8 @@ pub use args_of::*;
 pub use codec_name_of::*;
 pub use codecs_or_avc::*;
 pub use encoder_args::*;
+#[cfg(windows)]
+pub use encoder_codec_of::*;
 pub use ended_before_the_first_frame::*;
 pub use ffmpeg_args::*;
 pub use ffmpeg_command::*;
@@ -51,6 +64,10 @@ pub use forward_stderr::*;
 pub use input_args::*;
 pub use keyframe_interval_in_frames::*;
 pub use locate_ffmpeg::*;
+#[cfg(windows)]
+pub use native_output_for::*;
+#[cfg(windows)]
+pub use nvidia_output_for::*;
 pub use open_screen::*;
 pub use open_virtual_display::*;
 pub use pick_codec_and_encoder::*;
@@ -66,6 +83,10 @@ pub use release_screen::*;
 pub use reopen_step_of::*;
 pub use request_changed::*;
 pub use run_ffmpeg::*;
+#[cfg(windows)]
+pub use run_native_capture::*;
+#[cfg(not(windows))]
+pub use run_native_capture_unsupported::*;
 pub use run_while_watched::*;
 #[cfg(windows)]
 pub use saved_path_dirs::*;
@@ -73,6 +94,7 @@ pub use saved_path_dirs::*;
 pub use saved_path_dirs_unsupported::*;
 #[cfg(windows)]
 pub use saved_path_of::*;
+pub use spawn_capture_worker::*;
 pub use spawn_error_of::*;
 pub use spawn_ffmpeg::*;
 pub use supervise_capture::*;

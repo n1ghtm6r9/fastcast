@@ -1,0 +1,1 @@
+pub const TIMER_PERIOD_MILLISECONDS: u32 = 1;

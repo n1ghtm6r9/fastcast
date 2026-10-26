@@ -11,4 +11,6 @@ pub struct OutputInfo {
     pub width: u32,
     pub height: u32,
     pub attached: bool,
+    pub adapter_index: u32,
+    pub output_index: u32,
 }

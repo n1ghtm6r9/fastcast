@@ -32,15 +32,31 @@ mod fake_run;
 mod flv_stream;
 mod flv_video_tag;
 mod frame_tag;
+#[cfg(windows)]
+mod frame_while_running;
+#[cfg(windows)]
+mod frames_within_while_running;
+#[cfg(windows)]
+mod gpu_slots;
+#[cfg(windows)]
+mod held_gpu_slot;
+#[cfg(windows)]
+mod hold_gpu_slot;
 mod hvcc_parameter_sets_of;
 mod kill_counter;
 #[cfg(windows)]
+mod native_frame_wait;
+#[cfg(windows)]
 mod next_fake_ffmpeg_id;
+#[cfg(windows)]
+mod numbered_output;
 mod scripted_probe;
 mod scripted_probe_calls;
 mod scripted_probe_probe;
 mod sequence_header_tag;
 mod settle;
+#[cfg(windows)]
+mod try_lock_gpu_slot;
 pub use an_hevc_key_frame::*;
 pub use annex_b_of::*;
 pub use capture_target::*;
@@ -59,14 +75,34 @@ pub use fake_run::*;
 pub use flv_stream::*;
 pub use flv_video_tag::*;
 pub use frame_tag::*;
+#[cfg(windows)]
+pub use frame_while_running::*;
+#[cfg(windows)]
+pub use frames_within_while_running::*;
+#[cfg(windows)]
+pub use gpu_slots::*;
+#[cfg(windows)]
+pub use held_gpu_slot::*;
+#[cfg(windows)]
+pub use hold_gpu_slot::*;
 pub use hvcc_parameter_sets_of::*;
 pub use kill_counter::*;
 #[cfg(windows)]
+pub use native_frame_wait::*;
+#[cfg(windows)]
 pub use next_fake_ffmpeg_id::*;
+#[cfg(windows)]
+pub use numbered_output::*;
 pub use scripted_probe::*;
 pub use sequence_header_tag::*;
 pub use settle::*;
+#[cfg(windows)]
+pub use try_lock_gpu_slot::*;
 
+#[cfg(windows)]
+mod a_cancelled_native_run_lets_the_next_one_capture_test;
+#[cfg(windows)]
+mod a_cancelled_native_run_publishes_nothing_once_it_has_returned_test;
 mod a_capture_thread_that_cannot_start_keeps_its_cause_as_the_source_test;
 mod a_capture_thread_that_cannot_start_says_why_test;
 mod a_configured_ffmpeg_path_that_does_not_exist_is_refused_test;
@@ -94,6 +130,8 @@ mod a_fixed_x264_is_never_offered_for_hevc_test;
 mod a_forgotten_encoder_whose_probe_fails_moves_the_pick_on_test;
 mod a_forgotten_encoder_whose_probe_still_passes_is_picked_again_test;
 mod a_kept_screen_is_given_back_when_the_next_preparation_fails_test;
+#[cfg(windows)]
+mod a_key_frame_request_is_answered_with_a_key_frame_test;
 mod a_key_frame_whose_parameter_sets_cannot_be_described_is_refused_test;
 mod a_key_frame_without_parameter_sets_is_described_test;
 mod a_key_frame_without_parameter_sets_is_refused_test;
@@ -140,7 +178,10 @@ mod a_spawn_failure_other_than_a_missing_program_keeps_its_cause_test;
 mod a_stream_that_is_not_flv_is_a_demux_error_test;
 mod a_stream_with_no_frames_reports_zero_frames_test;
 mod a_switched_off_virtual_display_captures_the_configured_monitor_test;
+#[cfg(windows)]
+mod a_target_without_an_output_is_reported_missing_test;
 mod a_viewer_returning_within_the_grace_keeps_ffmpeg_running_test;
+mod a_worker_starts_only_after_the_previous_one_has_finished_test;
 mod an_early_picture_does_not_move_the_next_turn_earlier_test;
 mod an_encoded_key_frame_describes_the_stream_before_it_is_published_test;
 #[cfg(windows)]
@@ -150,6 +191,12 @@ mod an_encoder_marked_failed_twice_is_listed_once_test;
 mod an_error_is_not_a_run_that_ended_before_the_first_frame_test;
 #[cfg(windows)]
 mod an_ffmpeg_installed_while_the_server_runs_is_found_by_the_next_preparation_test;
+#[cfg(windows)]
+mod an_output_number_past_the_first_adapter_is_missing_test;
+#[cfg(windows)]
+mod an_output_of_another_adapter_is_not_the_numbered_output_test;
+#[cfg(windows)]
+mod an_output_of_another_vendor_is_reported_with_its_adapter_test;
 mod an_output_of_another_vendor_names_its_adapter_test;
 mod another_picture_tries_the_native_backend_again_test;
 mod arguments_are_split_on_any_whitespace_test;
@@ -157,6 +204,7 @@ mod auto_falls_back_to_x264_when_no_hardware_encoder_passes_test;
 mod auto_takes_the_first_encoder_whose_probe_passes_test;
 mod auto_walks_the_encoders_in_order_until_one_passes_test;
 mod before_any_picture_the_wait_is_one_interval_test;
+mod dropping_the_guard_sets_the_stop_flag_test;
 mod every_encoder_has_its_own_ffmpeg_codec_name_test;
 mod every_hevc_encoder_is_tried_before_falling_back_to_avc_test;
 mod ffmpeg_is_stopped_five_seconds_after_the_last_viewer_leaves_test;
@@ -164,8 +212,12 @@ mod ffmpeg_that_exits_while_viewers_remain_is_restarted_after_one_second_test;
 mod forgetting_the_resolved_encoder_keeps_the_failure_marks_test;
 mod forwarding_stderr_ends_when_the_pipe_closes_and_survives_invalid_utf8_test;
 mod frames_before_the_sequence_header_are_dropped_by_the_hub_test;
+#[cfg(windows)]
+mod frames_come_at_about_the_frame_rate_test;
 mod hevc_is_picked_when_the_viewer_lists_it_first_and_an_encoder_for_it_works_test;
 mod marking_the_resolved_encoder_failed_forgets_it_and_moves_on_to_the_next_test;
+#[cfg(not(windows))]
+mod native_capture_off_windows_fails_before_its_first_frame_test;
 #[cfg(not(windows))]
 mod native_capture_off_windows_says_it_needs_windows_test;
 mod no_viewers_means_ffmpeg_is_never_started_test;
@@ -179,6 +231,8 @@ mod the_configured_rate_is_what_the_config_announces_test;
 mod the_default_ffmpeg_comes_from_the_first_directory_that_has_it_test;
 #[cfg(windows)]
 mod the_default_ffmpeg_that_no_directory_has_is_reported_missing_test;
+#[cfg(windows)]
+mod the_encoder_codec_follows_the_stream_codec_test;
 mod the_ffmpeg_choice_never_prepares_the_native_backend_test;
 mod the_first_picture_may_be_encoded_at_once_test;
 mod the_first_viewer_starts_ffmpeg_test;
@@ -188,7 +242,15 @@ mod the_hub_is_cleared_when_ffmpeg_exits_by_itself_test;
 mod the_hub_is_cleared_when_the_last_viewer_has_left_and_ffmpeg_is_stopped_test;
 mod the_keyframe_interval_is_the_rate_times_the_seconds_test;
 mod the_last_picture_is_repeated_one_interval_after_it_was_encoded_test;
+mod the_native_backend_prefers_hevc_when_the_tv_decodes_it_test;
+#[cfg(windows)]
+mod the_native_backend_starts_with_a_described_key_frame_test;
+mod the_native_backend_uses_avc_when_the_tv_lists_no_hevc_test;
+#[cfg(windows)]
+mod the_native_output_is_the_numbered_output_of_the_first_adapter_test;
 mod the_no_encoder_error_names_every_encoder_tried_test;
+#[cfg(windows)]
+mod the_numbered_output_of_an_nvidia_adapter_is_taken_test;
 mod the_nvenc_pipeline_uses_the_documented_arguments_test;
 mod the_output_and_the_rate_come_from_the_target_and_the_bitrate_from_the_settings_test;
 mod the_probe_encodes_one_black_frame_with_the_chosen_codec_test;
