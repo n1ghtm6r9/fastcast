@@ -8,6 +8,7 @@ data class DisplayModeOption(
     val height: Int,
     val refreshRate: Float,
     val tunneled: Boolean = false,
+    val bestEffort: Boolean = false,
 ) {
 
     val fps: Int

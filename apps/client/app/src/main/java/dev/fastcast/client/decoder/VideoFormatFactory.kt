@@ -9,7 +9,6 @@ import java.nio.ByteBuffer
 object VideoFormatFactory {
 
     private const val MIN_INPUT_SIZE = 2 * 1024 * 1024
-    private const val REALTIME_PRIORITY = 0
     private const val LOW_LATENCY_ENABLED = 1
     private const val CSD_KEY_PREFIX = "csd-"
     private const val QUALCOMM_LOW_LATENCY = "vendor.qti-ext-dec-low-latency.enable"
@@ -24,14 +23,16 @@ object VideoFormatFactory {
         config: ConfigMessage,
         parameters: CodecConfiguration,
         choice: DecoderChoice,
+        pace: DecoderPace,
         audioSessionId: Int? = null,
-    ): MediaFormat = probe(mime, config).apply {
+    ): MediaFormat = MediaFormat.createVideoFormat(mime, config.width, config.height).apply {
+        pace.frameRate(config.fps)?.let { setInteger(MediaFormat.KEY_FRAME_RATE, it) }
         parameters.csdBuffers.forEachIndexed { index, csd ->
             setByteBuffer("$CSD_KEY_PREFIX$index", ByteBuffer.wrap(csd))
         }
         setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, maxInputSize(config))
-        setInteger(MediaFormat.KEY_PRIORITY, REALTIME_PRIORITY)
-        setInteger(MediaFormat.KEY_OPERATING_RATE, config.fps)
+        setInteger(MediaFormat.KEY_PRIORITY, pace.priority)
+        pace.operatingRate(config.fps)?.let { setInteger(MediaFormat.KEY_OPERATING_RATE, it) }
         if (audioSessionId == null) applyLowLatency(choice) else applyTunnel(audioSessionId)
     }
 

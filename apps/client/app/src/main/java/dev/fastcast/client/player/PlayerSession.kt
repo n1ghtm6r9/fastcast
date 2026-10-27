@@ -6,6 +6,7 @@ import android.os.SystemClock
 import android.view.Surface
 import dev.fastcast.client.debug.DebugCounters
 import dev.fastcast.client.decoder.DecoderEvents
+import dev.fastcast.client.decoder.DecoderPace
 import dev.fastcast.client.decoder.TunnelAudio
 import dev.fastcast.client.decoder.VideoDecoder
 import dev.fastcast.client.stream.ConfigMessage
@@ -22,11 +23,12 @@ class PlayerSession(
     displayLabel: () -> String,
     networkLabel: () -> String?,
     tunnel: TunnelAudio? = null,
+    pace: DecoderPace = DecoderPace.REALTIME,
 ) : StreamListener, DecoderEvents {
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private val stream = NativeStreamClient(offer::target, this)
-    private val decoder = VideoDecoder(surface, this, tunnel = tunnel)
+    private val decoder = VideoDecoder(surface, this, tunnel = tunnel, pace = pace)
     private val tunneled = tunnel != null
     private val throughput = ThroughputSampler(SystemClock.elapsedRealtime())
     private val reportedThroughput = ThroughputSampler(SystemClock.elapsedRealtime())

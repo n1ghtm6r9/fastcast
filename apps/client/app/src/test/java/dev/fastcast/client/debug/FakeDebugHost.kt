@@ -3,6 +3,7 @@ package dev.fastcast.client.debug
 class FakeDebugHost(private val clock: FakeDebugClock) : DebugHost {
 
     val events = mutableListOf<String>()
+    val trials = mutableListOf<StreamTrial>()
     val sent = mutableListOf<String>()
     var playing = true
     var trialStartsAfterMs: Map<String, Long?> = emptyMap()
@@ -54,6 +55,7 @@ class FakeDebugHost(private val clock: FakeDebugClock) : DebugHost {
 
     override fun streamTrial(trial: StreamTrial): String {
         events += "trial ${trial.step}"
+        trials += trial
         playing = false
         val startsAfterMs = if (trial.step in trialStartsAfterMs) trialStartsAfterMs[trial.step] else TRIAL_START_MS
         startsAfterMs?.let { clock.after(it) { playing = true } }

@@ -1,5 +1,6 @@
 package dev.fastcast.client.debug
 
+import dev.fastcast.client.decoder.DecoderPace
 import java.util.ArrayDeque
 import kotlin.math.roundToInt
 
@@ -170,9 +171,11 @@ class DebugRun(
         private const val NO_TRIAL_VIDEO = "no video within 20 s"
         private val ASKED_RATES = floatArrayOf(120f, 144f)
         private val TRIALS = listOf(
-            StreamTrial("fast1440", 2560, 1440, 120, tunneled = false, progress = DebugStep.FAST),
-            StreamTrial("tunnel1440", 2560, 1440, 120, tunneled = true, progress = DebugStep.TUNNEL),
-            StreamTrial("tunnel1080", 1920, 1080, 120, tunneled = true, progress = DebugStep.TUNNEL),
+            StreamTrial("tunnel2160full", 3840, 2160, 120, tunneled = true, DecoderPace.FULL_SPEED, DebugStep.TUNNEL),
+            StreamTrial("tunnel2160best", 3840, 2160, 120, tunneled = true, DecoderPace.BEST_EFFORT, DebugStep.TUNNEL),
+            StreamTrial("tunnel2160bare", 3840, 2160, 120, tunneled = true, DecoderPace.UNDECLARED, DebugStep.TUNNEL),
+            StreamTrial("tunnel2160realtime", 3840, 2160, 120, tunneled = true, DecoderPace.REALTIME, DebugStep.TUNNEL),
+            StreamTrial("fast2160full", 3840, 2160, 120, tunneled = false, DecoderPace.FULL_SPEED, DebugStep.FAST),
         )
     }
 }

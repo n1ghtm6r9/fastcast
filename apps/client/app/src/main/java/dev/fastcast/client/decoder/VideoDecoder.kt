@@ -17,6 +17,7 @@ class VideoDecoder(
     private val events: DecoderEvents,
     val stats: DecoderStats = DecoderStats(),
     private val tunnel: TunnelAudio? = null,
+    private val pace: DecoderPace = DecoderPace.REALTIME,
 ) {
 
     private val mailbox = LinkedBlockingQueue<Packet>()
@@ -133,7 +134,7 @@ class VideoDecoder(
         val parameters = CodecConfigurationParser.parse(mime, config.description)
             ?: throw UnsupportedStreamException("Invalid codec description")
         val choice = chooseDecoder(mime, VideoFormatFactory.probe(mime, config))
-        val format = VideoFormatFactory.create(mime, config, parameters, choice, tunnel?.sessionId)
+        val format = VideoFormatFactory.create(mime, config, parameters, choice, pace, tunnel?.sessionId)
         val started = createCodec(choice.name, format, config.fps)
         codec = started
         configured = config
