@@ -28,3 +28,7 @@ keystore.properties
 /*.md
 !/README.md
 !/PLAN.md
+
+/docs/
+.claude/
+.superpowers/
