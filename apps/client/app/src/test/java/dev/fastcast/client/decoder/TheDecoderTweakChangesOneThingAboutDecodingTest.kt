@@ -13,7 +13,8 @@ class TheDecoderTweakChangesOneThingAboutDecodingTest {
         assertFalse(DecoderTweak.NONE.lowLatency)
         assertTrue(DecoderTweak.NONE.usesStandardLowLatency)
         assertNull(DecoderTweak.NONE.operatingRate(120))
-        assertEquals(emptyMap<String, Number>(), DecoderTweak.NONE.vendorValues(120))
+        assertEquals(emptyMap<String, Number>(), DecoderTweak.NONE.vendorValues())
+        assertEquals(emptyMap<String, Number>(), DecoderTweak.NONE.liveVendorValues())
     }
 
     @Test
@@ -21,7 +22,8 @@ class TheDecoderTweakChangesOneThingAboutDecodingTest {
         assertTrue(DecoderTweak.LOW_LATENCY.lowLatency)
         assertTrue(DecoderTweak.LOW_LATENCY.usesStandardLowLatency)
         assertNull(DecoderTweak.LOW_LATENCY.operatingRate(120))
-        assertEquals(emptyMap<String, Number>(), DecoderTweak.LOW_LATENCY.vendorValues(120))
+        assertEquals(emptyMap<String, Number>(), DecoderTweak.LOW_LATENCY.vendorValues())
+        assertEquals(emptyMap<String, Number>(), DecoderTweak.LOW_LATENCY.liveVendorValues())
     }
 
     @Test
@@ -29,37 +31,30 @@ class TheDecoderTweakChangesOneThingAboutDecodingTest {
         assertFalse(DecoderTweak.MEDIATEK_GAME.lowLatency)
         assertFalse(DecoderTweak.MEDIATEK_GAME.usesStandardLowLatency)
         assertEquals(120, DecoderTweak.MEDIATEK_GAME.operatingRate(120))
-        assertEquals(
-            mapOf("vendor.mtk-codec2.game-mode" to 1, "vendor.mtk-codec2.low-latency-mode" to 1),
-            DecoderTweak.MEDIATEK_GAME.vendorValues(120),
-        )
+        assertEquals(GAME, DecoderTweak.MEDIATEK_GAME.vendorValues())
+        assertEquals(emptyMap<String, Number>(), DecoderTweak.MEDIATEK_GAME.liveVendorValues())
     }
 
     @Test
-    fun `forcing the display rate tells the MediaTek decoder the stream runs at 60`() {
-        assertTrue(DecoderTweak.FORCED_DISPLAY_RATE.usesStandardLowLatency)
-        assertNull(DecoderTweak.FORCED_DISPLAY_RATE.operatingRate(120))
-        assertEquals(
-            mapOf("vendor.mtk-codec2.force-frame-rate" to 60),
-            DecoderTweak.FORCED_DISPLAY_RATE.vendorValues(120),
-        )
+    fun `playing as a game live asks for the game modes again once the decoder runs`() {
+        assertFalse(DecoderTweak.MEDIATEK_GAME_LIVE.lowLatency)
+        assertFalse(DecoderTweak.MEDIATEK_GAME_LIVE.usesStandardLowLatency)
+        assertEquals(120, DecoderTweak.MEDIATEK_GAME_LIVE.operatingRate(120))
+        assertEquals(GAME, DecoderTweak.MEDIATEK_GAME_LIVE.vendorValues())
+        assertEquals(GAME, DecoderTweak.MEDIATEK_GAME_LIVE.liveVendorValues())
     }
 
     @Test
-    fun `forcing the stream rate tells the MediaTek decoder the rate the stream really has`() {
-        assertTrue(DecoderTweak.FORCED_STREAM_RATE.usesStandardLowLatency)
-        assertEquals(
-            mapOf("vendor.mtk-codec2.force-frame-rate" to 120),
-            DecoderTweak.FORCED_STREAM_RATE.vendorValues(120),
-        )
+    fun `forcing real time asks the MediaTek decoder for it before and after it starts`() {
+        assertFalse(DecoderTweak.MEDIATEK_REAL_TIME.lowLatency)
+        assertTrue(DecoderTweak.MEDIATEK_REAL_TIME.usesStandardLowLatency)
+        assertNull(DecoderTweak.MEDIATEK_REAL_TIME.operatingRate(120))
+        assertEquals(REAL_TIME, DecoderTweak.MEDIATEK_REAL_TIME.vendorValues())
+        assertEquals(REAL_TIME, DecoderTweak.MEDIATEK_REAL_TIME.liveVendorValues())
     }
 
-    @Test
-    fun `raising the rate limit lets the MediaTek decoder go up to the stream rate`() {
-        assertTrue(DecoderTweak.RAISED_RATE_LIMIT.usesStandardLowLatency)
-        assertEquals(
-            mapOf("vendor.mtk-codec2.max-frame-rate" to 120f),
-            DecoderTweak.RAISED_RATE_LIMIT.vendorValues(120),
-        )
+    private companion object {
+        val GAME = mapOf("vendor.mtk-codec2.game-mode" to 1, "vendor.mtk-codec2.low-latency-mode" to 1)
+        val REAL_TIME = mapOf("vendor.mtk-iview.force-real-time" to 1)
     }
 }

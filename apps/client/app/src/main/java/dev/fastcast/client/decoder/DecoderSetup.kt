@@ -4,6 +4,7 @@ class DecoderSetup(
     val pace: DecoderPace,
     val tweak: DecoderTweak,
     val inspectsVendorParameters: Boolean,
+    val timing: TunnelTiming = TunnelTiming.USUAL,
 ) {
 
     companion object {

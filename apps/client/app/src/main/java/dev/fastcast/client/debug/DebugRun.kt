@@ -1,8 +1,11 @@
 package dev.fastcast.client.debug
 
+import dev.fastcast.client.decoder.AudioStart
 import dev.fastcast.client.decoder.DecoderPace
 import dev.fastcast.client.decoder.DecoderSetup
 import dev.fastcast.client.decoder.DecoderTweak
+import dev.fastcast.client.decoder.TunnelClock
+import dev.fastcast.client.decoder.TunnelTiming
 import java.util.ArrayDeque
 import kotlin.math.roundToInt
 
@@ -182,27 +185,44 @@ class DebugRun(
         private const val FINISHED = "finished"
         private const val NO_VIDEO = "no video"
         private const val NO_TRIAL_VIDEO = "no video within 20 s"
+        private const val SHORT_VIDEO_DELAY_US = 25_000L
+        private const val SHORTEST_VIDEO_DELAY_US = 12_000L
         private val ASKED_RATES = floatArrayOf(120f, 144f)
         private val TRIALS = listOf(
-            surfaceAt4K("fast2160game", DecoderTweak.MEDIATEK_GAME),
-            surfaceAt4K("fast2160forced60", DecoderTweak.FORCED_DISPLAY_RATE),
-            surfaceAt4K("fast2160forced120", DecoderTweak.FORCED_STREAM_RATE),
-            surfaceAt4K("fast2160limit120", DecoderTweak.RAISED_RATE_LIMIT),
-            StreamTrial(
-                "tunnel2160game", 3840, 2160, 120, tunneled = true,
-                DecoderSetup(DecoderPace.UNDECLARED, DecoderTweak.MEDIATEK_GAME, inspectsVendorParameters = false),
-                showsText = true, DebugStep.TUNNEL,
+            tunnelAt1440("tunnel1440", DecoderSetup.USUAL, showsText = true),
+            tunnelAt1440("tunnel1440hidden", DecoderSetup.USUAL, showsText = false),
+            tunnelAt1440(
+                "tunnel1440videofirst", timed(TunnelClock.VIDEO_DELAY_US, AudioStart.WITH_FIRST_FRAME), showsText = true,
             ),
+            tunnelAt1440("tunnel1440delay25", timed(SHORT_VIDEO_DELAY_US, AudioStart.WITH_DECODER), showsText = true),
+            tunnelAt1440("tunnel1440delay12", timed(SHORTEST_VIDEO_DELAY_US, AudioStart.WITH_DECODER), showsText = true),
             StreamTrial(
-                "tunnel1440hidden", 2560, 1440, 120, tunneled = true, DecoderSetup.USUAL, showsText = false,
+                "tunnel1080hidden", 1920, 1080, 120, tunneled = true, DecoderSetup.USUAL, showsText = false,
                 DebugStep.TUNNEL,
+            ),
+            unpacedTunnel("tunnel1800", 3200, 1800, DecoderTweak.NONE),
+            unpacedTunnel("tunnel2160", 3840, 2160, DecoderTweak.NONE),
+            unpacedTunnel("tunnel2160game", 3840, 2160, DecoderTweak.MEDIATEK_GAME),
+            unpacedTunnel("tunnel2160gamelive", 3840, 2160, DecoderTweak.MEDIATEK_GAME_LIVE),
+            unpacedTunnel("tunnel2160realtime", 3840, 2160, DecoderTweak.MEDIATEK_REAL_TIME),
+            StreamTrial(
+                "fast2160gamelive", 3840, 2160, 120, tunneled = false, unpaced(DecoderTweak.MEDIATEK_GAME_LIVE),
+                showsText = false, DebugStep.FAST,
             ),
         )
 
-        private fun surfaceAt4K(step: String, tweak: DecoderTweak): StreamTrial = StreamTrial(
-            step, 3840, 2160, 120, tunneled = false,
-            DecoderSetup(DecoderPace.UNDECLARED, tweak, inspectsVendorParameters = true),
-            showsText = false, DebugStep.FAST,
+        private fun tunnelAt1440(step: String, setup: DecoderSetup, showsText: Boolean): StreamTrial =
+            StreamTrial(step, 2560, 1440, 120, tunneled = true, setup, showsText, DebugStep.TUNNEL)
+
+        private fun unpacedTunnel(step: String, width: Int, height: Int, tweak: DecoderTweak): StreamTrial =
+            StreamTrial(step, width, height, 120, tunneled = true, unpaced(tweak), showsText = true, DebugStep.TUNNEL)
+
+        private fun timed(videoDelayUs: Long, audioStart: AudioStart): DecoderSetup = DecoderSetup(
+            DecoderPace.REALTIME, DecoderTweak.NONE, inspectsVendorParameters = false,
+            TunnelTiming(videoDelayUs, audioStart),
         )
+
+        private fun unpaced(tweak: DecoderTweak): DecoderSetup =
+            DecoderSetup(DecoderPace.UNDECLARED, tweak, inspectsVendorParameters = true)
     }
 }

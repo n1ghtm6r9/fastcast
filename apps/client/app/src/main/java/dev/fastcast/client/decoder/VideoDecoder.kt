@@ -23,6 +23,7 @@ class VideoDecoder(
     private val mailbox = LinkedBlockingQueue<Packet>()
     private val backlog = PacketBacklog(MAX_QUEUED_PACKETS, stats.framesDropped, events::onKeyframeNeeded)
     private val bufferInfo = MediaCodec.BufferInfo()
+    private val schedule = TunnelSchedule(setup.timing.videoDelayUs)
 
     private var thread: Thread? = null
     private var codec: MediaCodec? = null
@@ -58,8 +59,7 @@ class VideoDecoder(
 
     fun tunnelFacts(): List<String> {
         val audio = tunnel ?: return emptyList()
-        val ready = if (stats.tunnelFrameReady) "ready" else "not reported"
-        return listOf("tunnel decoder ${stats.decoderName.ifEmpty { "none" }}", "first tunnel frame $ready", audio.describe())
+        return TunnelFacts.of(stats, audio.describe(), schedule.describe())
     }
 
     private fun decodeLoop() {
@@ -119,10 +119,10 @@ class VideoDecoder(
 
     private fun configure(config: ConfigMessage) {
         firstFrameRendered = false
-        if (tunnel != null || ConfigChange.needsNewDecoder(configured, codecRendered, config)) {
-            startCodec(config)
-        } else {
-            codec?.flush()
+        when (ConfigChange.actionFor(configured, codecRendered, config, tunnel != null)) {
+            ConfigAction.RESTART -> startCodec(config)
+            ConfigAction.FLUSH -> codec?.flush()
+            ConfigAction.KEEP -> Unit
         }
         events.onConfigured()
     }
@@ -139,6 +139,9 @@ class VideoDecoder(
         val started = createCodec(choice.name, format, config.fps)
         codec = started
         configured = config
+        stats.codecStarts.incrementAndGet()
+        schedule.restart()
+        if (setup.timing.audioStart == AudioStart.WITH_DECODER) tunnel?.start()
         nalLengthSize = parameters.nalLengthSize
         inputCapacity = inputCapacityOf(started, format)
         stats.decoderName = choice.name
@@ -167,7 +170,15 @@ class VideoDecoder(
             runQuietly(created::release)
             throw e
         }
+        applyLiveVendorValues(created)
         return created
+    }
+
+    private fun applyLiveVendorValues(created: MediaCodec) {
+        val values = setup.tweak.liveVendorValues()
+        if (values.isEmpty()) return
+        runCatching { created.setParameters(VendorBundle.of(values)) }
+            .onFailure { Log.w(TAG, "Live vendor parameters refused", it) }
     }
 
     private fun inspectVendorParameters(created: MediaCodec) {
@@ -206,14 +217,16 @@ class VideoDecoder(
         active.queueInputBuffer(index, 0, sample.size, presentationTimeUs, flagsOf(sample))
         pending = null
         stats.frameQueued(presentationTimeUs, System.nanoTime())
-        tunnel?.let { onTunnelFrameQueued(it, sample) }
+        tunnel?.let(::onTunnelFrameQueued)
     }
 
-    private fun presentationTimeOf(sample: VideoSample): Long =
-        if (tunnel == null) sample.presentationTimeUs else TunnelClock.videoTimeUs(sample.presentationTimeUs)
+    private fun presentationTimeOf(sample: VideoSample): Long {
+        val audio = tunnel ?: return sample.presentationTimeUs
+        return schedule.presentationUs(sample.presentationTimeUs, audio.clockUs(System.nanoTime()))
+    }
 
-    private fun onTunnelFrameQueued(audio: TunnelAudio, sample: VideoSample) {
-        audio.start(sample.presentationTimeUs)
+    private fun onTunnelFrameQueued(audio: TunnelAudio) {
+        if (setup.timing.audioStart == AudioStart.WITH_FIRST_FRAME) audio.start()
         codecRendered = true
         announceFirstFrame()
     }

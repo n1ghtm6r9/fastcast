@@ -36,7 +36,7 @@ object VideoFormatFactory {
         val operatingRate = tweak.operatingRate(config.fps) ?: pace.operatingRate(config.fps)
         operatingRate?.let { setInteger(MediaFormat.KEY_OPERATING_RATE, it) }
         if (audioSessionId == null) applySurface(choice, tweak) else applyTunnel(audioSessionId, choice, tweak)
-        tweak.vendorValues(config.fps).forEach { (key, value) -> setVendorValue(key, value) }
+        tweak.vendorValues().forEach { (key, value) -> setVendorValue(key, value) }
     }
 
     private fun maxInputSize(config: ConfigMessage): Int = maxOf(config.width * config.height, MIN_INPUT_SIZE)

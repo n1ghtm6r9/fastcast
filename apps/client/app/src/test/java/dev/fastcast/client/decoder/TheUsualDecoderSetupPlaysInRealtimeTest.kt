@@ -12,4 +12,11 @@ class TheUsualDecoderSetupPlaysInRealtimeTest {
         assertEquals(DecoderTweak.NONE, DecoderSetup.USUAL.tweak)
         assertFalse(DecoderSetup.USUAL.inspectsVendorParameters)
     }
+
+    @Test
+    fun `the usual tunnel starts its audio with the decoder and shows each frame 50 ms after the audio clock`() {
+        assertEquals(AudioStart.WITH_DECODER, DecoderSetup.USUAL.timing.audioStart)
+        assertEquals(50_000L, DecoderSetup.USUAL.timing.videoDelayUs)
+        assertEquals(TunnelClock.VIDEO_DELAY_US, TunnelTiming.USUAL.videoDelayUs)
+    }
 }

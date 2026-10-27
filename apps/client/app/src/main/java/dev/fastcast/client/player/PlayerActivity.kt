@@ -214,7 +214,9 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
         lastError = null
         switchStream(StreamRequest(trial.width, trial.height, trial.fps, TUNNEL_CODECS), trial.tunneled, trial.setup)
         val path = if (trial.tunneled) TUNNELED_PATH else SURFACE_PATH
-        val decoderAsk = "${trial.setup.pace.name.lowercase()} ${trial.setup.tweak.name.lowercase()}"
+        val timing = trial.setup.timing
+        val decoderAsk = "${trial.setup.pace.name.lowercase()} ${trial.setup.tweak.name.lowercase()} " +
+            "audio ${timing.audioStart.name.lowercase()} video delay ${timing.videoDelayUs / MICROS_PER_MILLISECOND} ms"
         return "asked ${trial.width}x${trial.height}@${trial.fps} $path $decoderAsk codecs ${TUNNEL_CODECS.joinToString(",")}"
     }
 
@@ -432,6 +434,7 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
         private const val SCALE_TOAST_MS = 1_500L
         private const val NO_DEBUG_RUN = 0L
         private const val TUNNELED_PATH = "tunneled"
+        private const val MICROS_PER_MILLISECOND = 1_000L
         private const val SURFACE_PATH = "surface"
         private val TUNNEL_CODECS = listOf(SupportedCodecs.HEVC)
 

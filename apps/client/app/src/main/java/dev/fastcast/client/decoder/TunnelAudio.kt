@@ -2,6 +2,7 @@ package dev.fastcast.client.decoder
 
 import android.media.AudioAttributes
 import android.media.AudioFormat
+import android.media.AudioTimestamp
 import android.media.AudioTrack
 import java.nio.ByteBuffer
 import java.util.Locale
@@ -10,10 +11,14 @@ import java.util.concurrent.atomic.AtomicLong
 class TunnelAudio(val sessionId: Int) {
 
     private val chunksWritten = AtomicLong()
+    private val timestamp = AudioTimestamp()
     private var writer: Thread? = null
 
     @Volatile
     private var track: AudioTrack? = null
+
+    @Volatile
+    private var sampler: AudioClockSampler? = null
 
     @Volatile
     private var writing = false
@@ -21,7 +26,7 @@ class TunnelAudio(val sessionId: Int) {
     @Volatile
     private var failure: String? = null
 
-    fun start(firstFrameUs: Long) {
+    fun start() {
         if (track != null) return
         val created = try {
             createTrack()
@@ -32,9 +37,9 @@ class TunnelAudio(val sessionId: Int) {
         track = created
         writing = true
         chunksWritten.set(0L)
+        sampler = AudioClockSampler(System.nanoTime())
         created.play()
-        val startNanos = TunnelClock.audioStartNanos(firstFrameUs)
-        writer = Thread({ writeSilence(created, startNanos) }, THREAD_NAME).apply { start() }
+        writer = Thread({ writeSilence(created) }, THREAD_NAME).apply { start() }
     }
 
     fun stop() {
@@ -45,6 +50,13 @@ class TunnelAudio(val sessionId: Int) {
         writer = null
         runQuietly(active::release)
         track = null
+        sampler = null
+    }
+
+    fun clockUs(nowNanos: Long): Long? {
+        val active = track ?: return null
+        val clock = sampler ?: return null
+        return clock.clockUs(nowNanos) { played(active) }
     }
 
     fun describe(): String {
@@ -58,10 +70,27 @@ class TunnelAudio(val sessionId: Int) {
                 active.playbackHeadPosition.toDouble() / TunnelClock.SAMPLE_RATE,
                 chunksWritten.get() * TunnelClock.CHUNK_MS / MILLISECONDS_PER_SECOND,
                 active.underrunCount,
-            ) + failure?.let { ", failed: $it" }.orEmpty()
+            ) + clockFacts() + failure?.let { ", failed: $it" }.orEmpty()
         } catch (e: Exception) {
             "$AUDIO: ${FailureText.of(e)}"
         }
+    }
+
+    private fun played(active: AudioTrack): PlayedAudio? = try {
+        if (active.getTimestamp(timestamp)) {
+            PlayedAudio(timestamp.framePosition, timestamp.nanoTime)
+        } else {
+            PlayedAudio(active.playbackHeadPosition.toLong() and UNSIGNED_INT, System.nanoTime())
+        }
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun clockFacts(): String {
+        val clock = sampler ?: return ""
+        val movedNanos = clock.movedAfterNanos ?: return CLOCK_STILL
+        val rate = clock.rate()?.let { RATE.format(Locale.ROOT, it) } ?: UNKNOWN_RATE
+        return CLOCK_MOVED.format(Locale.ROOT, movedNanos / NANOS_PER_MILLISECOND, rate)
     }
 
     private fun createTrack(): AudioTrack = AudioTrack.Builder()
@@ -93,14 +122,14 @@ class TunnelAudio(val sessionId: Int) {
         return maxOf(minimum * BUFFER_MULTIPLE, TunnelClock.CHUNK_BYTES * MIN_BUFFERED_CHUNKS)
     }
 
-    private fun writeSilence(target: AudioTrack, startNanos: Long) {
+    private fun writeSilence(target: AudioTrack) {
         val silence = ByteBuffer.allocateDirect(TunnelClock.CHUNK_BYTES)
         var index = 0L
         try {
             while (writing) {
                 silence.clear()
-                val timestamp = TunnelClock.chunkNanos(startNanos, index)
-                val written = target.write(silence, TunnelClock.CHUNK_BYTES, AudioTrack.WRITE_BLOCKING, timestamp)
+                val written =
+                    target.write(silence, TunnelClock.CHUNK_BYTES, AudioTrack.WRITE_BLOCKING, TunnelClock.chunkNanos(index))
                 if (written < 0) {
                     failure = "write returned $written"
                     return
@@ -121,7 +150,13 @@ class TunnelAudio(val sessionId: Int) {
         const val BUFFER_MULTIPLE = 2
         const val MIN_BUFFERED_CHUNKS = 4
         const val MILLISECONDS_PER_SECOND = 1_000.0
+        const val NANOS_PER_MILLISECOND = 1_000_000L
+        const val UNSIGNED_INT = 0xFFFF_FFFFL
         const val AUDIO = "audio clock"
         const val DESCRIPTION = "%s session %d: play state %d, played %.2f s, written %.2f s, underruns %d"
+        const val CLOCK_STILL = ", clock not moving yet"
+        const val CLOCK_MOVED = ", clock moved after %d ms, rate %s"
+        const val RATE = "%.4f"
+        const val UNKNOWN_RATE = "unknown"
     }
 }

@@ -23,7 +23,7 @@ class TheWatchedVendorParametersAreTheMediaTekRateKnobsTest {
 
     @Test
     fun `every knob a trial changes is watched`() {
-        val changed = DecoderTweak.values().flatMap { it.vendorValues(120).keys }.distinct()
+        val changed = DecoderTweak.values().flatMap { it.vendorValues().keys + it.liveVendorValues().keys }.distinct()
 
         assertEquals(changed, WatchedVendorParameters.among(changed))
     }

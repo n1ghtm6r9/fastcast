@@ -14,4 +14,5 @@ object MediaTekParameters {
     const val FRAME_RENDERED_INTERVAL = "vendor.mtk-codec2.frame-rendered-interval"
     const val START_FLIPPING = "vendor.mtk-codec2.start-flipping"
     const val PICTURE_RESTRICTIONS = "vendor.mtk-pq.restriction"
+    const val IVIEW_FORCE_REAL_TIME = "vendor.mtk-iview.force-real-time"
 }

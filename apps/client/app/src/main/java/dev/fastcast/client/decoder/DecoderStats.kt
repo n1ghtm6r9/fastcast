@@ -8,6 +8,7 @@ class DecoderStats {
     val framesDecoded = AtomicLong()
     val framesRendered = AtomicLong()
     val framesDropped = AtomicLong()
+    val codecStarts = AtomicLong()
     val presented = PresentTimes(PRESENTED_CAPACITY)
     val framesPresented = AtomicLong()
     val delays = RenderDelays(DELAY_CAPACITY)

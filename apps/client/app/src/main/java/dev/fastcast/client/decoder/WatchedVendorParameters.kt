@@ -17,6 +17,7 @@ object WatchedVendorParameters {
             FRAME_RENDERED_INTERVAL,
             START_FLIPPING,
             PICTURE_RESTRICTIONS,
+            IVIEW_FORCE_REAL_TIME,
         )
     }
 
