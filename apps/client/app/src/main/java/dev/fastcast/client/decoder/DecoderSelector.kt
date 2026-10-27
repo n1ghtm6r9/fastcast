@@ -37,9 +37,6 @@ object DecoderSelector {
     fun canTunnelInHardware(mime: String, width: Int, height: Int, fps: Int): Boolean =
         decodersFor(mime).any { !isSoftware(it) && supportsTunnel(it, mime) && declaresSizeAndRate(it, mime, width, height, fps) }
 
-    fun allowsTunnelInHardware(mime: String, width: Int, height: Int, fps: Int): Boolean =
-        decodersFor(mime).any { !isSoftware(it) && supportsTunnel(it, mime) && allowsSizeAndRate(it, mime, width, height, fps) }
-
     private fun decodersFor(mime: String): List<MediaCodecInfo> =
         MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos.filter { isDecoderFor(it, mime) }
 
@@ -78,11 +75,6 @@ object DecoderSelector {
     private fun declaresSizeAndRate(info: MediaCodecInfo, mime: String, width: Int, height: Int, fps: Int): Boolean =
         withCapabilities(info, mime, false) { capabilities ->
             capabilities.videoCapabilities?.areSizeAndRateSupported(width, height, fps.toDouble()) == true
-        }
-
-    private fun allowsSizeAndRate(info: MediaCodecInfo, mime: String, width: Int, height: Int, fps: Int): Boolean =
-        withCapabilities(info, mime, false) { capabilities ->
-            capabilities.videoCapabilities?.let { it.isSizeSupported(width, height) && it.supportedFrameRates.upper >= fps } == true
         }
 
     private fun sustains(video: VideoCapabilities, width: Int, height: Int, fps: Int): Boolean =

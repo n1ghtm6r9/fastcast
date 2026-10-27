@@ -17,7 +17,7 @@ class VideoDecoder(
     private val events: DecoderEvents,
     val stats: DecoderStats = DecoderStats(),
     private val tunnel: TunnelAudio? = null,
-    private val pace: DecoderPace = DecoderPace.REALTIME,
+    private val setup: DecoderSetup = DecoderSetup.USUAL,
 ) {
 
     private val mailbox = LinkedBlockingQueue<Packet>()
@@ -32,6 +32,7 @@ class VideoDecoder(
     private var pending: VideoSample? = null
     private var codecRendered = false
     private var firstFrameRendered = false
+    private var vendorParameters: List<String> = emptyList()
 
     @Volatile
     private var running = false
@@ -134,7 +135,7 @@ class VideoDecoder(
         val parameters = CodecConfigurationParser.parse(mime, config.description)
             ?: throw UnsupportedStreamException("Invalid codec description")
         val choice = chooseDecoder(mime, VideoFormatFactory.probe(mime, config))
-        val format = VideoFormatFactory.create(mime, config, parameters, choice, pace, tunnel?.sessionId)
+        val format = VideoFormatFactory.create(mime, config, parameters, choice, setup.pace, setup.tweak, tunnel?.sessionId)
         val started = createCodec(choice.name, format, config.fps)
         codec = started
         configured = config
@@ -157,6 +158,7 @@ class VideoDecoder(
         val created = MediaCodec.createByCodecName(name)
         try {
             created.configure(format, surface, null, 0)
+            inspectVendorParameters(created)
             created.setOnFrameRenderedListener({ _, ptsUs, nanoTime -> stats.framePresented(ptsUs, nanoTime) }, null)
             if (tunnel != null) watchFirstTunnelFrame(created)
             FrameRateHint.apply(surface, fps.toFloat())
@@ -166,6 +168,17 @@ class VideoDecoder(
             throw e
         }
         return created
+    }
+
+    private fun inspectVendorParameters(created: MediaCodec) {
+        if (!setup.inspectsVendorParameters || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
+        vendorParameters = runCatching { CodecParameterSnapshot.subscribe(created) }.getOrDefault(emptyList())
+    }
+
+    private fun recordCodecParameters(active: MediaCodec) {
+        if (!setup.inspectsVendorParameters || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
+        stats.codecParameters = runCatching { CodecParameterSnapshot.read(active, vendorParameters) }
+            .getOrElse { CodecParameters(emptyMap(), mapOf(UNREADABLE to it.javaClass.simpleName)) }
     }
 
     private fun watchFirstTunnelFrame(created: MediaCodec) {
@@ -196,8 +209,11 @@ class VideoDecoder(
         tunnel?.let { onTunnelFrameQueued(it, sample) }
     }
 
-    private fun presentationTimeOf(sample: VideoSample): Long =
-        if (tunnel == null) sample.presentationTimeUs else TunnelClock.videoTimeUs(sample.presentationTimeUs)
+    private fun presentationTimeOf(sample: VideoSample): Long = if (tunnel == null) {
+        setup.tweak.presentationTimeUs(sample.presentationTimeUs)
+    } else {
+        TunnelClock.videoTimeUs(sample.presentationTimeUs)
+    }
 
     private fun onTunnelFrameQueued(audio: TunnelAudio, sample: VideoSample) {
         audio.start(sample.presentationTimeUs)
@@ -215,7 +231,7 @@ class VideoDecoder(
             val index = active.dequeueOutputBuffer(bufferInfo, waitUs)
             waitUs = 0L
             if (index == MediaCodec.INFO_TRY_AGAIN_LATER) break
-            if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) onOutputFormatChanged(active.outputFormat)
+            if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) onOutputFormatChanged(active)
             if (index >= 0) {
                 stats.framesDecoded.incrementAndGet()
                 newest = supersede(active, newest, index)
@@ -235,21 +251,27 @@ class VideoDecoder(
     }
 
     private fun render(active: MediaCodec, index: Int) {
-        active.releaseOutputBuffer(index, true)
-        codecRendered = true
-        stats.framesRendered.incrementAndGet()
+        val shown = setup.tweak.rendersOutput
+        active.releaseOutputBuffer(index, shown)
+        if (shown) {
+            codecRendered = true
+            stats.framesRendered.incrementAndGet()
+        }
         announceFirstFrame()
     }
 
     private fun announceFirstFrame() {
         if (firstFrameRendered) return
         firstFrameRendered = true
+        codec?.let(::recordCodecParameters)
         events.onFirstFrame()
     }
 
-    private fun onOutputFormatChanged(format: MediaFormat) {
+    private fun onOutputFormatChanged(active: MediaCodec) {
+        val format = active.outputFormat
         stats.outputColor = OutputColor.of(format)
         reportSize(format)
+        recordCodecParameters(active)
     }
 
     private fun reportSize(format: MediaFormat) {
@@ -286,5 +308,6 @@ class VideoDecoder(
         const val OUTPUT_WAIT_US = 2_000L
         const val JOIN_TIMEOUT_MS = 3_000L
         const val NO_BUFFER = -1
+        const val UNREADABLE = "unreadable"
     }
 }

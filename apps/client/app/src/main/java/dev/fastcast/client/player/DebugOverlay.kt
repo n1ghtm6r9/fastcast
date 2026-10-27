@@ -37,6 +37,11 @@ class DebugOverlay(
         return context.getString(R.string.debug_trial_shown, label, result.presentedPerSecond, result.queuedPerSecond)
     }
 
+    fun hideNow() {
+        handler.removeCallbacks(hide)
+        hide.run()
+    }
+
     private fun show(text: String) {
         handler.removeCallbacks(hide)
         view.text = text

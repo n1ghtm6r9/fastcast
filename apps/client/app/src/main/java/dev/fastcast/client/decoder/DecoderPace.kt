@@ -2,8 +2,6 @@ package dev.fastcast.client.decoder
 
 enum class DecoderPace {
     REALTIME,
-    BEST_EFFORT,
-    FULL_SPEED,
     UNDECLARED,
     ;
 
@@ -12,17 +10,10 @@ enum class DecoderPace {
 
     fun frameRate(fps: Int): Int? = fps.takeUnless { this == UNDECLARED }
 
-    fun operatingRate(fps: Int): Int? = when (this) {
-        REALTIME, BEST_EFFORT -> fps
-        FULL_SPEED -> HIGHEST_OPERATING_RATE
-        UNDECLARED -> null
-    }
+    fun operatingRate(fps: Int): Int? = fps.takeUnless { this == UNDECLARED }
 
-    companion object {
-        private const val REALTIME_PRIORITY = 0
-        private const val BEST_EFFORT_PRIORITY = 1
-        private const val HIGHEST_OPERATING_RATE = Short.MAX_VALUE.toInt()
-
-        fun of(bestEffort: Boolean): DecoderPace = if (bestEffort) FULL_SPEED else REALTIME
+    private companion object {
+        const val REALTIME_PRIORITY = 0
+        const val BEST_EFFORT_PRIORITY = 1
     }
 }

@@ -84,14 +84,19 @@ class PlayerDebugHost(
 
     override fun streamTrial(trial: StreamTrial): String = player.streamTrial(trial)
 
-    override fun trialFacts(): List<String> =
-        player.currentSession()?.tunnelFacts().orEmpty() + PropertyChanges.between(propsAtStart, SystemProps.snapshot())
+    override fun trialFacts(): List<String> {
+        val session = player.currentSession()
+        return session?.tunnelFacts().orEmpty() + session?.codecFacts().orEmpty() +
+            PropertyChanges.between(propsAtStart, SystemProps.snapshot())
+    }
 
     override fun lastError(): String? = player.lastError()
 
     override fun streamUsual() = player.streamUsual()
 
     override fun showProgress(step: DebugStep) = overlay.showProgress(step)
+
+    override fun hideProgress() = overlay.hideNow()
 
     override fun showDone(results: List<TrialResult>) = overlay.showDone(results)
 

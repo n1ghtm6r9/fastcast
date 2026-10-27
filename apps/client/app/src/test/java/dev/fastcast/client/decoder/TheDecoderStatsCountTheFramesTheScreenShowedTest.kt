@@ -7,24 +7,6 @@ import org.junit.Test
 class TheDecoderStatsCountTheFramesTheScreenShowedTest {
 
     @Test
-    fun `the frames shown are the ones the screen reported`() {
-        val stats = DecoderStats()
-        stats.framesRendered.addAndGet(5L)
-        stats.framePresented(1L, 10L)
-        stats.framePresented(2L, 20L)
-
-        assertEquals(2L, stats.framesShown)
-    }
-
-    @Test
-    fun `a screen that reports nothing is taken to show every frame handed to it`() {
-        val stats = DecoderStats()
-        stats.framesRendered.addAndGet(5L)
-
-        assertEquals(5L, stats.framesShown)
-    }
-
-    @Test
     fun `a queued frame is counted`() {
         val stats = DecoderStats()
         stats.frameQueued(1L, 0L)

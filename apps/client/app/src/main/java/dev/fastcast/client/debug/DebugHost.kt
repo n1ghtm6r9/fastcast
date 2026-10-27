@@ -30,5 +30,7 @@ interface DebugHost {
 
     fun showProgress(step: DebugStep)
 
+    fun hideProgress()
+
     fun showDone(results: List<TrialResult>)
 }

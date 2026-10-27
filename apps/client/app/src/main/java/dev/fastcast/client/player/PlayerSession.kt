@@ -4,9 +4,10 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.view.Surface
+import dev.fastcast.client.debug.CodecParameterFacts
 import dev.fastcast.client.debug.DebugCounters
 import dev.fastcast.client.decoder.DecoderEvents
-import dev.fastcast.client.decoder.DecoderPace
+import dev.fastcast.client.decoder.DecoderSetup
 import dev.fastcast.client.decoder.TunnelAudio
 import dev.fastcast.client.decoder.VideoDecoder
 import dev.fastcast.client.stream.ConfigMessage
@@ -23,12 +24,12 @@ class PlayerSession(
     displayLabel: () -> String,
     networkLabel: () -> String?,
     tunnel: TunnelAudio? = null,
-    pace: DecoderPace = DecoderPace.REALTIME,
+    setup: DecoderSetup = DecoderSetup.USUAL,
 ) : StreamListener, DecoderEvents {
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private val stream = NativeStreamClient(offer::target, this)
-    private val decoder = VideoDecoder(surface, this, tunnel = tunnel, pace = pace)
+    private val decoder = VideoDecoder(surface, this, tunnel = tunnel, setup = setup)
     private val tunneled = tunnel != null
     private val throughput = ThroughputSampler(SystemClock.elapsedRealtime())
     private val reportedThroughput = ThroughputSampler(SystemClock.elapsedRealtime())
@@ -81,6 +82,9 @@ class PlayerSession(
 
     fun tunnelFacts(): List<String> = decoder.tunnelFacts()
 
+    fun codecFacts(): List<String> =
+        decoder.stats.codecParameters?.let { CodecParameterFacts.of(it.vendor, it.outputFormat) }.orEmpty()
+
     override fun onConnecting() = postStatus(PlayerStatus.Connecting)
 
     override fun onConnected() = postStatus(PlayerStatus.WaitingForVideo)
@@ -124,7 +128,12 @@ class PlayerSession(
     }
 
     private fun snapshotOf(sampler: ThroughputSampler, nowMs: Long): StatsSnapshot {
-        val rates = sampler.sample(nowMs, stream.bytesReceived.get(), decoder.stats.framesShown)
+        val rates = sampler.sample(
+            nowMs,
+            stream.bytesReceived.get(),
+            decoder.stats.framesPresented.get(),
+            decoder.stats.framesRendered.get(),
+        )
         return StatsSnapshot(
             width = videoWidth,
             height = videoHeight,

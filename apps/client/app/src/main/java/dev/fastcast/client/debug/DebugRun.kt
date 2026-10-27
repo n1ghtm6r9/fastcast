@@ -1,6 +1,7 @@
 package dev.fastcast.client.debug
 
 import dev.fastcast.client.decoder.DecoderPace
+import dev.fastcast.client.decoder.DecoderTweak
 import java.util.ArrayDeque
 import kotlin.math.roundToInt
 
@@ -63,9 +64,11 @@ class DebugRun(
     private fun measureStream() {
         host.clearRefreshRate()
         host.showProgress(DebugStep.STREAM)
-        sampleVideo(STREAM_SAMPLE_MS) { measurement ->
-            queue(STREAM, describe(measurement))
-            runTrial(0)
+        hideThenWarmUp {
+            sampleVideo(STREAM_SAMPLE_MS) { measurement ->
+                queue(STREAM, describe(measurement))
+                runTrial(0)
+            }
         }
     }
 
@@ -79,7 +82,7 @@ class DebugRun(
 
     private fun awaitTrialVideo(index: Int, asked: String, askedNanos: Long) {
         when {
-            host.isPlaying() -> later(TRIAL_WARMUP_MS) { sampleTrial(index, asked) }
+            host.isPlaying() -> hideThenWarmUp { sampleTrial(index, asked) }
             clock.nowNanos() - askedNanos >= TRIAL_START_TIMEOUT_MS * NANOS_PER_MILLISECOND -> {
                 val failure = listOf(asked, NO_TRIAL_VIDEO) + listOfNotNull(host.lastError())
                 queue(TRIALS[index].step, failure + host.trialFacts())
@@ -87,6 +90,11 @@ class DebugRun(
             }
             else -> later(POLL_MS) { awaitTrialVideo(index, asked, askedNanos) }
         }
+    }
+
+    private fun hideThenWarmUp(then: () -> Unit) {
+        host.hideProgress()
+        later(WARMUP_MS, then)
     }
 
     private fun sampleTrial(index: Int, asked: String) {
@@ -155,7 +163,7 @@ class DebugRun(
         private const val SETTLE_MS = 1_500L
         private const val STREAM_SAMPLE_MS = 5_000L
         private const val TRIAL_START_TIMEOUT_MS = 20_000L
-        private const val TRIAL_WARMUP_MS = 3_000L
+        private const val WARMUP_MS = 3_000L
         private const val TRIAL_SAMPLE_MS = 6_000L
         private const val POLL_MS = 250L
         private const val PUMP_MS = 50L
@@ -171,11 +179,14 @@ class DebugRun(
         private const val NO_TRIAL_VIDEO = "no video within 20 s"
         private val ASKED_RATES = floatArrayOf(120f, 144f)
         private val TRIALS = listOf(
-            StreamTrial("tunnel2160full", 3840, 2160, 120, tunneled = true, DecoderPace.FULL_SPEED, DebugStep.TUNNEL),
-            StreamTrial("tunnel2160best", 3840, 2160, 120, tunneled = true, DecoderPace.BEST_EFFORT, DebugStep.TUNNEL),
-            StreamTrial("tunnel2160bare", 3840, 2160, 120, tunneled = true, DecoderPace.UNDECLARED, DebugStep.TUNNEL),
-            StreamTrial("tunnel2160realtime", 3840, 2160, 120, tunneled = true, DecoderPace.REALTIME, DebugStep.TUNNEL),
-            StreamTrial("fast2160full", 3840, 2160, 120, tunneled = false, DecoderPace.FULL_SPEED, DebugStep.FAST),
+            trialAt4K("tunnel2160bare", tunneled = true, DecoderTweak.NONE, DebugStep.TUNNEL),
+            trialAt4K("tunnel2160lowlatency", tunneled = true, DecoderTweak.LOW_LATENCY, DebugStep.TUNNEL),
+            trialAt4K("fast2160bare", tunneled = false, DecoderTweak.NONE, DebugStep.FAST),
+            trialAt4K("fast2160discard", tunneled = false, DecoderTweak.DISCARD_OUTPUT, DebugStep.FAST),
+            trialAt4K("fast2160stretched", tunneled = false, DecoderTweak.STRETCHED_TIMESTAMPS, DebugStep.FAST),
         )
+
+        private fun trialAt4K(step: String, tunneled: Boolean, tweak: DecoderTweak, progress: DebugStep): StreamTrial =
+            StreamTrial(step, 3840, 2160, 120, tunneled, DecoderPace.UNDECLARED, tweak, progress)
     }
 }

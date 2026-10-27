@@ -24,12 +24,21 @@ class TheDebugRunWalksEveryStepTest {
         assertEquals(
             listOf(
                 "step FACTS", "step VSYNC", "vsync", "step ASK", "ask 120.0", "vsync", "ask 144.0", "vsync", "clear",
-                "step STREAM", "step TUNNEL", "trial tunnel2160full", "step TUNNEL", "trial tunnel2160best",
-                "step TUNNEL", "trial tunnel2160bare", "step TUNNEL", "trial tunnel2160realtime", "step FAST",
-                "trial fast2160full", "step RESTORE", "usual", "done",
+                "step STREAM", "hide", "step TUNNEL", "trial tunnel2160bare", "hide", "step TUNNEL",
+                "trial tunnel2160lowlatency", "hide", "step FAST", "trial fast2160bare", "hide", "step FAST",
+                "trial fast2160discard", "hide", "step FAST", "trial fast2160stretched", "hide", "step RESTORE", "usual",
+                "done",
             ),
             host.events,
         )
+    }
+
+    @Test
+    fun `every video is measured with the debug text hidden for a while`() {
+        runToTheEnd()
+
+        assertEquals(12, host.countedAfterHidingMs.size)
+        assertTrue(host.countedAfterHidingMs.toString(), host.countedAfterHidingMs.all { it != null && it >= 3_000L })
     }
 
     @Test
@@ -39,8 +48,8 @@ class TheDebugRunWalksEveryStepTest {
         val steps = host.sent.map { JSONObject(it).getString("step") }.distinct()
         assertEquals(
             listOf(
-                "device", "display", "vsync", "ask120", "ask144", "stream", "tunnel2160full", "tunnel2160best",
-                "tunnel2160bare", "tunnel2160realtime", "fast2160full", "done",
+                "device", "display", "vsync", "ask120", "ask144", "stream", "tunnel2160bare", "tunnel2160lowlatency",
+                "fast2160bare", "fast2160discard", "fast2160stretched", "done",
             ),
             steps,
         )
@@ -63,25 +72,27 @@ class TheDebugRunWalksEveryStepTest {
     fun `a trial report names what was asked, the rates and what the trial saw`() {
         runToTheEnd()
 
-        val tunnel = textOf("tunnel2160best")
+        val tunnel = textOf("tunnel2160bare")
         assertTrue(tunnel, tunnel.startsWith("asked 3840x2160@120 tunneled; queued 120.0/s, decoded 120.0/s"))
         assertTrue(tunnel, tunnel.contains("presented: "))
         assertTrue(tunnel, tunnel.endsWith("; audio played 6.0 s"))
     }
 
     @Test
-    fun `4K at 120 is tried through the tunnel at every pace and on the surface at full speed`() {
+    fun `4K at 120 is tried in the tunnel plain and with low latency and on the surface plain, unshown and restamped`() {
         runToTheEnd()
 
         assertEquals(
             listOf(
-                "3840x2160@120 tunneled FULL_SPEED",
-                "3840x2160@120 tunneled BEST_EFFORT",
-                "3840x2160@120 tunneled UNDECLARED",
-                "3840x2160@120 tunneled REALTIME",
-                "3840x2160@120 surface FULL_SPEED",
+                "3840x2160@120 tunneled UNDECLARED NONE",
+                "3840x2160@120 tunneled UNDECLARED LOW_LATENCY",
+                "3840x2160@120 surface UNDECLARED NONE",
+                "3840x2160@120 surface UNDECLARED DISCARD_OUTPUT",
+                "3840x2160@120 surface UNDECLARED STRETCHED_TIMESTAMPS",
             ),
-            host.trials.map { "${it.width}x${it.height}@${it.fps} ${if (it.tunneled) "tunneled" else "surface"} ${it.pace}" },
+            host.trials.map {
+                "${it.width}x${it.height}@${it.fps} ${if (it.tunneled) "tunneled" else "surface"} ${it.pace} ${it.tweak}"
+            },
         )
     }
 
@@ -93,7 +104,7 @@ class TheDebugRunWalksEveryStepTest {
 
         val results = requireNotNull(host.shownResults)
         assertEquals(
-            listOf("tunnel2160full", "tunnel2160best", "tunnel2160bare", "tunnel2160realtime", "fast2160full"),
+            listOf("tunnel2160bare", "tunnel2160lowlatency", "fast2160bare", "fast2160discard", "fast2160stretched"),
             results.map { it.trial.step },
         )
         results.forEach {
@@ -104,18 +115,18 @@ class TheDebugRunWalksEveryStepTest {
 
     @Test
     fun `a trial that never plays is reported with the last error and the next trial still runs`() {
-        host.trialStartsAfterMs = mapOf("tunnel2160realtime" to null)
+        host.trialStartsAfterMs = mapOf("tunnel2160lowlatency" to null)
         host.lastError = "Decoder error: no tunnel"
 
         runToTheEnd()
 
         assertEquals(
             "asked 3840x2160@120 tunneled; no video within 20 s; Decoder error: no tunnel; audio played 6.0 s",
-            textOf("tunnel2160realtime"),
+            textOf("tunnel2160lowlatency"),
         )
-        assertEquals(listOf("trial fast2160full", "step RESTORE", "usual", "done"), host.events.takeLast(4))
+        assertEquals(listOf("trial fast2160stretched", "hide", "step RESTORE", "usual", "done"), host.events.takeLast(5))
         assertEquals(
-            listOf("tunnel2160full", "tunnel2160best", "tunnel2160bare", "fast2160full"),
+            listOf("tunnel2160bare", "fast2160bare", "fast2160discard", "fast2160stretched"),
             requireNotNull(host.shownResults).map { it.trial.step },
         )
     }
@@ -123,7 +134,7 @@ class TheDebugRunWalksEveryStepTest {
     @Test
     fun `when no trial plays the usual stream still comes back`() {
         host.trialStartsAfterMs = listOf(
-            "tunnel2160full", "tunnel2160best", "tunnel2160bare", "tunnel2160realtime", "fast2160full",
+            "tunnel2160bare", "tunnel2160lowlatency", "fast2160bare", "fast2160discard", "fast2160stretched",
         ).associateWith { null }
 
         runToTheEnd()

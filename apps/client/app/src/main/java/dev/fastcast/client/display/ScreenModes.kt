@@ -13,9 +13,8 @@ object ScreenModes {
 
     fun withTunnels(
         offer: List<DisplayModeOption>,
-        declares: (width: Int, height: Int, fps: Int) -> Boolean,
-        allows: (width: Int, height: Int, fps: Int) -> Boolean,
-    ): List<DisplayModeOption> = (offer + TunnelModes.beside(offer, declares, allows)).sortedWith(ModeOrder.SMALLEST_FIRST)
+        canTunnel: (width: Int, height: Int, fps: Int) -> Boolean,
+    ): List<DisplayModeOption> = (offer + TunnelModes.beside(offer, canTunnel)).sortedWith(ModeOrder.SMALLEST_FIRST)
 
     fun saved(offer: List<DisplayModeOption>, label: String?): DisplayModeOption? =
         offer.firstOrNull { it.label == label }

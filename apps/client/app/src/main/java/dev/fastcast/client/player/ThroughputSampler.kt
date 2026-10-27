@@ -4,15 +4,18 @@ class ThroughputSampler(startMs: Long) {
 
     private var lastTimeMs = startMs
     private var lastBytes = 0L
-    private var lastFrames = 0L
+    private var lastPresented = 0L
+    private var lastRendered = 0L
 
-    fun sample(nowMs: Long, totalBytes: Long, totalFrames: Long): Throughput {
+    fun sample(nowMs: Long, totalBytes: Long, presentedFrames: Long, renderedFrames: Long): Throughput {
         val elapsedMs = nowMs - lastTimeMs
         val bytes = totalBytes - lastBytes
-        val frames = totalFrames - lastFrames
+        val presented = presentedFrames - lastPresented
+        val frames = if (presented > 0L) presented else renderedFrames - lastRendered
         lastTimeMs = nowMs
         lastBytes = totalBytes
-        lastFrames = totalFrames
+        lastPresented = presentedFrames
+        lastRendered = renderedFrames
         if (elapsedMs <= 0) return Throughput(0.0, 0.0)
         val seconds = elapsedMs / MILLISECONDS_PER_SECOND
         return Throughput(

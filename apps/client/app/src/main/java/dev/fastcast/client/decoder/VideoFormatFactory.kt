@@ -24,6 +24,7 @@ object VideoFormatFactory {
         parameters: CodecConfiguration,
         choice: DecoderChoice,
         pace: DecoderPace,
+        tweak: DecoderTweak,
         audioSessionId: Int? = null,
     ): MediaFormat = MediaFormat.createVideoFormat(mime, config.width, config.height).apply {
         pace.frameRate(config.fps)?.let { setInteger(MediaFormat.KEY_FRAME_RATE, it) }
@@ -33,14 +34,15 @@ object VideoFormatFactory {
         setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, maxInputSize(config))
         setInteger(MediaFormat.KEY_PRIORITY, pace.priority)
         pace.operatingRate(config.fps)?.let { setInteger(MediaFormat.KEY_OPERATING_RATE, it) }
-        if (audioSessionId == null) applyLowLatency(choice) else applyTunnel(audioSessionId)
+        if (audioSessionId == null) applyLowLatency(choice) else applyTunnel(audioSessionId, choice, tweak)
     }
 
     private fun maxInputSize(config: ConfigMessage): Int = maxOf(config.width * config.height, MIN_INPUT_SIZE)
 
-    private fun MediaFormat.applyTunnel(audioSessionId: Int) {
+    private fun MediaFormat.applyTunnel(audioSessionId: Int, choice: DecoderChoice, tweak: DecoderTweak) {
         setFeatureEnabled(CodecCapabilities.FEATURE_TunneledPlayback, true)
         setInteger(MediaFormat.KEY_AUDIO_SESSION_ID, audioSessionId)
+        if (tweak.lowLatency) applyLowLatency(choice)
     }
 
     private fun MediaFormat.applyLowLatency(choice: DecoderChoice) {

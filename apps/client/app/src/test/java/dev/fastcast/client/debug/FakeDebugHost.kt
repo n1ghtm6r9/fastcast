@@ -12,6 +12,9 @@ class FakeDebugHost(private val clock: FakeDebugClock) : DebugHost {
     var trialFacts = listOf("audio played 6.0 s")
     var shownResults: List<TrialResult>? = null
         private set
+    val countedAfterHidingMs = mutableListOf<Long?>()
+    private var progressHidden = false
+    private var hiddenAtMs = 0L
     var sections = listOf(
         FactSection("device", listOf("model TV")),
         FactSection("display", listOf("mode 3840x2160@60")),
@@ -43,6 +46,7 @@ class FakeDebugHost(private val clock: FakeDebugClock) : DebugHost {
     }
 
     override fun counters(): DebugCounters {
+        countedAfterHidingMs += if (progressHidden) clock.nowMs - hiddenAtMs else null
         val frames = clock.nowMs * DECODED_PER_SECOND / MILLISECONDS_PER_SECOND
         return DebugCounters(clock.nowNanos(), clock.nowMs * BYTES_PER_MILLISECOND, frames, frames, frames, 0L)
     }
@@ -75,10 +79,18 @@ class FakeDebugHost(private val clock: FakeDebugClock) : DebugHost {
 
     override fun showProgress(step: DebugStep) {
         events += "step ${step.name}"
+        progressHidden = false
+    }
+
+    override fun hideProgress() {
+        events += "hide"
+        progressHidden = true
+        hiddenAtMs = clock.nowMs
     }
 
     override fun showDone(results: List<TrialResult>) {
         events += "done"
+        progressHidden = false
         shownResults = results
     }
 

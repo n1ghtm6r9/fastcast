@@ -12,9 +12,6 @@ class DecoderStats {
     val framesPresented = AtomicLong()
     val delays = RenderDelays(DELAY_CAPACITY)
 
-    val framesShown: Long
-        get() = framesPresented.get().takeIf { it > 0L } ?: framesRendered.get()
-
     @Volatile
     var decoderName: String = ""
 
@@ -26,6 +23,9 @@ class DecoderStats {
 
     @Volatile
     var tunnelFrameReady: Boolean = false
+
+    @Volatile
+    var codecParameters: CodecParameters? = null
 
     fun frameQueued(ptsUs: Long, nanos: Long) {
         framesQueued.incrementAndGet()
