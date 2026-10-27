@@ -20,8 +20,12 @@ import dev.fastcast.client.discovery.DiscoveredServer
 import dev.fastcast.client.display.DisplayModeChooser
 import dev.fastcast.client.display.DisplayModeOption
 import dev.fastcast.client.display.DisplayModes
+import dev.fastcast.client.display.FrameRateHint
 import dev.fastcast.client.display.MinimalPostProcessing
 import dev.fastcast.client.display.PreferredDisplayMode
+import dev.fastcast.client.display.ScreenModeStore
+import dev.fastcast.client.display.ScreenModes
+import dev.fastcast.client.network.ActiveNetwork
 import dev.fastcast.client.stream.StreamRequest
 import kotlin.math.ceil
 
@@ -37,6 +41,10 @@ class PlayerActivity : Activity(), PlayerSessionListener {
     private lateinit var statsText: TextView
     private lateinit var controlsHint: View
     private lateinit var menuSubtitle: TextView
+    private lateinit var screenValue: TextView
+    private lateinit var screenPrevious: View
+    private lateinit var screenNext: View
+    private lateinit var screenModeStore: ScreenModeStore
     private lateinit var menu: PlayerMenu
 
     private val handler = Handler(Looper.getMainLooper())
@@ -54,11 +62,14 @@ class PlayerActivity : Activity(), PlayerSessionListener {
     private var statsVisible = false
     private var controlsHintShown = false
     private var modeSummary = ""
+    private var screenModes: List<DisplayModeOption> = emptyList()
+    private var requestedMode: DisplayModeOption? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         MinimalPostProcessing.request(window)
+        GameplaySignals.announce(this)
         setContentView(R.layout.activity_player)
         ImmersiveMode.enter(window)
         val requestedAddress = intent.getStringExtra(EXTRA_ADDRESS)
@@ -69,6 +80,7 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         address = requestedAddress
         serverName = intent.getStringExtra(EXTRA_NAME) ?: requestedAddress
         screen = DisplayModes.defaultDisplay(this)
+        screenModeStore = ScreenModeStore(this)
         offer = StreamOffer(address, requestStream())
         videoSurface = findViewById(R.id.video_surface)
         statusPanel = findViewById(R.id.status_panel)
@@ -77,6 +89,9 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         statsText = findViewById(R.id.stats_text)
         controlsHint = findViewById(R.id.controls_hint)
         menuSubtitle = findViewById(R.id.menu_subtitle)
+        screenValue = findViewById(R.id.menu_screen_value)
+        screenPrevious = findViewById(R.id.menu_screen_previous)
+        screenNext = findViewById(R.id.menu_screen_next)
         findViewById<TextView>(R.id.menu_title).text = serverName
         menu = PlayerMenu(findViewById(R.id.menu_panel), findViewById(R.id.menu_resume), handler)
         findViewById<View>(R.id.menu_resume).setOnClickListener { menu.close() }
@@ -85,6 +100,8 @@ class PlayerActivity : Activity(), PlayerSessionListener {
             toggleStats()
         }
         findViewById<View>(R.id.menu_disconnect).setOnClickListener { finish() }
+        screenPrevious.setOnClickListener { stepScreenMode(-1) }
+        screenNext.setOnClickListener { stepScreenMode(1) }
         findViewById<View>(R.id.player_root).setOnClickListener { openMenu() }
         videoSurface.holder.addCallback(SurfaceLifecycle(::startSession, ::stopSession))
         showStatus(PlayerStatus.Connecting)
@@ -146,18 +163,43 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         handler.removeCallbacks(hideControlsHint)
         controlsHint.visibility = View.GONE
         menuSubtitle.text = getString(R.string.menu_subtitle, address, activeDisplayLabel())
+        renderScreenRow()
         menu.open()
+    }
+
+    private fun stepScreenMode(delta: Int) {
+        val next = ScreenModes.step(screenModes, requestedMode, delta) ?: return
+        screenModeStore.save(next)
+        offer = StreamOffer(address, requestStream())
+        renderScreenRow()
+        val surface = videoSurface.holder.surface
+        if (surface.isValid) startSession(surface)
+    }
+
+    private fun renderScreenRow() {
+        val mode = requestedMode ?: return
+        screenValue.text = getString(R.string.menu_screen_mode, mode.width, mode.height, mode.fps)
+        showStep(screenPrevious, ScreenModes.step(screenModes, mode, -1) != null)
+        showStep(screenNext, ScreenModes.step(screenModes, mode, 1) != null)
+    }
+
+    private fun showStep(button: View, possible: Boolean) {
+        button.isEnabled = possible
+        button.alpha = if (possible) 1f else UNAVAILABLE_STEP_ALPHA
     }
 
     private fun requestStream(): StreamRequest? {
         val display = screen ?: return null
         val modes = DisplayModes.supported(display)
-        val chosen = DisplayModeChooser.choose(modes) { hardwareCodecsAt(it).isNotEmpty() }
+        val sustains = { mode: DisplayModeOption -> hardwareCodecsAt(mode).isNotEmpty() }
+        screenModes = ScreenModes.offer(modes, sustains)
+        val chosen = ScreenModes.saved(screenModes, screenModeStore.load()) ?: DisplayModeChooser.choose(modes, sustains)
         chosen?.let { PreferredDisplayMode.apply(window, it) }
         val mode = chosen ?: DisplayModes.active(display)
+        requestedMode = mode
         val codecs = hardwareCodecsAt(mode)
         val tenBit = tenBitCodecsAt(mode)
-        modeSummary = ModeSummary.of(modes, mode, codecs, tenBit)
+        modeSummary = ModeSummary.of(modes, codecs, tenBit)
         return StreamRequest(mode.width, mode.height, mode.fps, codecs, tenBit)
     }
 
@@ -172,12 +214,18 @@ class PlayerActivity : Activity(), PlayerSessionListener {
     private fun activeDisplayLabel(): String = screen?.let { DisplayModes.active(it).label }.orEmpty()
 
     private fun reportedDisplayLabel(): String =
-        listOf(activeDisplayLabel(), modeSummary).filter { it.isNotEmpty() }.joinToString(REPORT_SEPARATOR)
+        listOf(activeDisplayLabel(), modeSummary, gameSummary()).filter { it.isNotEmpty() }.joinToString(REPORT_SEPARATOR)
+
+    private fun gameSummary(): String =
+        GameModeSummary.of(screen?.let(MinimalPostProcessing::supported) ?: false, GameplaySignals.gameMode(this))
+
+    private fun networkLabel(): String? = ActiveNetwork.describe(this)
 
     private fun startSession(surface: Surface) {
         stopSession()
         showStatus(PlayerStatus.Connecting)
-        session = PlayerSession(offer, surface, this, ::reportedDisplayLabel).also { it.start() }
+        requestedMode?.let { FrameRateHint.apply(surface, it.refreshRate) }
+        session = PlayerSession(offer, surface, this, ::reportedDisplayLabel, ::networkLabel).also { it.start() }
     }
 
     private fun stopSession() {
@@ -249,6 +297,7 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         private const val MILLISECONDS_PER_SECOND = 1_000.0
         private const val NO_DECODER = "-"
         private const val REPORT_SEPARATOR = "; "
+        private const val UNAVAILABLE_STEP_ALPHA = 0.35f
 
         fun createIntent(context: Context, server: DiscoveredServer): Intent =
             Intent(context, PlayerActivity::class.java)

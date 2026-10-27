@@ -16,6 +16,7 @@ class StatsMessage(
     val colorStandard: Int? = null,
     val colorRange: Int? = null,
     val colorTransfer: Int? = null,
+    val network: String? = null,
     val error: String? = null,
 ) {
 
@@ -48,6 +49,7 @@ class StatsMessage(
         colorStandard?.let { json.put(COLOR_STANDARD, it) }
         colorRange?.let { json.put(COLOR_RANGE, it) }
         colorTransfer?.let { json.put(COLOR_TRANSFER, it) }
+        network?.let { json.put(NETWORK, it) }
         texts[ERROR]?.let { json.put(ERROR, it) }
         return json.toString()
     }
@@ -77,6 +79,7 @@ class StatsMessage(
         private const val COLOR_STANDARD = "colorStandard"
         private const val COLOR_RANGE = "colorRange"
         private const val COLOR_TRANSFER = "colorTransfer"
+        private const val NETWORK = "network"
         private const val ERROR = "error"
         private const val TENTHS_PER_UNIT = 10.0
     }

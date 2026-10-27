@@ -105,6 +105,48 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:clipChildren="false"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/menu_screen"
+                android:textColor="@color/text_muted"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/menu_screen_previous"
+                style="@style/MenuButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:minWidth="64dp"
+                android:text="@string/menu_step_previous" />
+
+            <TextView
+                android:id="@+id/menu_screen_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:minWidth="240dp"
+                android:textColor="@color/text"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/menu_screen_next"
+                style="@style/MenuButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="64dp"
+                android:text="@string/menu_step_next" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:clipChildren="false"
             android:orientation="horizontal">
 
             <TextView

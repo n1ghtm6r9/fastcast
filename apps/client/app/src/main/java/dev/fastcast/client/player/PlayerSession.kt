@@ -16,6 +16,7 @@ class PlayerSession(
     surface: Surface,
     private val listener: PlayerSessionListener,
     displayLabel: () -> String,
+    networkLabel: () -> String?,
 ) : StreamListener, DecoderEvents {
 
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -27,6 +28,7 @@ class PlayerSession(
         snapshot = { snapshotOf(reportedThroughput, SystemClock.elapsedRealtime()) },
         display = displayLabel,
         send = stream::send,
+        network = networkLabel,
     )
 
     @Volatile

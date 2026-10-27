@@ -1,6 +1,7 @@
 package dev.fastcast.client.display
 
 import android.os.Build
+import android.view.Display
 import android.view.Window
 
 object MinimalPostProcessing {
@@ -8,4 +9,7 @@ object MinimalPostProcessing {
     fun request(window: Window) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) window.setPreferMinimalPostProcessing(true)
     }
+
+    fun supported(display: Display): Boolean =
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && display.isMinimalPostProcessingSupported
 }

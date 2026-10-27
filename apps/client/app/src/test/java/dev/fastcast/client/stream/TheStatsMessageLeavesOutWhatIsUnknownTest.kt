@@ -14,6 +14,7 @@ class TheStatsMessageLeavesOutWhatIsUnknownTest {
         colorRange: Int? = null,
         colorTransfer: Int? = null,
         error: String? = null,
+        network: String? = null,
     ): JSONObject = JSONObject(
         StatsMessage(
             decoder = "c2.mtk.hevc.decoder",
@@ -29,8 +30,19 @@ class TheStatsMessageLeavesOutWhatIsUnknownTest {
             colorRange = colorRange,
             colorTransfer = colorTransfer,
             error = error,
+            network = network,
         ).toJson(),
     )
+
+    @Test
+    fun `a network the tv did not name is left out`() {
+        assertFalse(messageWith().has("network"))
+    }
+
+    @Test
+    fun `a named network is sent`() {
+        assertEquals("ethernet 1000 Mbit/s", messageWith(network = "ethernet 1000 Mbit/s").getString("network"))
+    }
 
     @Test
     fun `colors the decoder did not report are left out`() {

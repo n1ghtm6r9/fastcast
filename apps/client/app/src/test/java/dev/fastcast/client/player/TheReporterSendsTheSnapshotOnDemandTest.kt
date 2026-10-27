@@ -16,11 +16,13 @@ class TheReporterSendsTheSnapshotOnDemandTest {
     private val dropped = AtomicLong(0L)
     private val receiveBuffer = AtomicInteger(8_388_608)
     private val display = AtomicReference("3840x2160@60")
+    private val network = AtomicReference<String?>("ethernet 100 Mbit/s")
     private val reporter = StatsReporter(
         snapshot = { aStatsSnapshot(droppedFrames = dropped.get(), receiveBufferBytes = receiveBuffer.get()) },
         display = display::get,
         send = sink::send,
         intervalMs = 60_000L,
+        network = network::get,
     )
 
     @After
@@ -70,6 +72,22 @@ class TheReporterSendsTheSnapshotOnDemandTest {
         reporter.reportNow()
 
         assertFalse(sink.next().has("receiveBuffer"))
+    }
+
+    @Test
+    fun `a report carries the network of the tv`() {
+        reporter.reportNow()
+
+        assertEquals("ethernet 100 Mbit/s", sink.next().getString("network"))
+    }
+
+    @Test
+    fun `a report leaves out a network that is not known`() {
+        network.set(null)
+
+        reporter.reportNow()
+
+        assertFalse(sink.next().has("network"))
     }
 
     @Test

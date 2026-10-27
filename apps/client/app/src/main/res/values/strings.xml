@@ -19,5 +19,9 @@
     <string name="menu_resume">Resume</string>
     <string name="menu_stats">Stats</string>
     <string name="menu_disconnect">Disconnect</string>
+    <string name="menu_screen">Screen</string>
+    <string name="menu_screen_mode">%1$d×%2$d · %3$d Hz</string>
+    <string name="menu_step_previous" translatable="false">‹</string>
+    <string name="menu_step_next" translatable="false">›</string>
     <string name="stats_format">%1$dx%2$d  %3$.1f fps  %4$.1f Mbit/s\nDecoder: %5$s  Dropped: %6$d</string>
 </resources>

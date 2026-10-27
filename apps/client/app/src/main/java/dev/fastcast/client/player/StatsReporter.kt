@@ -13,6 +13,7 @@ class StatsReporter(
     private val send: (String) -> Boolean,
     private val intervalMs: Long = INTERVAL_MS,
     private val flushDelayMs: Long = FLUSH_DELAY_MS,
+    private val network: () -> String? = { null },
 ) {
 
     private val executor = Executors.newSingleThreadScheduledExecutor(
@@ -60,6 +61,7 @@ class StatsReporter(
                 colorStandard = current.color.standard,
                 colorRange = current.color.range,
                 colorTransfer = current.color.transfer,
+                network = network(),
                 error = error,
             )
             send(message.toJson())
