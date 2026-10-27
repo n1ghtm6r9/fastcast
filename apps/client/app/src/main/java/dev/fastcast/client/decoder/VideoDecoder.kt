@@ -209,11 +209,8 @@ class VideoDecoder(
         tunnel?.let { onTunnelFrameQueued(it, sample) }
     }
 
-    private fun presentationTimeOf(sample: VideoSample): Long = if (tunnel == null) {
-        setup.tweak.presentationTimeUs(sample.presentationTimeUs)
-    } else {
-        TunnelClock.videoTimeUs(sample.presentationTimeUs)
-    }
+    private fun presentationTimeOf(sample: VideoSample): Long =
+        if (tunnel == null) sample.presentationTimeUs else TunnelClock.videoTimeUs(sample.presentationTimeUs)
 
     private fun onTunnelFrameQueued(audio: TunnelAudio, sample: VideoSample) {
         audio.start(sample.presentationTimeUs)
@@ -251,12 +248,9 @@ class VideoDecoder(
     }
 
     private fun render(active: MediaCodec, index: Int) {
-        val shown = setup.tweak.rendersOutput
-        active.releaseOutputBuffer(index, shown)
-        if (shown) {
-            codecRendered = true
-            stats.framesRendered.incrementAndGet()
-        }
+        active.releaseOutputBuffer(index, true)
+        codecRendered = true
+        stats.framesRendered.incrementAndGet()
         announceFirstFrame()
     }
 

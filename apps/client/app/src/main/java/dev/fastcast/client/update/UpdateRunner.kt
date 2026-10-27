@@ -23,6 +23,11 @@ class UpdateRunner(
     }
 
     @Synchronized
+    fun checkAgain() {
+        if (current?.foundNoUpdate == true) current = Flow().also(Flow::begin)
+    }
+
+    @Synchronized
     fun stop() {
         current?.end()
         current = null
@@ -35,6 +40,10 @@ class UpdateRunner(
 
         @Volatile
         private var active = true
+
+        @Volatile
+        var foundNoUpdate = false
+            private set
 
         fun begin() = thread.start()
 
@@ -54,7 +63,7 @@ class UpdateRunner(
         }
 
         private fun update() {
-            val manifest = cache.resolve(fetch)?.takeUnless { rejected.isRejected(it.versionCode) }
+            val manifest = findUpdate()
             if (!active) return
             if (manifest == null) {
                 report { onNoUpdate() }
@@ -67,6 +76,15 @@ class UpdateRunner(
                 if (active) cache.dismiss()
                 throw e
             }
+        }
+
+        private fun findUpdate(): UpdateManifest? = try {
+            val manifest = cache.resolve(fetch)?.takeUnless { rejected.isRejected(it.versionCode) }
+            foundNoUpdate = manifest == null
+            manifest
+        } catch (e: Exception) {
+            foundNoUpdate = true
+            throw e
         }
 
         private fun downloadAndInstall(manifest: UpdateManifest) {

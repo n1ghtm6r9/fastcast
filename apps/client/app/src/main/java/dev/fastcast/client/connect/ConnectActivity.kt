@@ -52,6 +52,7 @@ class ConnectActivity : Activity(), ServerFinderListener, UpdateListener {
     private val finder = ServerFinder(this, deliverOnMain)
     private val installFailure = Runnable { stopUpdating() }
     private val hintTimer = Runnable { hintText.visibility = View.VISIBLE }
+    private val updateTimer = Runnable { checkForUpdateAgain() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,6 +89,7 @@ class ConnectActivity : Activity(), ServerFinderListener, UpdateListener {
         updateRunner.start()
         finder.start()
         handler.postDelayed(hintTimer, HINT_DELAY_MS)
+        handler.postDelayed(updateTimer, UPDATE_RECHECK_MS)
     }
 
     override fun onStop() {
@@ -109,6 +111,7 @@ class ConnectActivity : Activity(), ServerFinderListener, UpdateListener {
     }
 
     override fun onServersChanged(servers: List<DiscoveredServer>) {
+        if (this.servers.isEmpty() && servers.isNotEmpty()) updateRunner.checkAgain()
         render(servers)
         focusServer()
     }
@@ -129,6 +132,11 @@ class ConnectActivity : Activity(), ServerFinderListener, UpdateListener {
     override fun onUpdateFailed(cause: Exception) {
         Log.w(TAG, "Update failed", cause)
         stopUpdating()
+    }
+
+    private fun checkForUpdateAgain() {
+        updateRunner.checkAgain()
+        handler.postDelayed(updateTimer, UPDATE_RECHECK_MS)
     }
 
     private fun stopUpdating() {
@@ -175,6 +183,7 @@ class ConnectActivity : Activity(), ServerFinderListener, UpdateListener {
         const val UPDATES_DIRECTORY = "updates"
         const val REQUEST_PLAYER = 1
         const val HINT_DELAY_MS = 5_000L
+        const val UPDATE_RECHECK_MS = 30_000L
         val ARROW_KEYS = setOf(
             KeyEvent.KEYCODE_DPAD_UP,
             KeyEvent.KEYCODE_DPAD_DOWN,

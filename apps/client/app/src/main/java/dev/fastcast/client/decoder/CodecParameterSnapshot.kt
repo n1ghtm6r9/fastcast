@@ -20,7 +20,7 @@ object CodecParameterSnapshot {
     )
 
     fun subscribe(codec: MediaCodec): List<String> {
-        val names = codec.supportedVendorParameters
+        val names = WatchedVendorParameters.among(codec.supportedVendorParameters)
         if (names.isNotEmpty()) codec.subscribeToVendorParameters(names)
         return names
     }

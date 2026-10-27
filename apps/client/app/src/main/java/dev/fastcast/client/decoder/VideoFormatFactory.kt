@@ -33,11 +33,21 @@ object VideoFormatFactory {
         }
         setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, maxInputSize(config))
         setInteger(MediaFormat.KEY_PRIORITY, pace.priority)
-        pace.operatingRate(config.fps)?.let { setInteger(MediaFormat.KEY_OPERATING_RATE, it) }
-        if (audioSessionId == null) applyLowLatency(choice) else applyTunnel(audioSessionId, choice, tweak)
+        val operatingRate = tweak.operatingRate(config.fps) ?: pace.operatingRate(config.fps)
+        operatingRate?.let { setInteger(MediaFormat.KEY_OPERATING_RATE, it) }
+        if (audioSessionId == null) applySurface(choice, tweak) else applyTunnel(audioSessionId, choice, tweak)
+        tweak.vendorValues(config.fps).forEach { (key, value) -> setVendorValue(key, value) }
     }
 
     private fun maxInputSize(config: ConfigMessage): Int = maxOf(config.width * config.height, MIN_INPUT_SIZE)
+
+    private fun MediaFormat.applySurface(choice: DecoderChoice, tweak: DecoderTweak) {
+        if (tweak.usesStandardLowLatency) applyLowLatency(choice)
+    }
+
+    private fun MediaFormat.setVendorValue(key: String, value: Number) {
+        if (value is Float) setFloat(key, value) else setInteger(key, value.toInt())
+    }
 
     private fun MediaFormat.applyTunnel(audioSessionId: Int, choice: DecoderChoice, tweak: DecoderTweak) {
         setFeatureEnabled(CodecCapabilities.FEATURE_TunneledPlayback, true)

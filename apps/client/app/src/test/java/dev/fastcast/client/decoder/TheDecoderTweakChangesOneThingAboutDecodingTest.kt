@@ -2,36 +2,64 @@ package dev.fastcast.client.decoder
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class TheDecoderTweakChangesOneThingAboutDecodingTest {
 
     @Test
-    fun `no tweak shows every frame at its own time without asking the tunnel for low latency`() {
+    fun `no tweak keeps the standard low latency hint and asks the decoder for nothing more`() {
         assertFalse(DecoderTweak.NONE.lowLatency)
-        assertTrue(DecoderTweak.NONE.rendersOutput)
-        assertEquals(8_333L, DecoderTweak.NONE.presentationTimeUs(8_333L))
+        assertTrue(DecoderTweak.NONE.usesStandardLowLatency)
+        assertNull(DecoderTweak.NONE.operatingRate(120))
+        assertEquals(emptyMap<String, Number>(), DecoderTweak.NONE.vendorValues(120))
     }
 
     @Test
-    fun `low latency asks the tunneled decoder for low latency and changes nothing else`() {
+    fun `the low latency tweak asks the tunnel for low latency`() {
         assertTrue(DecoderTweak.LOW_LATENCY.lowLatency)
-        assertTrue(DecoderTweak.LOW_LATENCY.rendersOutput)
-        assertEquals(8_333L, DecoderTweak.LOW_LATENCY.presentationTimeUs(8_333L))
+        assertTrue(DecoderTweak.LOW_LATENCY.usesStandardLowLatency)
+        assertNull(DecoderTweak.LOW_LATENCY.operatingRate(120))
+        assertEquals(emptyMap<String, Number>(), DecoderTweak.LOW_LATENCY.vendorValues(120))
     }
 
     @Test
-    fun `discarding output decodes every frame without showing it`() {
-        assertFalse(DecoderTweak.DISCARD_OUTPUT.lowLatency)
-        assertFalse(DecoderTweak.DISCARD_OUTPUT.rendersOutput)
-        assertEquals(8_333L, DecoderTweak.DISCARD_OUTPUT.presentationTimeUs(8_333L))
+    fun `playing as a game swaps the standard hint for the MediaTek game and low latency modes at the stream rate`() {
+        assertFalse(DecoderTweak.MEDIATEK_GAME.lowLatency)
+        assertFalse(DecoderTweak.MEDIATEK_GAME.usesStandardLowLatency)
+        assertEquals(120, DecoderTweak.MEDIATEK_GAME.operatingRate(120))
+        assertEquals(
+            mapOf("vendor.mtk-codec2.game-mode" to 1, "vendor.mtk-codec2.low-latency-mode" to 1),
+            DecoderTweak.MEDIATEK_GAME.vendorValues(120),
+        )
     }
 
     @Test
-    fun `stretched timestamps tell the decoder the frames come at half the rate`() {
-        assertFalse(DecoderTweak.STRETCHED_TIMESTAMPS.lowLatency)
-        assertTrue(DecoderTweak.STRETCHED_TIMESTAMPS.rendersOutput)
-        assertEquals(16_666L, DecoderTweak.STRETCHED_TIMESTAMPS.presentationTimeUs(8_333L))
+    fun `forcing the display rate tells the MediaTek decoder the stream runs at 60`() {
+        assertTrue(DecoderTweak.FORCED_DISPLAY_RATE.usesStandardLowLatency)
+        assertNull(DecoderTweak.FORCED_DISPLAY_RATE.operatingRate(120))
+        assertEquals(
+            mapOf("vendor.mtk-codec2.force-frame-rate" to 60),
+            DecoderTweak.FORCED_DISPLAY_RATE.vendorValues(120),
+        )
+    }
+
+    @Test
+    fun `forcing the stream rate tells the MediaTek decoder the rate the stream really has`() {
+        assertTrue(DecoderTweak.FORCED_STREAM_RATE.usesStandardLowLatency)
+        assertEquals(
+            mapOf("vendor.mtk-codec2.force-frame-rate" to 120),
+            DecoderTweak.FORCED_STREAM_RATE.vendorValues(120),
+        )
+    }
+
+    @Test
+    fun `raising the rate limit lets the MediaTek decoder go up to the stream rate`() {
+        assertTrue(DecoderTweak.RAISED_RATE_LIMIT.usesStandardLowLatency)
+        assertEquals(
+            mapOf("vendor.mtk-codec2.max-frame-rate" to 120f),
+            DecoderTweak.RAISED_RATE_LIMIT.vendorValues(120),
+        )
     }
 }

@@ -212,10 +212,9 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
 
     override fun streamTrial(trial: StreamTrial): String {
         lastError = null
-        val trialDecoding = DecoderSetup(trial.pace, trial.tweak, inspectsVendorParameters = true)
-        switchStream(StreamRequest(trial.width, trial.height, trial.fps, TUNNEL_CODECS), trial.tunneled, trialDecoding)
+        switchStream(StreamRequest(trial.width, trial.height, trial.fps, TUNNEL_CODECS), trial.tunneled, trial.setup)
         val path = if (trial.tunneled) TUNNELED_PATH else SURFACE_PATH
-        val decoderAsk = "${trial.pace.name.lowercase()} ${trial.tweak.name.lowercase()}"
+        val decoderAsk = "${trial.setup.pace.name.lowercase()} ${trial.setup.tweak.name.lowercase()}"
         return "asked ${trial.width}x${trial.height}@${trial.fps} $path $decoderAsk codecs ${TUNNEL_CODECS.joinToString(",")}"
     }
 

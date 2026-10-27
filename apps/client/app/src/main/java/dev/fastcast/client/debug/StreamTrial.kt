@@ -1,7 +1,6 @@
 package dev.fastcast.client.debug
 
-import dev.fastcast.client.decoder.DecoderPace
-import dev.fastcast.client.decoder.DecoderTweak
+import dev.fastcast.client.decoder.DecoderSetup
 
 class StreamTrial(
     val step: String,
@@ -9,7 +8,7 @@ class StreamTrial(
     val height: Int,
     val fps: Int,
     val tunneled: Boolean,
-    val pace: DecoderPace,
-    val tweak: DecoderTweak,
+    val setup: DecoderSetup,
+    val showsText: Boolean,
     val progress: DebugStep,
 )

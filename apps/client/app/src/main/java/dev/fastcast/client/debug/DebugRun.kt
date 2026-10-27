@@ -1,6 +1,7 @@
 package dev.fastcast.client.debug
 
 import dev.fastcast.client.decoder.DecoderPace
+import dev.fastcast.client.decoder.DecoderSetup
 import dev.fastcast.client.decoder.DecoderTweak
 import java.util.ArrayDeque
 import kotlin.math.roundToInt
@@ -82,7 +83,7 @@ class DebugRun(
 
     private fun awaitTrialVideo(index: Int, asked: String, askedNanos: Long) {
         when {
-            host.isPlaying() -> hideThenWarmUp { sampleTrial(index, asked) }
+            host.isPlaying() -> warmUp(TRIALS[index]) { sampleTrial(index, asked) }
             clock.nowNanos() - askedNanos >= TRIAL_START_TIMEOUT_MS * NANOS_PER_MILLISECOND -> {
                 val failure = listOf(asked, NO_TRIAL_VIDEO) + listOfNotNull(host.lastError())
                 queue(TRIALS[index].step, failure + host.trialFacts())
@@ -90,6 +91,10 @@ class DebugRun(
             }
             else -> later(POLL_MS) { awaitTrialVideo(index, asked, askedNanos) }
         }
+    }
+
+    private fun warmUp(trial: StreamTrial, then: () -> Unit) {
+        if (trial.showsText) later(WARMUP_MS, then) else hideThenWarmUp(then)
     }
 
     private fun hideThenWarmUp(then: () -> Unit) {
@@ -179,14 +184,25 @@ class DebugRun(
         private const val NO_TRIAL_VIDEO = "no video within 20 s"
         private val ASKED_RATES = floatArrayOf(120f, 144f)
         private val TRIALS = listOf(
-            trialAt4K("tunnel2160bare", tunneled = true, DecoderTweak.NONE, DebugStep.TUNNEL),
-            trialAt4K("tunnel2160lowlatency", tunneled = true, DecoderTweak.LOW_LATENCY, DebugStep.TUNNEL),
-            trialAt4K("fast2160bare", tunneled = false, DecoderTweak.NONE, DebugStep.FAST),
-            trialAt4K("fast2160discard", tunneled = false, DecoderTweak.DISCARD_OUTPUT, DebugStep.FAST),
-            trialAt4K("fast2160stretched", tunneled = false, DecoderTweak.STRETCHED_TIMESTAMPS, DebugStep.FAST),
+            surfaceAt4K("fast2160game", DecoderTweak.MEDIATEK_GAME),
+            surfaceAt4K("fast2160forced60", DecoderTweak.FORCED_DISPLAY_RATE),
+            surfaceAt4K("fast2160forced120", DecoderTweak.FORCED_STREAM_RATE),
+            surfaceAt4K("fast2160limit120", DecoderTweak.RAISED_RATE_LIMIT),
+            StreamTrial(
+                "tunnel2160game", 3840, 2160, 120, tunneled = true,
+                DecoderSetup(DecoderPace.UNDECLARED, DecoderTweak.MEDIATEK_GAME, inspectsVendorParameters = false),
+                showsText = true, DebugStep.TUNNEL,
+            ),
+            StreamTrial(
+                "tunnel1440hidden", 2560, 1440, 120, tunneled = true, DecoderSetup.USUAL, showsText = false,
+                DebugStep.TUNNEL,
+            ),
         )
 
-        private fun trialAt4K(step: String, tunneled: Boolean, tweak: DecoderTweak, progress: DebugStep): StreamTrial =
-            StreamTrial(step, 3840, 2160, 120, tunneled, DecoderPace.UNDECLARED, tweak, progress)
+        private fun surfaceAt4K(step: String, tweak: DecoderTweak): StreamTrial = StreamTrial(
+            step, 3840, 2160, 120, tunneled = false,
+            DecoderSetup(DecoderPace.UNDECLARED, tweak, inspectsVendorParameters = true),
+            showsText = false, DebugStep.FAST,
+        )
     }
 }
