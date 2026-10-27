@@ -1,4 +1,4 @@
-use super::{FakeBackend, FakePreparation, settle};
+use super::{FakeBackend, FakePreparation, FakeScaler, settle};
 use crate::capture::supervise_capture;
 use crate::display::DisplayMode;
 use crate::hub::{Hub, ViewerRequest};
@@ -9,7 +9,11 @@ use std::sync::Arc;
 async fn a_new_request_ends_the_wait_before_a_retry() {
     let hub = Arc::new(Hub::new());
     let backend = FakeBackend::preparing(vec![FakePreparation::Fails], vec![]);
-    let supervisor = tokio::spawn(supervise_capture(hub.clone(), backend.clone()));
+    let supervisor = tokio::spawn(supervise_capture(
+        hub.clone(),
+        backend.clone(),
+        FakeScaler::unknown(),
+    ));
     let _viewer = hub.join();
     let request = ViewerRequest {
         mode: Some(DisplayMode {

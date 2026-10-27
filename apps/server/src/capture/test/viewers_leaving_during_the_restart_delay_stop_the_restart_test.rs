@@ -1,4 +1,4 @@
-use super::{FakeBackend, FakeRun, settle};
+use super::{FakeBackend, FakeRun, FakeScaler, settle};
 use crate::capture::supervise_capture;
 use crate::hub::Hub;
 use std::sync::Arc;
@@ -12,7 +12,11 @@ async fn viewers_leaving_during_the_restart_delay_stop_the_restart() {
         delay: Duration::from_millis(100),
         frames: 10,
     }]);
-    let supervisor = tokio::spawn(supervise_capture(hub.clone(), backend.clone()));
+    let supervisor = tokio::spawn(supervise_capture(
+        hub.clone(),
+        backend.clone(),
+        FakeScaler::unknown(),
+    ));
     let viewer = hub.join();
 
     settle().await;

@@ -2,12 +2,17 @@ use crate::capture::{
     CaptureBackend, PrepareOutcome, RESTART_DELAY, WatchOutcome, prepare_while_watched,
     release_screen, run_while_watched, wait_before_retry,
 };
+use crate::display::ScreenScaler;
 use crate::hub::Hub;
 use std::sync::Arc;
 use tokio::time::sleep;
 use tracing::{error, info, warn};
 
-pub async fn supervise_capture<B: CaptureBackend>(hub: Arc<Hub>, backend: Arc<B>) {
+pub async fn supervise_capture<B: CaptureBackend, S: ScreenScaler>(
+    hub: Arc<Hub>,
+    backend: Arc<B>,
+    scaler: Arc<S>,
+) {
     let mut viewers = hub.watch_viewers();
     let mut requests = hub.watch_requests();
     let mut kept = None;
@@ -61,6 +66,7 @@ pub async fn supervise_capture<B: CaptureBackend>(hub: Arc<Hub>, backend: Arc<B>
         let outcome = run_while_watched(
             &hub,
             backend.as_ref(),
+            scaler.as_ref(),
             &pipeline,
             &screen.target,
             &mut viewers,

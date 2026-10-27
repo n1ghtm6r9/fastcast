@@ -51,6 +51,7 @@ fn every_packet_kind_survives_a_round_trip() {
         }),
         Packet::Bye,
         Packet::Stats("{\"fps\":120}"),
+        Packet::Notice("{\"type\":\"scale\",\"step\":1}"),
     ];
 
     for (index, packet) in packets.into_iter().enumerate() {

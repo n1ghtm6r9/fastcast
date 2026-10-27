@@ -7,5 +7,7 @@ impl Hub {
         state.config = None;
         state.gop.clear();
         state.awaiting_reset = false;
+        drop(state);
+        self.scale.send_replace(None);
     }
 }

@@ -1,4 +1,4 @@
-use crate::link::{CLOSED_BY_SERVER, LinkFlow, LinkShared, LinkState, LinkTarget};
+use crate::link::{CLOSED_BY_SERVER, LinkEvent, LinkFlow, LinkShared, LinkState, LinkTarget};
 use crate::link::{accept_welcome, end_link};
 use std::net::SocketAddr;
 use std::time::Instant;
@@ -38,6 +38,10 @@ pub(crate) fn take_datagram(
         Packet::Bye => {
             end_link(shared, CLOSED_BY_SERVER);
             LinkFlow::Leave
+        }
+        Packet::Notice(text) => {
+            shared.queue.push(LinkEvent::Notice(text.to_owned()));
+            LinkFlow::Continue
         }
         _ => LinkFlow::Continue,
     }

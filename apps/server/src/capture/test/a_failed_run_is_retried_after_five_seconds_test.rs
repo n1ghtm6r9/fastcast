@@ -1,4 +1,4 @@
-use super::{FakeBackend, FakeRun, settle};
+use super::{FakeBackend, FakeRun, FakeScaler, settle};
 use crate::capture::supervise_capture;
 use crate::hub::Hub;
 use std::sync::Arc;
@@ -11,7 +11,11 @@ async fn a_failed_run_is_retried_after_five_seconds() {
     let backend = FakeBackend::scripted(vec![FakeRun::Fails {
         delay: Duration::from_millis(100),
     }]);
-    let supervisor = tokio::spawn(supervise_capture(hub.clone(), backend.clone()));
+    let supervisor = tokio::spawn(supervise_capture(
+        hub.clone(),
+        backend.clone(),
+        FakeScaler::unknown(),
+    ));
     let _viewer = hub.join();
 
     settle().await;

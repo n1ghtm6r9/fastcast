@@ -20,6 +20,7 @@ mod link_next_event;
 mod link_open;
 mod link_receive_buffer_bytes;
 mod link_request_key_frame;
+mod link_send_notice;
 mod link_send_stats;
 mod link_shared;
 mod link_shared_request_key_frame;

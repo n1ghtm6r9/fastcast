@@ -48,6 +48,10 @@ class NativeStreamClient(
         handle != NO_HANDLE && link.sendStats(handle, text.toByteArray(Charsets.UTF_8))
     }
 
+    fun askScale(step: Int): Boolean = synchronized(lock) {
+        handle != NO_HANDLE && link.sendNotice(handle, ScaleAsk(step).toJson().toByteArray(Charsets.UTF_8))
+    }
+
     fun receiveBufferBytes(): Int = synchronized(lock) {
         if (handle == NO_HANDLE) UNKNOWN_BUFFER else link.receiveBufferBytes(handle)
     }
@@ -112,6 +116,7 @@ class NativeStreamClient(
             NativeLink.EVENT_CONFIG -> config(event)
             NativeLink.EVENT_VIDEO -> video(event)
             NativeLink.EVENT_ENDED -> lost(id, textAfterKind(event).ifEmpty { CLOSED_BY_SERVER })
+            NativeLink.EVENT_NOTICE -> notice(event)
         }
     }
 
@@ -134,6 +139,10 @@ class NativeStreamClient(
             listener.onHealthy()
         }
         listener.onFrame(frame)
+    }
+
+    private fun notice(event: ByteArray) {
+        ScaleMessage.parse(textAfterKind(event))?.let(listener::onScale)
     }
 
     private fun textAfterKind(event: ByteArray): String =

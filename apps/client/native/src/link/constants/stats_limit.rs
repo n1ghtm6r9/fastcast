@@ -1,3 +1,0 @@
-use wire::{DATAGRAM_LIMIT, HEADER_SIZE};
-
-pub const STATS_LIMIT: usize = DATAGRAM_LIMIT - HEADER_SIZE;

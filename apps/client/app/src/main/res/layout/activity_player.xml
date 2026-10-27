@@ -68,6 +68,16 @@
         android:text="@string/player_controls_hint"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/scale_toast"
+        style="@style/OverlayText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="48dp"
+        android:textSize="24sp"
+        android:visibility="gone" />
+
     <LinearLayout
         android:id="@+id/menu_panel"
         android:layout_width="wrap_content"
@@ -111,6 +121,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minWidth="120dp"
                 android:text="@string/menu_screen"
                 android:textColor="@color/text_muted"
                 android:textSize="18sp" />
@@ -140,6 +151,51 @@
                 android:layout_height="wrap_content"
                 android:minWidth="64dp"
                 android:text="@string/menu_step_next" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/menu_scale_row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:clipChildren="false"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="120dp"
+                android:text="@string/menu_scale"
+                android:textColor="@color/text_muted"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/menu_scale_smaller"
+                style="@style/MenuButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:minWidth="64dp"
+                android:text="@string/menu_scale_smaller" />
+
+            <TextView
+                android:id="@+id/menu_scale_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:minWidth="240dp"
+                android:textColor="@color/text"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/menu_scale_larger"
+                style="@style/MenuButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="64dp"
+                android:text="@string/menu_scale_larger" />
         </LinearLayout>
 
         <LinearLayout

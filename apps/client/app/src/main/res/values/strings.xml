@@ -15,7 +15,7 @@
     <string name="status_reconnecting">Connection lost, retrying in %1$d s…</string>
     <string name="status_decoder_error">Decoder error: %1$s</string>
     <string name="status_leave_hint">Back — return to the PC list</string>
-    <string name="player_controls_hint">"OK — menu      Back — disconnect"</string>
+    <string name="player_controls_hint">"OK — menu      ▲▼ — scale      Back — disconnect"</string>
     <string name="menu_resume">Resume</string>
     <string name="menu_stats">Stats</string>
     <string name="menu_disconnect">Disconnect</string>
@@ -23,5 +23,10 @@
     <string name="menu_screen_mode">%1$d×%2$d · %3$d Hz</string>
     <string name="menu_step_previous" translatable="false">‹</string>
     <string name="menu_step_next" translatable="false">›</string>
+    <string name="menu_scale">Scale</string>
+    <string name="menu_scale_value" translatable="false">%1$d %%</string>
+    <string name="menu_scale_smaller" translatable="false">−</string>
+    <string name="menu_scale_larger" translatable="false">+</string>
+    <string name="scale_toast">Scale %1$d %%</string>
     <string name="stats_format">%1$dx%2$d  %3$.1f fps  %4$.1f Mbit/s\nDecoder: %5$s  Dropped: %6$d</string>
 </resources>

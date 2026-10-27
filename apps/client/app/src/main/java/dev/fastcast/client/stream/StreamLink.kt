@@ -8,6 +8,8 @@ interface StreamLink {
 
     fun sendStats(link: Long, text: ByteArray): Boolean
 
+    fun sendNotice(link: Long, text: ByteArray): Boolean
+
     fun receiveBufferBytes(link: Long): Int
 
     fun requestKeyFrame(link: Long)

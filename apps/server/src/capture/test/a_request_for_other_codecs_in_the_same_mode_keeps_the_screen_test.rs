@@ -1,4 +1,4 @@
-use super::{FakeBackend, settle};
+use super::{FakeBackend, FakeScaler, settle};
 use crate::capture::supervise_capture;
 use crate::display::DisplayMode;
 use crate::hub::{Hub, ViewerRequest};
@@ -9,7 +9,11 @@ use std::sync::Arc;
 async fn a_request_for_other_codecs_in_the_same_mode_keeps_the_screen() {
     let hub = Arc::new(Hub::new());
     let backend = FakeBackend::scripted(vec![]);
-    let supervisor = tokio::spawn(supervise_capture(hub.clone(), backend.clone()));
+    let supervisor = tokio::spawn(supervise_capture(
+        hub.clone(),
+        backend.clone(),
+        FakeScaler::unknown(),
+    ));
     let _viewer = hub.join();
     let ten_bit = ViewerRequest {
         mode: Some(DisplayMode {

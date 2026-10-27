@@ -13,6 +13,10 @@ pub(crate) fn received_packet_of(bytes: &[u8]) -> Option<ReceivedPacket> {
             session,
             text: text.to_string(),
         }),
+        Packet::Notice(text) => Some(ReceivedPacket::Notice {
+            session,
+            text: text.to_string(),
+        }),
         Packet::Welcome(_) | Packet::Shard(_) => None,
     }
 }

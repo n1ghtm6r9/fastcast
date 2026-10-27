@@ -1,4 +1,4 @@
-use super::default_settings;
+use super::{FakeScaler, default_settings};
 use crate::capture::{FfmpegBackend, locate_ffmpeg, supervise_capture};
 use crate::hub::Hub;
 use std::sync::Arc;
@@ -11,7 +11,11 @@ async fn a_missing_ffmpeg_keeps_the_supervisor_alive_and_retrying() {
     let backend = Arc::new(FfmpegBackend::with_locator(default_settings(), || {
         locate_ffmpeg(&[])
     }));
-    let supervisor = tokio::spawn(supervise_capture(hub.clone(), backend));
+    let supervisor = tokio::spawn(supervise_capture(
+        hub.clone(),
+        backend,
+        FakeScaler::unknown(),
+    ));
     let _viewer = hub.join();
 
     sleep(Duration::from_secs(12)).await;

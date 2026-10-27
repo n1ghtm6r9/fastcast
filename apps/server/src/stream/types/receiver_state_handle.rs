@@ -21,6 +21,7 @@ impl ReceiverState {
             Packet::Hello(hello) => self.hello(peer, &hello, now),
             Packet::Feedback(feedback) => self.feedback(peer, datagram.session, &feedback, now),
             Packet::Stats(text) => self.stats(peer, datagram.session, text, now),
+            Packet::Notice(text) => self.notice(peer, datagram.session, text, now),
             Packet::Bye => self.bye(peer, datagram.session),
             Packet::Welcome(_) | Packet::Shard(_) => {}
         }

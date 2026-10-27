@@ -1,11 +1,16 @@
 mod device_named;
+mod levels_of;
 mod mode_of;
 mod placement_of;
 pub use device_named::*;
+pub use levels_of::*;
 pub use mode_of::*;
 pub use placement_of::*;
 
+mod a_current_level_past_the_highest_reads_as_the_highest_test;
 mod a_display_at_another_refresh_or_place_is_not_back_test;
+mod a_display_config_failure_names_the_call_and_the_code_test;
+mod a_display_that_is_not_active_has_no_scale_test;
 mod a_mode_reads_as_width_x_height_at_refresh_test;
 mod a_mode_without_a_refresh_rate_is_no_multiple_of_the_request_test;
 mod a_new_display_of_another_adapter_is_not_a_parsec_display_test;
@@ -15,12 +20,17 @@ mod a_refresh_the_display_lacks_is_shown_at_its_lowest_offered_multiple_test;
 mod a_refused_detach_names_the_device_and_the_code_test;
 mod a_refused_mode_change_names_the_device_the_mode_and_the_code_test;
 mod a_size_the_display_does_not_offer_falls_back_to_3840x2160_at_60_test;
+mod a_step_moves_the_level_by_its_size_test;
+mod a_step_never_leaves_the_levels_the_screen_offers_test;
 mod a_system_error_names_the_call_and_keeps_its_cause_test;
 mod a_virtual_display_can_move_to_another_thread_test;
 #[cfg(windows)]
 mod a_virtual_display_is_the_only_screen_until_it_is_dropped_test;
 mod an_exact_mode_is_chosen_when_the_display_offers_it_test;
 mod an_exact_refresh_wins_over_its_multiples_test;
+mod an_output_that_does_not_exist_is_named_by_its_number_test;
+mod each_level_above_zero_is_one_step_up_the_percent_list_test;
+mod levels_past_the_known_percents_have_no_scale_test;
 mod no_mode_is_chosen_when_the_fallback_is_not_offered_either_test;
 #[cfg(not(windows))]
 mod opening_a_display_off_windows_is_unsupported_test;
@@ -28,11 +38,16 @@ mod polling_gives_up_with_nothing_after_the_timeout_test;
 mod polling_returns_the_first_value_that_turns_up_test;
 mod polling_stops_at_the_first_error_test;
 mod the_display_at_the_origin_is_the_primary_one_test;
+#[cfg(windows)]
+mod the_dpi_scale_packets_have_the_sizes_windows_expects_test;
 mod the_layout_is_back_when_every_saved_display_is_in_place_test;
 mod the_layout_is_not_back_while_a_saved_display_is_off_test;
 mod the_missing_driver_error_says_where_to_get_it_test;
 mod the_parsec_adapter_is_recognised_in_any_letter_case_test;
 mod the_remove_request_carries_the_index_as_a_big_endian_u16_test;
+mod the_scale_at_level_zero_is_the_recommended_one_test;
+#[cfg(windows)]
+mod the_scale_of_the_first_output_can_be_read_test;
 mod when_every_refresh_is_above_the_request_the_lowest_one_is_chosen_test;
 mod wide_text_ends_at_the_first_nul_test;
 mod without_the_exact_refresh_the_highest_one_below_it_is_chosen_test;

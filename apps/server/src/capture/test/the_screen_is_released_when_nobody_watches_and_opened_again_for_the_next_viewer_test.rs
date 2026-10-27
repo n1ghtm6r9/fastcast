@@ -1,4 +1,4 @@
-use super::{FakeBackend, settle};
+use super::{FakeBackend, FakeScaler, settle};
 use crate::capture::supervise_capture;
 use crate::hub::Hub;
 use std::sync::Arc;
@@ -9,7 +9,11 @@ use tokio::time::sleep;
 async fn the_screen_is_released_when_nobody_watches_and_opened_again_for_the_next_viewer() {
     let hub = Arc::new(Hub::new());
     let backend = FakeBackend::scripted(vec![]);
-    let supervisor = tokio::spawn(supervise_capture(hub.clone(), backend.clone()));
+    let supervisor = tokio::spawn(supervise_capture(
+        hub.clone(),
+        backend.clone(),
+        FakeScaler::unknown(),
+    ));
     let first = hub.join();
 
     settle().await;

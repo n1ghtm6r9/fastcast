@@ -8,4 +8,5 @@ pub enum Packet<'a> {
     Feedback(Feedback),
     Bye,
     Stats(&'a str),
+    Notice(&'a str),
 }

@@ -24,6 +24,7 @@ pub fn decode_datagram(bytes: &[u8]) -> Option<Datagram<'_>> {
         PacketKind::Feedback => Packet::Feedback(decode_feedback(&mut reader)?),
         PacketKind::Bye => Packet::Bye,
         PacketKind::Stats => Packet::Stats(from_utf8(reader.rest()).ok()?),
+        PacketKind::Notice => Packet::Notice(from_utf8(reader.rest()).ok()?),
     };
 
     Some(Datagram {

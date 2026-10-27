@@ -17,6 +17,6 @@ pub fn write_datagram(datagram: &Datagram<'_>, out: &mut Vec<u8>) {
         Packet::Shard(shard) => write_shard(shard, out),
         Packet::Feedback(feedback) => write_feedback(feedback, out),
         Packet::Bye => {}
-        Packet::Stats(text) => out.extend_from_slice(text.as_bytes()),
+        Packet::Stats(text) | Packet::Notice(text) => out.extend_from_slice(text.as_bytes()),
     }
 }

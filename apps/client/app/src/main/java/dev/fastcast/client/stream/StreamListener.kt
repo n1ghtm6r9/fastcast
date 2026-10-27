@@ -10,6 +10,8 @@ interface StreamListener {
 
     fun onFrame(frame: FrameMessage)
 
+    fun onScale(scale: ScaleMessage)
+
     fun onHealthy()
 
     fun onDisconnected(retryInMs: Long, reason: String)

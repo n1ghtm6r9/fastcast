@@ -15,6 +15,13 @@ mod display_error;
 mod display_mode;
 mod display_placement;
 mod display_placement_is_primary;
+mod display_scale;
+#[cfg(windows)]
+mod display_source;
+#[cfg(windows)]
+mod dpi_scale_change;
+#[cfg(windows)]
+mod dpi_scale_request;
 #[cfg(windows)]
 mod driver_handle;
 #[cfg(windows)]
@@ -29,6 +36,13 @@ mod keep_alive_drop;
 mod keep_alive_start;
 #[cfg(windows)]
 mod saved_display;
+mod scale_levels;
+mod screen_scaler;
+mod system_scaler;
+#[cfg(windows)]
+mod system_scaler_levels;
+#[cfg(not(windows))]
+mod system_scaler_levels_unsupported;
 mod virtual_display;
 mod virtual_display_device_name;
 mod virtual_display_drop;
@@ -47,10 +61,20 @@ pub use display_device::*;
 pub use display_error::*;
 pub use display_mode::*;
 pub use display_placement::*;
+pub use display_scale::*;
+#[cfg(windows)]
+pub use display_source::*;
+#[cfg(windows)]
+pub use dpi_scale_change::*;
+#[cfg(windows)]
+pub use dpi_scale_request::*;
 #[cfg(windows)]
 pub use driver_handle::*;
 #[cfg(windows)]
 pub use keep_alive::*;
 #[cfg(windows)]
 pub use saved_display::*;
+pub use scale_levels::*;
+pub use screen_scaler::*;
+pub use system_scaler::*;
 pub use virtual_display::*;

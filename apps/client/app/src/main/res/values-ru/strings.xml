@@ -12,11 +12,13 @@
     <string name="status_reconnecting">Связь потеряна, переподключение через %1$d с…</string>
     <string name="status_decoder_error">Ошибка декодера: %1$s</string>
     <string name="status_leave_hint">Назад — к списку компьютеров</string>
-    <string name="player_controls_hint">"OK — меню      Назад — отключиться"</string>
+    <string name="player_controls_hint">"OK — меню      ▲▼ — масштаб      Назад — отключиться"</string>
     <string name="menu_resume">Продолжить</string>
     <string name="menu_stats">Статистика</string>
     <string name="menu_disconnect">Отключиться</string>
     <string name="menu_screen">Экран</string>
     <string name="menu_screen_mode">%1$d×%2$d · %3$d Гц</string>
+    <string name="menu_scale">Масштаб</string>
+    <string name="scale_toast">Масштаб %1$d %%</string>
     <string name="stats_format">%1$d×%2$d  %3$.1f к/с  %4$.1f Мбит/с\nДекодер: %5$s  Потеряно: %6$d</string>
 </resources>

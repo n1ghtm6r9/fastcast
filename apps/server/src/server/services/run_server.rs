@@ -1,5 +1,6 @@
 use crate::app::{lan_ip, log_ffmpeg, log_stream_address};
 use crate::capture::{FfmpegBackend, NativeBackend, SwitchingBackend, supervise_capture};
+use crate::display::SystemScaler;
 use crate::hub::Hub;
 use crate::server::{ServerState, ServerStatus, forward_hub_status};
 use crate::settings::Settings;
@@ -38,7 +39,11 @@ pub async fn run_server(
 
     log_stream_address(address);
     log_ffmpeg();
-    tasks.spawn(supervise_capture(hub.clone(), backend));
+    tasks.spawn(supervise_capture(
+        hub.clone(),
+        backend,
+        Arc::new(SystemScaler),
+    ));
     tasks.spawn(forward_hub_status(hub, status.clone()));
     status.send_modify(|status| status.state = ServerState::Running { address });
 

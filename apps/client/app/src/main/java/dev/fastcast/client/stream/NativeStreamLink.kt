@@ -27,6 +27,8 @@ object NativeStreamLink : StreamLink {
 
     override fun sendStats(link: Long, text: ByteArray): Boolean = NativeLink.sendStats(link, text)
 
+    override fun sendNotice(link: Long, text: ByteArray): Boolean = NativeLink.sendNotice(link, text)
+
     override fun receiveBufferBytes(link: Long): Int = NativeLink.receiveBufferBytes(link)
 
     override fun requestKeyFrame(link: Long) = NativeLink.requestKeyFrame(link)

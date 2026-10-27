@@ -1,4 +1,4 @@
-use super::{FakeBackend, FakePreparation, settle};
+use super::{FakeBackend, FakePreparation, FakeScaler, settle};
 use crate::capture::supervise_capture;
 use crate::display::DisplayMode;
 use crate::hub::{Hub, ViewerRequest};
@@ -15,7 +15,11 @@ async fn a_new_request_while_ffmpeg_is_prepared_restarts_the_preparation() {
         }],
         vec![],
     );
-    let supervisor = tokio::spawn(supervise_capture(hub.clone(), backend.clone()));
+    let supervisor = tokio::spawn(supervise_capture(
+        hub.clone(),
+        backend.clone(),
+        FakeScaler::unknown(),
+    ));
     let _viewer = hub.join();
     let request = ViewerRequest {
         mode: Some(DisplayMode {

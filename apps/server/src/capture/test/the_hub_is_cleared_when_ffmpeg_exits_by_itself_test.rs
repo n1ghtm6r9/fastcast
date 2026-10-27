@@ -1,4 +1,4 @@
-use super::{FakeBackend, FakeRun, settle};
+use super::{FakeBackend, FakeRun, FakeScaler, settle};
 use crate::capture::supervise_capture;
 use crate::hub::Hub;
 use std::sync::Arc;
@@ -12,7 +12,11 @@ async fn the_hub_is_cleared_when_ffmpeg_exits_by_itself() {
         delay: Duration::from_millis(100),
         frames: 10,
     }]);
-    let supervisor = tokio::spawn(supervise_capture(hub.clone(), backend.clone()));
+    let supervisor = tokio::spawn(supervise_capture(
+        hub.clone(),
+        backend.clone(),
+        FakeScaler::unknown(),
+    ));
     let _viewer = hub.join();
 
     settle().await;

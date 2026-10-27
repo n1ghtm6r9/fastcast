@@ -6,6 +6,7 @@ object NativeLink {
     const val EVENT_CONFIG = 1
     const val EVENT_CONNECTED = 2
     const val EVENT_ENDED = 3
+    const val EVENT_NOTICE = 4
 
     const val NO_HANDLE = 0L
 
@@ -34,6 +35,9 @@ object NativeLink {
 
     @JvmStatic
     external fun sendStats(link: Long, text: ByteArray): Boolean
+
+    @JvmStatic
+    external fun sendNotice(link: Long, text: ByteArray): Boolean
 
     @JvmStatic
     external fun receiveBufferBytes(link: Long): Int

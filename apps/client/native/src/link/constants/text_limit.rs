@@ -1,0 +1,3 @@
+use wire::{DATAGRAM_LIMIT, HEADER_SIZE};
+
+pub const TEXT_LIMIT: usize = DATAGRAM_LIMIT - HEADER_SIZE;

@@ -42,6 +42,7 @@ mod rate_control_args;
 mod release_screen;
 mod reopen_step_of;
 mod request_changed;
+mod rescaled;
 mod run_ffmpeg;
 #[cfg(windows)]
 mod run_native_capture;
@@ -54,6 +55,7 @@ mod saved_path_dirs;
 mod saved_path_dirs_unsupported;
 #[cfg(windows)]
 mod saved_path_of;
+mod serve_screen_scale;
 mod spawn_capture_worker;
 mod spawn_error_of;
 mod spawn_ffmpeg;
@@ -107,6 +109,7 @@ pub use rate_control_args::*;
 pub use release_screen::*;
 pub use reopen_step_of::*;
 pub use request_changed::*;
+pub use rescaled::*;
 pub use run_ffmpeg::*;
 #[cfg(windows)]
 pub use run_native_capture::*;
@@ -119,6 +122,7 @@ pub use saved_path_dirs::*;
 pub use saved_path_dirs_unsupported::*;
 #[cfg(windows)]
 pub use saved_path_of::*;
+pub use serve_screen_scale::*;
 pub use spawn_capture_worker::*;
 pub use spawn_error_of::*;
 pub use spawn_ffmpeg::*;

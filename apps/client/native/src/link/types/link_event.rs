@@ -4,4 +4,5 @@ pub enum LinkEvent {
     Config(Vec<u8>),
     Video(Vec<u8>),
     Ended(String),
+    Notice(String),
 }

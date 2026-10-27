@@ -1,4 +1,4 @@
-use super::FakeBackend;
+use super::{FakeBackend, FakeScaler};
 use crate::capture::supervise_capture;
 use crate::hub::Hub;
 use std::sync::Arc;
@@ -9,7 +9,11 @@ use tokio::time::sleep;
 async fn no_viewers_means_ffmpeg_is_never_started() {
     let hub = Arc::new(Hub::new());
     let backend = FakeBackend::scripted(vec![]);
-    let supervisor = tokio::spawn(supervise_capture(hub.clone(), backend.clone()));
+    let supervisor = tokio::spawn(supervise_capture(
+        hub.clone(),
+        backend.clone(),
+        FakeScaler::unknown(),
+    ));
 
     sleep(Duration::from_secs(60)).await;
 

@@ -6,4 +6,5 @@ pub(crate) enum ReceivedPacket {
     Feedback { session: u32, feedback: Feedback },
     Bye { session: u32 },
     Stats { session: u32, text: String },
+    Notice { session: u32, text: String },
 }

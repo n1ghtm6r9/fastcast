@@ -31,6 +31,10 @@ mod fake_ffmpeg_installed;
 mod fake_ffmpeg_path;
 mod fake_preparation;
 mod fake_run;
+mod fake_scaler;
+mod fake_scaler_changes;
+mod fake_scaler_levels;
+mod fake_scaler_unknown;
 #[cfg(windows)]
 mod ffmpeg_backend_for;
 mod flv_stream;
@@ -54,8 +58,10 @@ mod kill_counter;
 mod native_frame_wait;
 #[cfg(windows)]
 mod next_fake_ffmpeg_id;
+mod next_shown_scale;
 #[cfg(windows)]
 mod numbered_output;
+mod scale_levels_of;
 mod scripted_probe;
 mod scripted_probe_calls;
 mod scripted_probe_probe;
@@ -80,6 +86,7 @@ pub use fake_ffmpeg::*;
 pub use fake_ffmpeg_directory::*;
 pub use fake_preparation::*;
 pub use fake_run::*;
+pub use fake_scaler::*;
 #[cfg(windows)]
 pub use ffmpeg_backend_for::*;
 pub use flv_stream::*;
@@ -103,8 +110,10 @@ pub use kill_counter::*;
 pub use native_frame_wait::*;
 #[cfg(windows)]
 pub use next_fake_ffmpeg_id::*;
+pub use next_shown_scale::*;
 #[cfg(windows)]
 pub use numbered_output::*;
+pub use scale_levels_of::*;
 pub use scripted_probe::*;
 pub use sequence_header_tag::*;
 pub use settle::*;
@@ -193,6 +202,7 @@ mod a_preparation_that_succeeds_is_reported_ready_test;
 mod a_prepared_pipeline_holds_the_ffmpeg_the_encoder_and_the_codec_that_passed_test;
 mod a_probe_error_stops_the_pick_and_marks_nothing_test;
 mod a_published_frame_is_reported_as_published_test;
+mod a_refused_change_tells_the_scale_the_screen_kept_test;
 #[cfg(windows)]
 mod a_reopen_that_gave_up_is_not_a_lasting_failure_test;
 #[cfg(windows)]
@@ -213,6 +223,8 @@ mod a_run_nobody_watches_is_stopped_after_the_grace_and_reported_idle_test;
 mod a_run_that_ends_by_itself_is_reported_as_finished_test;
 mod a_run_that_produced_frames_did_not_end_before_the_first_frame_test;
 mod a_run_without_frames_ended_before_the_first_frame_test;
+mod a_scale_ask_reaches_the_screen_and_its_new_scale_is_shown_test;
+mod a_screen_whose_scale_is_unknown_tells_none_test;
 mod a_sequence_header_and_frames_end_up_in_the_hub_test;
 mod a_sequence_header_for_another_stream_replaces_the_config_and_clears_the_gop_test;
 mod a_sequence_header_the_server_cannot_describe_leaves_the_hub_without_a_config_test;
@@ -229,6 +241,9 @@ mod a_target_without_an_output_is_reported_missing_test;
 mod a_viewer_returning_within_the_grace_keeps_ffmpeg_running_test;
 mod a_viewer_without_ten_bit_decoding_gets_eight_bits_test;
 mod a_worker_starts_only_after_the_previous_one_has_finished_test;
+mod an_ask_moves_the_screen_by_its_step_and_tells_the_new_scale_test;
+mod an_ask_of_zero_tells_the_scale_without_changing_it_test;
+mod an_ask_past_the_largest_scale_changes_nothing_test;
 mod an_avc_delta_frame_after_a_key_frame_shares_its_config_test;
 mod an_avc_delta_frame_before_any_key_frame_is_not_published_test;
 mod an_avc_key_frame_describes_the_stream_before_it_is_published_test;
@@ -304,6 +319,7 @@ mod ten_bits_ask_the_converter_for_ten_bit_output_test;
 mod the_amf_pipeline_uses_the_documented_arguments_test;
 mod the_auto_choice_runs_the_native_backend_when_it_prepares_test;
 mod the_auto_codec_choice_tries_the_codecs_in_the_order_the_tv_lists_them_test;
+mod the_capture_shows_the_scale_of_the_screen_it_runs_on_test;
 mod the_configured_rate_is_what_the_config_announces_test;
 #[cfg(windows)]
 mod the_default_ffmpeg_comes_from_the_first_directory_that_has_it_test;
@@ -349,6 +365,7 @@ mod the_screen_is_kept_while_ffmpeg_restarts_test;
 mod the_screen_is_not_opened_before_ffmpeg_and_the_encoder_are_ready_test;
 mod the_screen_is_opened_for_what_the_viewer_asked_test;
 mod the_screen_is_released_when_nobody_watches_and_opened_again_for_the_next_viewer_test;
+mod the_screen_scale_is_shown_once_the_service_runs_test;
 mod the_x264_pipeline_uses_the_documented_arguments_test;
 mod viewers_gone_for_never_returns_while_someone_is_watching_test;
 mod viewers_gone_for_returns_after_the_grace_when_nobody_is_watching_test;

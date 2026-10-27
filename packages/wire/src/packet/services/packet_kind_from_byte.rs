@@ -8,6 +8,7 @@ pub fn packet_kind_from_byte(byte: u8) -> Option<PacketKind> {
         4 => Some(PacketKind::Feedback),
         5 => Some(PacketKind::Bye),
         6 => Some(PacketKind::Stats),
+        7 => Some(PacketKind::Notice),
         _ => None,
     }
 }

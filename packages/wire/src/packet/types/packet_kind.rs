@@ -6,4 +6,5 @@ pub enum PacketKind {
     Feedback = 4,
     Bye = 5,
     Stats = 6,
+    Notice = 7,
 }

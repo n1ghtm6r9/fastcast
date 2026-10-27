@@ -9,6 +9,7 @@ import dev.fastcast.client.decoder.VideoDecoder
 import dev.fastcast.client.stream.ConfigMessage
 import dev.fastcast.client.stream.FrameMessage
 import dev.fastcast.client.stream.NativeStreamClient
+import dev.fastcast.client.stream.ScaleMessage
 import dev.fastcast.client.stream.StreamListener
 
 class PlayerSession(
@@ -56,6 +57,8 @@ class PlayerSession(
 
     fun snapshot(nowMs: Long): StatsSnapshot = snapshotOf(throughput, nowMs)
 
+    fun askScale(step: Int): Boolean = stream.askScale(step)
+
     override fun onConnecting() = postStatus(PlayerStatus.Connecting)
 
     override fun onConnected() = postStatus(PlayerStatus.WaitingForVideo)
@@ -66,6 +69,10 @@ class PlayerSession(
     }
 
     override fun onFrame(frame: FrameMessage) = decoder.submit(frame)
+
+    override fun onScale(scale: ScaleMessage) {
+        mainHandler.post { if (active) listener.onScale(scale) }
+    }
 
     override fun onHealthy() = offer.streamHealthy()
 

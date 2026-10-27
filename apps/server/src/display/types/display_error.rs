@@ -36,6 +36,13 @@ pub enum DisplayError {
     OutputNotFound {
         device: String,
     },
+    ScaleUnsupported,
+    NoSuchOutput {
+        output: u32,
+    },
+    InactiveDisplay {
+        device: String,
+    },
 }
 
 impl fmt::Display for DisplayError {
@@ -79,6 +86,20 @@ impl fmt::Display for DisplayError {
                 formatter,
                 "{device} did not become an output of the first DXGI adapter within {} seconds, so ddagrab cannot capture it",
                 OUTPUT_APPEAR_TIMEOUT.as_secs()
+            ),
+            Self::ScaleUnsupported => {
+                write!(
+                    formatter,
+                    "the display scale can only be changed on Windows"
+                )
+            }
+            Self::NoSuchOutput { output } => write!(
+                formatter,
+                "output {output} of the first DXGI adapter does not exist"
+            ),
+            Self::InactiveDisplay { device } => write!(
+                formatter,
+                "{device} is not an active display, so Windows has no scale for it"
             ),
         }
     }

@@ -35,6 +35,7 @@ pub fn run_session(
         config,
         gop,
         mut frames,
+        mut scales,
         guard,
     } = hub.join();
     let mut cursor = SessionCursor::starting_with(config.clone());
@@ -51,6 +52,10 @@ pub fn run_session(
         hub.request_key_frame();
     }
 
+    if let Some(scale) = *scales.borrow_and_update() {
+        sender.send_scale(&scale);
+    }
+
     while !control.is_stopped() {
         if control.take_welcome() {
             sender.send_welcome(nonce);
@@ -61,13 +66,14 @@ pub fn run_session(
             hub.request_key_frame();
         }
 
-        match runtime.block_on(next_hub_event(&mut frames, &control)) {
+        match runtime.block_on(next_hub_event(&mut frames, &mut scales, &control)) {
             HubEvent::Frame(frame) => deliver_frame(&mut sender, &mut cursor, &frame),
+            HubEvent::Scale(Some(scale)) => sender.send_scale(&scale),
             HubEvent::Lagged => {
                 cursor.lagged();
                 hub.request_key_frame();
             }
-            HubEvent::Woken => {}
+            HubEvent::Woken | HubEvent::Scale(None) => {}
             HubEvent::Closed => break,
         }
     }

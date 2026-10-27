@@ -1,4 +1,4 @@
-use super::{FakeBackend, FakePreparation, settle};
+use super::{FakeBackend, FakePreparation, FakeScaler, settle};
 use crate::capture::supervise_capture;
 use crate::hub::Hub;
 use std::sync::Arc;
@@ -9,7 +9,11 @@ use tokio::time::sleep;
 async fn a_failed_preparation_is_retried_after_five_seconds() {
     let hub = Arc::new(Hub::new());
     let backend = FakeBackend::preparing(vec![FakePreparation::Fails], vec![]);
-    let supervisor = tokio::spawn(supervise_capture(hub.clone(), backend.clone()));
+    let supervisor = tokio::spawn(supervise_capture(
+        hub.clone(),
+        backend.clone(),
+        FakeScaler::unknown(),
+    ));
     let _viewer = hub.join();
 
     settle().await;

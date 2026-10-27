@@ -1,4 +1,4 @@
-use super::{FakeBackend, FakeRun, capture_target};
+use super::{FakeBackend, FakeRun, FakeScaler, capture_target};
 use crate::capture::{WatchOutcome, run_while_watched};
 use crate::hub::Hub;
 use std::sync::Arc;
@@ -19,6 +19,7 @@ async fn a_run_that_ends_by_itself_is_reported_as_finished() {
     let outcome = run_while_watched(
         &hub,
         backend.as_ref(),
+        FakeScaler::unknown().as_ref(),
         &(),
         &capture_target(),
         &mut viewers,

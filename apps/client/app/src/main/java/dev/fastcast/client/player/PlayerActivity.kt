@@ -26,6 +26,7 @@ import dev.fastcast.client.display.PreferredDisplayMode
 import dev.fastcast.client.display.ScreenModeStore
 import dev.fastcast.client.display.ScreenModes
 import dev.fastcast.client.network.ActiveNetwork
+import dev.fastcast.client.stream.ScaleMessage
 import dev.fastcast.client.stream.StreamRequest
 import kotlin.math.ceil
 
@@ -44,6 +45,11 @@ class PlayerActivity : Activity(), PlayerSessionListener {
     private lateinit var screenValue: TextView
     private lateinit var screenPrevious: View
     private lateinit var screenNext: View
+    private lateinit var scaleRow: View
+    private lateinit var scaleValue: TextView
+    private lateinit var scaleSmaller: View
+    private lateinit var scaleLarger: View
+    private lateinit var scaleToast: TextView
     private lateinit var screenModeStore: ScreenModeStore
     private lateinit var menu: PlayerMenu
 
@@ -55,6 +61,7 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         }
     }
     private val hideControlsHint = Runnable { controlsHint.visibility = View.GONE }
+    private val hideScaleToast = Runnable { scaleToast.visibility = View.GONE }
 
     private var screen: Display? = null
     private var session: PlayerSession? = null
@@ -64,6 +71,8 @@ class PlayerActivity : Activity(), PlayerSessionListener {
     private var modeSummary = ""
     private var screenModes: List<DisplayModeOption> = emptyList()
     private var requestedMode: DisplayModeOption? = null
+    private var screenScale: ScaleMessage? = null
+    private var announceScaleUntilMs = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,6 +101,11 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         screenValue = findViewById(R.id.menu_screen_value)
         screenPrevious = findViewById(R.id.menu_screen_previous)
         screenNext = findViewById(R.id.menu_screen_next)
+        scaleRow = findViewById(R.id.menu_scale_row)
+        scaleValue = findViewById(R.id.menu_scale_value)
+        scaleSmaller = findViewById(R.id.menu_scale_smaller)
+        scaleLarger = findViewById(R.id.menu_scale_larger)
+        scaleToast = findViewById(R.id.scale_toast)
         findViewById<TextView>(R.id.menu_title).text = serverName
         menu = PlayerMenu(findViewById(R.id.menu_panel), findViewById(R.id.menu_resume), handler)
         findViewById<View>(R.id.menu_resume).setOnClickListener { menu.close() }
@@ -102,6 +116,8 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         findViewById<View>(R.id.menu_disconnect).setOnClickListener { finish() }
         screenPrevious.setOnClickListener { stepScreenMode(-1) }
         screenNext.setOnClickListener { stepScreenMode(1) }
+        scaleSmaller.setOnClickListener { askScale(-1) }
+        scaleLarger.setOnClickListener { askScale(1) }
         findViewById<View>(R.id.player_root).setOnClickListener { openMenu() }
         videoSurface.holder.addCallback(SurfaceLifecycle(::startSession, ::stopSession))
         showStatus(PlayerStatus.Connecting)
@@ -132,6 +148,8 @@ class PlayerActivity : Activity(), PlayerSessionListener {
             openMenu()
             true
         }
+        RemoteAction.ScaleUp -> scaleByKey(keyCode, event, 1)
+        RemoteAction.ScaleDown -> scaleByKey(keyCode, event, -1)
         null -> super.onKeyDown(keyCode, event)
     }
 
@@ -155,6 +173,12 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         videoSurface.setVideoSize(width, height)
     }
 
+    override fun onScale(scale: ScaleMessage) {
+        screenScale = scale
+        renderScaleRow()
+        if (SystemClock.uptimeMillis() < announceScaleUntilMs) showScaleToast(scale)
+    }
+
     private fun leave() {
         if (menu.isOpen) menu.close() else finish()
     }
@@ -164,6 +188,7 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         controlsHint.visibility = View.GONE
         menuSubtitle.text = getString(R.string.menu_subtitle, address, activeDisplayLabel())
         renderScreenRow()
+        askScale(NO_STEP)
         menu.open()
     }
 
@@ -186,6 +211,31 @@ class PlayerActivity : Activity(), PlayerSessionListener {
     private fun showStep(button: View, possible: Boolean) {
         button.isEnabled = possible
         button.alpha = if (possible) 1f else UNAVAILABLE_STEP_ALPHA
+    }
+
+    private fun scaleByKey(keyCode: Int, event: KeyEvent, step: Int): Boolean {
+        if (menu.isOpen) return super.onKeyDown(keyCode, event)
+        if (event.repeatCount == 0 && askScale(step)) {
+            announceScaleUntilMs = SystemClock.uptimeMillis() + SCALE_ANSWER_MS
+        }
+        return true
+    }
+
+    private fun askScale(step: Int): Boolean = session?.askScale(step) ?: false
+
+    private fun renderScaleRow() {
+        val scale = screenScale ?: return
+        scaleRow.visibility = View.VISIBLE
+        scaleValue.text = getString(R.string.menu_scale_value, scale.percent)
+        showStep(scaleSmaller, scale.percent > scale.min)
+        showStep(scaleLarger, scale.percent < scale.max)
+    }
+
+    private fun showScaleToast(scale: ScaleMessage) {
+        scaleToast.text = getString(R.string.scale_toast, scale.percent)
+        scaleToast.visibility = View.VISIBLE
+        handler.removeCallbacks(hideScaleToast)
+        handler.postDelayed(hideScaleToast, SCALE_TOAST_MS)
     }
 
     private fun requestStream(): StreamRequest? {
@@ -298,6 +348,9 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         private const val NO_DECODER = "-"
         private const val REPORT_SEPARATOR = "; "
         private const val UNAVAILABLE_STEP_ALPHA = 0.35f
+        private const val NO_STEP = 0
+        private const val SCALE_ANSWER_MS = 2_000L
+        private const val SCALE_TOAST_MS = 1_500L
 
         fun createIntent(context: Context, server: DiscoveredServer): Intent =
             Intent(context, PlayerActivity::class.java)

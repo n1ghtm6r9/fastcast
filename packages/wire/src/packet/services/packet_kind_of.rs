@@ -8,5 +8,6 @@ pub fn packet_kind_of(packet: &Packet<'_>) -> PacketKind {
         Packet::Feedback(_) => PacketKind::Feedback,
         Packet::Bye => PacketKind::Bye,
         Packet::Stats(_) => PacketKind::Stats,
+        Packet::Notice(_) => PacketKind::Notice,
     }
 }

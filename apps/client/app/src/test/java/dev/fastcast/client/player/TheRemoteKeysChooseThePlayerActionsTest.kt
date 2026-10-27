@@ -8,20 +8,32 @@ import org.junit.Test
 class TheRemoteKeysChooseThePlayerActionsTest {
 
     @Test
-    fun `ok, the arrows and the menu key open the menu`() {
+    fun `ok, the side arrows and the menu key open the menu`() {
         val keys = listOf(
             KeyEvent.KEYCODE_DPAD_CENTER,
             KeyEvent.KEYCODE_ENTER,
             KeyEvent.KEYCODE_NUMPAD_ENTER,
             KeyEvent.KEYCODE_BUTTON_A,
             KeyEvent.KEYCODE_MENU,
-            KeyEvent.KEYCODE_DPAD_UP,
-            KeyEvent.KEYCODE_DPAD_DOWN,
             KeyEvent.KEYCODE_DPAD_LEFT,
             KeyEvent.KEYCODE_DPAD_RIGHT,
         )
 
         keys.forEach { key -> assertEquals("key $key", RemoteAction.ShowMenu, RemoteKeys.actionFor(key)) }
+    }
+
+    @Test
+    fun `up and channel up scale the PC screen up`() {
+        val keys = listOf(KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_CHANNEL_UP)
+
+        keys.forEach { key -> assertEquals("key $key", RemoteAction.ScaleUp, RemoteKeys.actionFor(key)) }
+    }
+
+    @Test
+    fun `down and channel down scale the PC screen down`() {
+        val keys = listOf(KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_CHANNEL_DOWN)
+
+        keys.forEach { key -> assertEquals("key $key", RemoteAction.ScaleDown, RemoteKeys.actionFor(key)) }
     }
 
     @Test
@@ -37,13 +49,12 @@ class TheRemoteKeysChooseThePlayerActionsTest {
     }
 
     @Test
-    fun `volume, home and channel keys are left to the TV`() {
+    fun `volume, home and digit keys are left to the TV`() {
         val keys = listOf(
             KeyEvent.KEYCODE_VOLUME_UP,
             KeyEvent.KEYCODE_VOLUME_DOWN,
             KeyEvent.KEYCODE_VOLUME_MUTE,
             KeyEvent.KEYCODE_HOME,
-            KeyEvent.KEYCODE_CHANNEL_UP,
             KeyEvent.KEYCODE_0,
         )
 
