@@ -142,7 +142,9 @@ class NativeStreamClient(
     }
 
     private fun notice(event: ByteArray) {
-        ScaleMessage.parse(textAfterKind(event))?.let(listener::onScale)
+        val text = textAfterKind(event)
+        ScaleMessage.parse(text)?.let(listener::onScale)
+        DiagnoseMessage.parse(text)?.let(listener::onDiagnose)
     }
 
     private fun textAfterKind(event: ByteArray): String =

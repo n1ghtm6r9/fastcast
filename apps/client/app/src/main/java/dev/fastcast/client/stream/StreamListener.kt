@@ -12,6 +12,8 @@ interface StreamListener {
 
     fun onScale(scale: ScaleMessage)
 
+    fun onDiagnose(diagnose: DiagnoseMessage)
+
     fun onHealthy()
 
     fun onDisconnected(retryInMs: Long, reason: String)

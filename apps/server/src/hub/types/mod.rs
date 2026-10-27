@@ -2,6 +2,7 @@ mod config_message;
 mod frame;
 mod hub;
 mod hub_ask_scale;
+mod hub_diagnose;
 mod hub_join;
 mod hub_lock_state;
 mod hub_publish;

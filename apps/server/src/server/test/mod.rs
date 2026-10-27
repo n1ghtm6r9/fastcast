@@ -26,7 +26,10 @@ pub use status_where::*;
 pub use stopped::*;
 
 mod a_busy_port_fails_the_server_naming_the_address_test;
+mod a_clock_before_1970_still_names_a_diagnose_run_test;
 mod a_failed_server_shows_the_reason_test;
+mod a_ticked_debug_box_names_the_run_by_the_start_time_test;
+mod an_unticked_debug_box_asks_for_no_diagnosis_test;
 mod applying_other_settings_restarts_the_server_with_them_test;
 mod applying_the_same_settings_after_a_failure_starts_the_server_again_test;
 mod applying_the_same_settings_keeps_the_server_running_test;

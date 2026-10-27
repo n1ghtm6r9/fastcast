@@ -1,10 +1,11 @@
 use crate::hub::{Hub, Subscription, ViewerRequest};
 use crate::stream::{
-    HubEvent, MAX_REPLAY_FRAMES, SessionControl, SessionCursor, SessionSender, deliver_frame,
-    next_hub_event,
+    DiagnoseRepeat, HubEvent, MAX_REPLAY_FRAMES, SessionControl, SessionCursor, SessionSender,
+    deliver_frame, next_hub_event,
 };
 use std::net::{SocketAddr, UdpSocket};
 use std::sync::Arc;
+use std::time::Instant;
 use tokio::runtime::Builder;
 use tracing::warn;
 
@@ -36,9 +37,11 @@ pub fn run_session(
         gop,
         mut frames,
         mut scales,
+        diagnose,
         guard,
     } = hub.join();
     let mut cursor = SessionCursor::starting_with(config.clone());
+    let mut diagnosis = DiagnoseRepeat::new(diagnose);
 
     if let Some(config) = &config {
         sender.send_config(config);
@@ -57,6 +60,10 @@ pub fn run_session(
     }
 
     while !control.is_stopped() {
+        if let Some(run) = diagnosis.due(Instant::now()) {
+            sender.send_diagnose(run);
+        }
+
         if control.take_welcome() {
             sender.send_welcome(nonce);
         }

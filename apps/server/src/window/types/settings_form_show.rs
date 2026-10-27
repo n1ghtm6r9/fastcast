@@ -46,6 +46,9 @@ impl SettingsForm {
                 let bitrate = setting_row(ui, "Битрейт", |ui| {
                     bitrate_slider(ui, &mut edited.video_bitrate_mbps)
                 });
+                setting_row(ui, "Отладка", |ui| {
+                    ui.checkbox(&mut edited.debug, "проверить ТВ, итог в журнале")
+                });
 
                 name.has_focus() || bitrate.dragged()
             })

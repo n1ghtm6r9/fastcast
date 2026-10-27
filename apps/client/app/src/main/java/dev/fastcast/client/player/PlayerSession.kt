@@ -4,9 +4,11 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.view.Surface
+import dev.fastcast.client.debug.DebugCounters
 import dev.fastcast.client.decoder.DecoderEvents
 import dev.fastcast.client.decoder.VideoDecoder
 import dev.fastcast.client.stream.ConfigMessage
+import dev.fastcast.client.stream.DiagnoseMessage
 import dev.fastcast.client.stream.FrameMessage
 import dev.fastcast.client.stream.NativeStreamClient
 import dev.fastcast.client.stream.ScaleMessage
@@ -59,6 +61,18 @@ class PlayerSession(
 
     fun askScale(step: Int): Boolean = stream.askScale(step)
 
+    fun send(text: String): Boolean = stream.send(text)
+
+    fun debugCounters(): DebugCounters = DebugCounters(
+        nanos = System.nanoTime(),
+        bytes = stream.bytesReceived.get(),
+        decoded = decoder.stats.framesDecoded.get(),
+        rendered = decoder.stats.framesRendered.get(),
+        dropped = decoder.stats.framesDropped.get(),
+    )
+
+    fun presentedSince(startNanos: Long): LongArray = decoder.stats.presented.since(startNanos)
+
     override fun onConnecting() = postStatus(PlayerStatus.Connecting)
 
     override fun onConnected() = postStatus(PlayerStatus.WaitingForVideo)
@@ -72,6 +86,10 @@ class PlayerSession(
 
     override fun onScale(scale: ScaleMessage) {
         mainHandler.post { if (active) listener.onScale(scale) }
+    }
+
+    override fun onDiagnose(diagnose: DiagnoseMessage) {
+        mainHandler.post { if (active) listener.onDiagnose(diagnose.run) }
     }
 
     override fun onHealthy() = offer.streamHealthy()

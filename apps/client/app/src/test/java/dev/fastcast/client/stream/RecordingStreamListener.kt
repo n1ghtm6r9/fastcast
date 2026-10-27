@@ -9,6 +9,7 @@ class RecordingStreamListener : StreamListener {
     private val configs = LinkedBlockingQueue<ConfigMessage>()
     private val frames = LinkedBlockingQueue<FrameMessage>()
     private val scales = LinkedBlockingQueue<ScaleMessage>()
+    private val diagnoses = LinkedBlockingQueue<Long>()
     private val retryDelays = LinkedBlockingQueue<Long>()
     private val reasons = LinkedBlockingQueue<String>()
 
@@ -35,6 +36,11 @@ class RecordingStreamListener : StreamListener {
         events.add(SCALE)
     }
 
+    override fun onDiagnose(diagnose: DiagnoseMessage) {
+        diagnoses.add(diagnose.run)
+        events.add(DIAGNOSE)
+    }
+
     override fun onHealthy() {
         events.add(HEALTHY)
     }
@@ -59,6 +65,8 @@ class RecordingStreamListener : StreamListener {
 
     fun nextScale(): ScaleMessage = await(scales)
 
+    fun nextDiagnosis(): Long = await(diagnoses)
+
     fun nextRetryDelay(): Long = await(retryDelays)
 
     fun nextReason(): String = await(reasons)
@@ -72,6 +80,7 @@ class RecordingStreamListener : StreamListener {
         const val CONFIG = "config"
         const val FRAME = "frame"
         const val SCALE = "scale"
+        const val DIAGNOSE = "diagnose"
         const val HEALTHY = "healthy"
         const val DISCONNECTED = "disconnected"
         private const val TIMEOUT_SECONDS = 5L

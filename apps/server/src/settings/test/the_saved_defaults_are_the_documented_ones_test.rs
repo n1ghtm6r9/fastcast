@@ -12,6 +12,7 @@ fn the_saved_defaults_are_the_documented_ones() {
             video_codec: CodecChoice::Auto,
             video_bitrate_mbps: 60,
             log_level: LogLevel::Info,
+            debug: false,
         }
     );
 }

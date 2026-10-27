@@ -1,3 +1,5 @@
+mod diagnose_notice_interval;
+mod diagnose_notice_kind;
 mod discovery_version;
 mod display_rate_range;
 mod display_side_range;
@@ -16,6 +18,8 @@ mod server_reply_kind;
 mod session_counter;
 mod stream_port;
 mod viewer_report_limit;
+pub use diagnose_notice_interval::*;
+pub use diagnose_notice_kind::*;
 pub use discovery_version::*;
 pub use display_rate_range::*;
 pub use display_side_range::*;

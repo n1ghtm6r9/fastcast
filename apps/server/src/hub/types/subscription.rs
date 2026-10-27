@@ -8,5 +8,6 @@ pub struct Subscription {
     pub gop: Vec<Arc<Frame>>,
     pub frames: broadcast::Receiver<Arc<Frame>>,
     pub scales: watch::Receiver<Option<DisplayScale>>,
+    pub diagnose: Option<u64>,
     pub guard: ViewerGuard,
 }

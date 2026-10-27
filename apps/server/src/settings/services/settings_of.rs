@@ -11,5 +11,6 @@ pub fn settings_of(saved: &SavedSettings) -> Settings {
         video_bitrate_kbps: saved
             .video_bitrate_mbps
             .saturating_mul(KILOBITS_PER_MEGABIT),
+        debug: saved.debug,
     }
 }

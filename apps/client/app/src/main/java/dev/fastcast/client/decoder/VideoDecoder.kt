@@ -2,10 +2,10 @@ package dev.fastcast.client.decoder
 
 import android.media.MediaCodec
 import android.media.MediaFormat
-import android.os.Build
 import android.os.Process
 import android.util.Log
 import android.view.Surface
+import dev.fastcast.client.display.FrameRateHint
 import dev.fastcast.client.stream.ConfigMessage
 import dev.fastcast.client.stream.FrameMessage
 import java.util.concurrent.LinkedBlockingQueue
@@ -139,19 +139,14 @@ class VideoDecoder(
         val created = MediaCodec.createByCodecName(name)
         try {
             created.configure(format, surface, null, 0)
-            applyFrameRate(fps)
+            created.setOnFrameRenderedListener({ _, _, nanoTime -> stats.presented.add(nanoTime) }, null)
+            FrameRateHint.apply(surface, fps.toFloat())
             created.start()
         } catch (e: Exception) {
             runQuietly(created::release)
             throw e
         }
         return created
-    }
-
-    private fun applyFrameRate(fps: Int) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            surface.setFrameRate(fps.toFloat(), Surface.FRAME_RATE_COMPATIBILITY_FIXED_SOURCE)
-        }
     }
 
     private fun inputCapacityOf(started: MediaCodec, requested: MediaFormat): Int {
@@ -183,7 +178,10 @@ class VideoDecoder(
             waitUs = 0L
             if (index == MediaCodec.INFO_TRY_AGAIN_LATER) break
             if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) onOutputFormatChanged(active.outputFormat)
-            if (index >= 0) newest = supersede(active, newest, index)
+            if (index >= 0) {
+                stats.framesDecoded.incrementAndGet()
+                newest = supersede(active, newest, index)
+            }
         }
         if (newest != NO_BUFFER) render(active, newest)
     }

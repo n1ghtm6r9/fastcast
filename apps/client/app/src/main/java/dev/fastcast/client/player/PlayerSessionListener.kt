@@ -9,4 +9,6 @@ interface PlayerSessionListener {
     fun onVideoSize(width: Int, height: Int)
 
     fun onScale(scale: ScaleMessage)
+
+    fun onDiagnose(run: Long)
 }

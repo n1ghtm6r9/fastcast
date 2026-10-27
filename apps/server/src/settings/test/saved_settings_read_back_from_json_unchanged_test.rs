@@ -10,6 +10,7 @@ fn saved_settings_read_back_from_json_unchanged() {
         video_codec: CodecChoice::Avc,
         video_bitrate_mbps: 80,
         log_level: LogLevel::Trace,
+        debug: true,
     };
 
     let json = serde_json::to_string(&saved).expect("the settings serialize");

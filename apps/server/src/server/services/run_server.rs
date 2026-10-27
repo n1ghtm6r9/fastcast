@@ -2,7 +2,7 @@ use crate::app::{lan_ip, log_ffmpeg, log_stream_address};
 use crate::capture::{FfmpegBackend, NativeBackend, SwitchingBackend, supervise_capture};
 use crate::display::SystemScaler;
 use crate::hub::Hub;
-use crate::server::{ServerState, ServerStatus, forward_hub_status};
+use crate::server::{ServerState, ServerStatus, diagnose_run_of, forward_hub_status};
 use crate::settings::Settings;
 use crate::stream::{
     EndpointOptions, FALLBACK_STREAM_FPS, StreamEndpoint, StreamError, bind_stream_socket,
@@ -10,6 +10,7 @@ use crate::stream::{
 };
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::sync::Arc;
+use std::time::SystemTime;
 use tokio::sync::{oneshot, watch};
 use tokio::task::{JoinSet, spawn_blocking};
 use tracing::{info, warn};
@@ -21,6 +22,12 @@ pub async fn run_server(
     status: watch::Sender<ServerStatus>,
 ) -> Result<(), StreamError> {
     let hub = Arc::new(Hub::new());
+
+    if let Some(run) = diagnose_run_of(&settings, SystemTime::now()) {
+        info!("debug: the TV will be asked to diagnose itself (run {run})");
+        hub.diagnose(run);
+    }
+
     let socket = bind_stream_socket(stream_address(port))?;
     let endpoint = StreamEndpoint::start(
         socket,

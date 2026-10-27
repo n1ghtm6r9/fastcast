@@ -1,7 +1,7 @@
 use crate::settings::{CodecChoice, FrameRate, LogLevel, SavedSettings};
 use crate::window::test::{
     applied_settings, choose_option, finish_typing, open_journal, running_status, saving_works,
-    slide_to, test_window, type_into, window_harness,
+    slide_to, test_window, tick, type_into, window_harness,
 };
 
 #[test]
@@ -15,6 +15,7 @@ fn every_setting_in_the_form_reaches_the_server() {
     choose_option(&mut harness, "Кадров/с", "120");
     choose_option(&mut harness, "Кодек", "HEVC");
     slide_to(&mut harness, "Битрейт", 80.0);
+    tick(&mut harness, "Отладка");
     open_journal(&mut harness);
     choose_option(&mut harness, "Подробность", "Подробная");
 
@@ -28,6 +29,7 @@ fn every_setting_in_the_form_reaches_the_server() {
             video_codec: CodecChoice::Hevc,
             video_bitrate_mbps: 80,
             log_level: LogLevel::Debug,
+            debug: true,
         })
     );
 }

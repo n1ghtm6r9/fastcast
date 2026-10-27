@@ -29,4 +29,13 @@
     <string name="menu_scale_larger" translatable="false">+</string>
     <string name="scale_toast">Scale %1$d %%</string>
     <string name="stats_format">%1$dx%2$d  %3$.1f fps  %4$.1f Mbit/s\nDecoder: %5$s  Dropped: %6$d</string>
+    <string name="debug_step">Debug %1$d/%2$d: %3$s</string>
+    <string name="debug_step_facts">collecting what the TV knows about itself</string>
+    <string name="debug_step_vsync">measuring the screen refresh</string>
+    <string name="debug_step_ask">asking the screen for 120 and 144 Hz</string>
+    <string name="debug_step_stream">measuring the usual stream</string>
+    <string name="debug_step_fast">trying a 120 fps stream</string>
+    <string name="debug_step_restore">bringing the usual stream back</string>
+    <string name="debug_done_rates">Debug finished: decoded %1$.0f fps, shown %2$.0f fps. The details are in the server journal.</string>
+    <string name="debug_done">Debug finished. The details are in the server journal.</string>
 </resources>

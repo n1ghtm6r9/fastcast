@@ -1,7 +1,9 @@
+mod diagnose_run_of;
 mod drive_server;
 mod forward_hub_status;
 mod run_server;
 mod wait_for_other_settings;
+pub use diagnose_run_of::*;
 pub use drive_server::*;
 pub use forward_hub_status::*;
 pub use run_server::*;

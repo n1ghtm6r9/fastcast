@@ -12,6 +12,7 @@ pub struct SavedSettings {
     pub video_codec: CodecChoice,
     pub video_bitrate_mbps: u32,
     pub log_level: LogLevel,
+    pub debug: bool,
 }
 
 impl Default for SavedSettings {
@@ -24,6 +25,7 @@ impl Default for SavedSettings {
             video_codec: CodecChoice::default(),
             video_bitrate_mbps: VIDEO_BITRATE_MBPS_SETTING.default,
             log_level: LogLevel::default(),
+            debug: false,
         }
     }
 }

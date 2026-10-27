@@ -10,6 +10,7 @@ fn the_saved_settings_become_the_settings_the_server_runs_with() {
         video_codec: CodecChoice::Hevc,
         video_bitrate_mbps: 30,
         log_level: LogLevel::Debug,
+        debug: true,
     };
 
     assert_eq!(
@@ -21,6 +22,7 @@ fn the_saved_settings_become_the_settings_the_server_runs_with() {
             frame_rate: FrameRate::Fps30,
             video_codec: CodecChoice::Hevc,
             video_bitrate_kbps: 30000,
+            debug: true,
         }
     );
 }

@@ -12,6 +12,7 @@ pub struct Hub {
     pub(crate) reports: watch::Sender<Option<String>>,
     pub(crate) scale_asks: broadcast::Sender<i32>,
     pub(crate) scale: watch::Sender<Option<DisplayScale>>,
+    pub(crate) diagnose: watch::Sender<Option<u64>>,
     pub(crate) key_frame_wanted: AtomicBool,
 }
 
@@ -23,6 +24,7 @@ impl Hub {
         let (reports, _) = watch::channel(None);
         let (scale_asks, _) = broadcast::channel(SCALE_ASK_CAPACITY);
         let (scale, _) = watch::channel(None);
+        let (diagnose, _) = watch::channel(None);
 
         Self {
             state: Mutex::new(HubState::default()),
@@ -32,6 +34,7 @@ impl Hub {
             reports,
             scale_asks,
             scale,
+            diagnose,
             key_frame_wanted: AtomicBool::new(false),
         }
     }

@@ -21,4 +21,13 @@
     <string name="menu_scale">Масштаб</string>
     <string name="scale_toast">Масштаб %1$d %%</string>
     <string name="stats_format">%1$d×%2$d  %3$.1f к/с  %4$.1f Мбит/с\nДекодер: %5$s  Потеряно: %6$d</string>
+    <string name="debug_step">Отладка %1$d/%2$d: %3$s</string>
+    <string name="debug_step_facts">собираю сведения о ТВ</string>
+    <string name="debug_step_vsync">измеряю частоту экрана</string>
+    <string name="debug_step_ask">прошу у экрана 120 и 144 Гц</string>
+    <string name="debug_step_stream">измеряю обычный поток</string>
+    <string name="debug_step_fast">пробую поток 120 кадров/с</string>
+    <string name="debug_step_restore">возвращаю обычный поток</string>
+    <string name="debug_done_rates">Отладка завершена: декодировано %1$.0f к/с, показано %2$.0f к/с. Подробности в журнале сервера.</string>
+    <string name="debug_done">Отладка завершена. Подробности в журнале сервера.</string>
 </resources>

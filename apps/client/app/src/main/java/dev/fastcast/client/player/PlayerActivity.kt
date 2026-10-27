@@ -14,6 +14,8 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
 import dev.fastcast.client.R
+import dev.fastcast.client.debug.DebugRun
+import dev.fastcast.client.debug.HandlerClock
 import dev.fastcast.client.decoder.DecoderSelector
 import dev.fastcast.client.decoder.SupportedCodecs
 import dev.fastcast.client.discovery.DiscoveredServer
@@ -30,7 +32,7 @@ import dev.fastcast.client.stream.ScaleMessage
 import dev.fastcast.client.stream.StreamRequest
 import kotlin.math.ceil
 
-class PlayerActivity : Activity(), PlayerSessionListener {
+class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
 
     private lateinit var address: String
     private lateinit var serverName: String
@@ -52,6 +54,7 @@ class PlayerActivity : Activity(), PlayerSessionListener {
     private lateinit var scaleToast: TextView
     private lateinit var screenModeStore: ScreenModeStore
     private lateinit var menu: PlayerMenu
+    private lateinit var debugOverlay: DebugOverlay
 
     private val handler = Handler(Looper.getMainLooper())
     private val statsTicker = object : Runnable {
@@ -73,6 +76,9 @@ class PlayerActivity : Activity(), PlayerSessionListener {
     private var requestedMode: DisplayModeOption? = null
     private var screenScale: ScaleMessage? = null
     private var announceScaleUntilMs = 0L
+    private var playing = false
+    private var debugRun: DebugRun? = null
+    private var debugRunId = NO_DEBUG_RUN
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,6 +112,7 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         scaleSmaller = findViewById(R.id.menu_scale_smaller)
         scaleLarger = findViewById(R.id.menu_scale_larger)
         scaleToast = findViewById(R.id.scale_toast)
+        debugOverlay = DebugOverlay(findViewById(R.id.debug_status), handler)
         findViewById<TextView>(R.id.menu_title).text = serverName
         menu = PlayerMenu(findViewById(R.id.menu_panel), findViewById(R.id.menu_resume), handler)
         findViewById<View>(R.id.menu_resume).setOnClickListener { menu.close() }
@@ -159,6 +166,7 @@ class PlayerActivity : Activity(), PlayerSessionListener {
     }
 
     override fun onDestroy() {
+        debugRun?.cancel()
         handler.removeCallbacksAndMessages(null)
         stopSession()
         super.onDestroy()
@@ -177,6 +185,36 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         screenScale = scale
         renderScaleRow()
         if (SystemClock.uptimeMillis() < announceScaleUntilMs) showScaleToast(scale)
+    }
+
+    override fun onDiagnose(run: Long) {
+        if (run == debugRunId || debugRun?.isRunning == true) return
+        debugRunId = run
+        debugRun = DebugRun(PlayerDebugHost(this, this, debugOverlay), HandlerClock(handler)).also { it.start() }
+    }
+
+    override fun currentSession(): PlayerSession? = session
+
+    override fun isPlaying(): Boolean = playing
+
+    override fun outputSurface(): Surface? = videoSurface.holder.surface.takeIf { it.isValid }
+
+    override fun usualRefreshRate(): Float? = requestedMode?.refreshRate
+
+    override fun streamFast(): String {
+        val usual = requestStream() ?: return NO_STREAM_REQUEST
+        val fast = StreamRequest(usual.width, usual.height, FAST_STREAM_FPS, usual.codecs, usual.tenBitCodecs)
+        restream(fast)
+        return "asked ${fast.width}x${fast.height}@${fast.fps} codecs ${fast.codecs.joinToString(",")} " +
+            "ten-bit ${fast.tenBitCodecs.joinToString(",")}"
+    }
+
+    override fun streamUsual() = restream(requestStream())
+
+    private fun restream(request: StreamRequest?) {
+        offer = StreamOffer(address, request)
+        val surface = videoSurface.holder.surface
+        if (surface.isValid) startSession(surface)
     }
 
     private fun leave() {
@@ -293,6 +331,7 @@ class PlayerActivity : Activity(), PlayerSessionListener {
     }
 
     private fun showStatus(status: PlayerStatus) {
+        playing = status == PlayerStatus.Playing
         val message = statusMessage(status)
         statusText.text = message
         statusPanel.visibility = if (message == null) View.GONE else View.VISIBLE
@@ -351,6 +390,9 @@ class PlayerActivity : Activity(), PlayerSessionListener {
         private const val NO_STEP = 0
         private const val SCALE_ANSWER_MS = 2_000L
         private const val SCALE_TOAST_MS = 1_500L
+        private const val NO_DEBUG_RUN = 0L
+        private const val FAST_STREAM_FPS = 120
+        private const val NO_STREAM_REQUEST = "no stream request"
 
         fun createIntent(context: Context, server: DiscoveredServer): Intent =
             Intent(context, PlayerActivity::class.java)

@@ -8,4 +8,5 @@ pub struct Settings {
     pub frame_rate: FrameRate,
     pub video_codec: CodecChoice,
     pub video_bitrate_kbps: u32,
+    pub debug: bool,
 }
