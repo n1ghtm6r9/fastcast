@@ -1,5 +1,6 @@
 use crate::stream::{
-    ReceiverState, SessionControl, SessionEntry, new_session_id, run_session, viewer_request_of,
+    LinkJournal, ReceiverState, SessionControl, SessionEntry, new_session_id, run_session,
+    viewer_request_of,
 };
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -47,6 +48,7 @@ impl ReceiverState {
                         control,
                         loss: LossMeter::new(),
                         fec: FecController::new(now),
+                        link: LinkJournal::default(),
                         thread,
                     },
                 );

@@ -1,6 +1,7 @@
 mod bitrate_slider;
 mod choice_combo;
 mod codec_text;
+mod frame_rate_note;
 mod list_monitors;
 mod monitor_text;
 #[cfg(windows)]
@@ -13,9 +14,11 @@ mod show_status;
 mod status_color;
 mod status_dot;
 mod status_headline;
+mod tv_refresh_hz;
 pub use bitrate_slider::*;
 pub use choice_combo::*;
 pub use codec_text::*;
+pub use frame_rate_note::*;
 pub use list_monitors::*;
 pub use monitor_text::*;
 #[cfg(windows)]
@@ -28,3 +31,4 @@ pub use show_status::*;
 pub use status_color::*;
 pub use status_dot::*;
 pub use status_headline::*;
+pub use tv_refresh_hz::*;

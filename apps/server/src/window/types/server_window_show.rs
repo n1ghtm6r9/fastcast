@@ -1,4 +1,4 @@
-use crate::window::{ServerWindow, show_status};
+use crate::window::{ServerWindow, show_status, tv_refresh_hz};
 use eframe::egui::{CentralPanel, CollapsingHeader, Frame, Margin, Panel, Ui};
 
 impl ServerWindow<'_> {
@@ -13,7 +13,7 @@ impl ServerWindow<'_> {
             }
         });
         CentralPanel::default().frame(body).show(ui, |ui| {
-            self.form.show(ui);
+            self.form.show(ui, tv_refresh_hz(&status));
             ui.separator();
             CollapsingHeader::new("Журнал").show(ui, |ui| {
                 self.form.show_level(ui);

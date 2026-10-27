@@ -1,12 +1,12 @@
 use crate::settings::constants::DEFAULT_SERVER_NAME;
 use crate::window::{
     CODEC_CHOICES, FIELD_WIDTH, FRAME_RATE_CHOICES, SettingsForm, bitrate_slider, choice_combo,
-    screen_combo, setting_row,
+    frame_rate_note, screen_combo, setting_row,
 };
-use eframe::egui::{Grid, TextEdit, Ui};
+use eframe::egui::{Grid, RichText, TextEdit, Ui};
 
 impl SettingsForm {
-    pub fn show(&mut self, ui: &mut Ui) {
+    pub fn show(&mut self, ui: &mut Ui, tv_refresh_hz: Option<u32>) {
         let edited = &mut self.edited;
         let monitors = &mut self.monitors;
         let list_monitors = self.list_monitors;
@@ -26,12 +26,19 @@ impl SettingsForm {
                     screen_combo(ui, edited, monitors, list_monitors)
                 });
                 setting_row(ui, "Кадров/с", |ui| {
-                    choice_combo(
-                        ui,
-                        "frame_rate",
-                        &mut edited.frame_rate,
-                        &FRAME_RATE_CHOICES,
-                    )
+                    ui.horizontal(|ui| {
+                        let combo = choice_combo(
+                            ui,
+                            "frame_rate",
+                            &mut edited.frame_rate,
+                            &FRAME_RATE_CHOICES,
+                        );
+                        if let Some(note) = frame_rate_note(edited.frame_rate, tv_refresh_hz) {
+                            ui.label(RichText::new(note).weak());
+                        }
+                        combo
+                    })
+                    .inner
                 });
                 setting_row(ui, "Кодек", |ui| {
                     choice_combo(ui, "video_codec", &mut edited.video_codec, &CODEC_CHOICES)

@@ -1,4 +1,4 @@
-use crate::stream::SessionControl;
+use crate::stream::{LinkJournal, SessionControl};
 use std::sync::Arc;
 use std::thread::JoinHandle;
 use std::time::Instant;
@@ -11,5 +11,6 @@ pub struct SessionEntry {
     pub control: Arc<SessionControl>,
     pub loss: LossMeter,
     pub fec: FecController,
+    pub link: LinkJournal,
     pub thread: JoinHandle<()>,
 }
