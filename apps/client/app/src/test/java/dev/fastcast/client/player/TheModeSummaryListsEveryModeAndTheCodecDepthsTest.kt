@@ -1,5 +1,6 @@
 package dev.fastcast.client.player
 
+import dev.fastcast.client.display.DisplayModeOption
 import dev.fastcast.client.testing.aDisplayMode
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -17,6 +18,19 @@ class TheModeSummaryListsEveryModeAndTheCodecDepthsTest {
         assertEquals(
             "modes 3840x2160 120/60/24, 2560x1440 120, 1920x1080 144/50; hevc 10-bit, avc 8-bit",
             ModeSummary.of(modes, listOf("hevc", "avc"), setOf("hevc")),
+        )
+    }
+
+    @Test
+    fun `the fast modes through the tv video path follow the screen modes`() {
+        val tunnels = listOf(
+            DisplayModeOption(1, 1920, 1080, 120f, tunneled = true),
+            DisplayModeOption(1, 2560, 1440, 120f, tunneled = true),
+        )
+
+        assertEquals(
+            "modes 3840x2160 60; tunnel 2560x1440 120, 1920x1080 120; hevc 8-bit",
+            ModeSummary.of(listOf(aDisplayMode()), listOf("hevc"), emptySet(), tunnels),
         )
     }
 

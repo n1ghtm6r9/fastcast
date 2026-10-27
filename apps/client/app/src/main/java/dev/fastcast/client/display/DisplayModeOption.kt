@@ -7,6 +7,7 @@ data class DisplayModeOption(
     val width: Int,
     val height: Int,
     val refreshRate: Float,
+    val tunneled: Boolean = false,
 ) {
 
     val fps: Int
@@ -16,5 +17,8 @@ data class DisplayModeOption(
         get() = width * height
 
     val label: String
+        get() = if (tunneled) "$sizeAndRate tunneled" else sizeAndRate
+
+    private val sizeAndRate: String
         get() = "${width}x$height@$fps"
 }

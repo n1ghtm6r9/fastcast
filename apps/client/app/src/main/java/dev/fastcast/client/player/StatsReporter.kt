@@ -63,6 +63,8 @@ class StatsReporter(
                 colorTransfer = current.color.transfer,
                 network = network(),
                 error = error,
+                delayMs = current.delayMs,
+                tunneled = current.tunneled,
             )
             send(message.toJson())
         }

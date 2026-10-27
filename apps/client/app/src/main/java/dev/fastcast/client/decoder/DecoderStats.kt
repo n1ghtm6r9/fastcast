@@ -9,6 +9,11 @@ class DecoderStats {
     val framesRendered = AtomicLong()
     val framesDropped = AtomicLong()
     val presented = PresentTimes(PRESENTED_CAPACITY)
+    val framesPresented = AtomicLong()
+    val delays = RenderDelays(DELAY_CAPACITY)
+
+    val framesShown: Long
+        get() = framesPresented.get().takeIf { it > 0L } ?: framesRendered.get()
 
     @Volatile
     var decoderName: String = ""
@@ -22,7 +27,19 @@ class DecoderStats {
     @Volatile
     var tunnelFrameReady: Boolean = false
 
+    fun frameQueued(ptsUs: Long, nanos: Long) {
+        framesQueued.incrementAndGet()
+        delays.queued(ptsUs, nanos)
+    }
+
+    fun framePresented(ptsUs: Long, nanos: Long) {
+        framesPresented.incrementAndGet()
+        presented.add(nanos)
+        delays.rendered(ptsUs, nanos)
+    }
+
     private companion object {
         const val PRESENTED_CAPACITY = 4_096
+        const val DELAY_CAPACITY = 600
     }
 }

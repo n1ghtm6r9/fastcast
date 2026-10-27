@@ -13,6 +13,8 @@ fun aStatsSnapshot(
     mime: String = "video/hevc",
     color: OutputColor = OutputColor(standard = 1, range = 2, transfer = 3),
     receiveBufferBytes: Int = 8_388_608,
+    delayMs: Double? = null,
+    tunneled: Boolean = false,
 ): StatsSnapshot = StatsSnapshot(
     width = width,
     height = height,
@@ -23,4 +25,6 @@ fun aStatsSnapshot(
     mime = mime,
     color = color,
     receiveBufferBytes = receiveBufferBytes,
+    delayMs = delayMs,
+    tunneled = tunneled,
 )

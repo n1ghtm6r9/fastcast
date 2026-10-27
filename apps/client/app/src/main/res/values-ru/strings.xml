@@ -18,9 +18,11 @@
     <string name="menu_disconnect">Отключиться</string>
     <string name="menu_screen">Экран</string>
     <string name="menu_screen_mode">%1$d×%2$d · %3$d Гц</string>
+    <string name="menu_screen_mode_tunnel">%1$d×%2$d · %3$d Гц · видеотракт ТВ</string>
     <string name="menu_scale">Масштаб</string>
     <string name="scale_toast">Масштаб %1$d %%</string>
-    <string name="stats_format">%1$d×%2$d  %3$.1f к/с  %4$.1f Мбит/с\nДекодер: %5$s  Потеряно: %6$d</string>
+    <string name="stats_format">%1$d×%2$d  %3$.1f к/с  %4$.1f Мбит/с\nДекодер: %5$s  Потеряно: %6$d  Задержка ТВ: %7$s</string>
+    <string name="stats_delay_ms">%1$.0f мс</string>
     <string name="debug_step">Отладка %1$d/%2$d: %3$s</string>
     <string name="debug_step_facts">собираю сведения о ТВ</string>
     <string name="debug_step_vsync">измеряю частоту экрана</string>

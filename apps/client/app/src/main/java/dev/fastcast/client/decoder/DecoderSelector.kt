@@ -34,6 +34,9 @@ object DecoderSelector {
     fun canDecodeTenBitInHardware(mime: String, width: Int, height: Int, fps: Int): Boolean =
         decodersFor(mime).any { sustainsInHardware(it, mime, width, height, fps) && hasTenBitProfile(it, mime) }
 
+    fun canTunnelInHardware(mime: String, width: Int, height: Int, fps: Int): Boolean =
+        decodersFor(mime).any { !isSoftware(it) && supportsTunnel(it, mime) && declaresSizeAndRate(it, mime, width, height, fps) }
+
     private fun decodersFor(mime: String): List<MediaCodecInfo> =
         MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos.filter { isDecoderFor(it, mime) }
 
@@ -67,6 +70,11 @@ object DecoderSelector {
     private fun supportsSizeAndRate(info: MediaCodecInfo, mime: String, width: Int, height: Int, fps: Int): Boolean =
         withCapabilities(info, mime, false) { capabilities ->
             capabilities.videoCapabilities?.let { sustains(it, width, height, fps) } == true
+        }
+
+    private fun declaresSizeAndRate(info: MediaCodecInfo, mime: String, width: Int, height: Int, fps: Int): Boolean =
+        withCapabilities(info, mime, false) { capabilities ->
+            capabilities.videoCapabilities?.areSizeAndRateSupported(width, height, fps.toDouble()) == true
         }
 
     private fun sustains(video: VideoCapabilities, width: Int, height: Int, fps: Int): Boolean =

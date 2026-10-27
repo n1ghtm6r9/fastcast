@@ -18,6 +18,8 @@ class StatsMessage(
     val colorTransfer: Int? = null,
     val network: String? = null,
     val error: String? = null,
+    val delayMs: Double? = null,
+    val tunneled: Boolean = false,
 ) {
 
     fun toJson(): String {
@@ -50,6 +52,8 @@ class StatsMessage(
         colorRange?.let { json.put(COLOR_RANGE, it) }
         colorTransfer?.let { json.put(COLOR_TRANSFER, it) }
         network?.let { json.put(NETWORK, it) }
+        delayMs?.let { json.put(DELAY_MS, roundedToTenths(it)) }
+        if (tunneled) json.put(TUNNELED, true)
         texts[ERROR]?.let { json.put(ERROR, it) }
         return json.toString()
     }
@@ -81,6 +85,8 @@ class StatsMessage(
         private const val COLOR_TRANSFER = "colorTransfer"
         private const val NETWORK = "network"
         private const val ERROR = "error"
+        private const val DELAY_MS = "delayMs"
+        private const val TUNNELED = "tunneled"
         private const val TENTHS_PER_UNIT = 10.0
     }
 }

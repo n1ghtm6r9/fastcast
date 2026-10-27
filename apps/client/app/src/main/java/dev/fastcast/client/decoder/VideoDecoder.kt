@@ -156,7 +156,7 @@ class VideoDecoder(
         val created = MediaCodec.createByCodecName(name)
         try {
             created.configure(format, surface, null, 0)
-            created.setOnFrameRenderedListener({ _, _, nanoTime -> stats.presented.add(nanoTime) }, null)
+            created.setOnFrameRenderedListener({ _, ptsUs, nanoTime -> stats.framePresented(ptsUs, nanoTime) }, null)
             if (tunnel != null) watchFirstTunnelFrame(created)
             FrameRateHint.apply(surface, fps.toFloat())
             created.start()
@@ -188,9 +188,10 @@ class VideoDecoder(
         val buffer = checkNotNull(active.getInputBuffer(index)) { "Input buffer $index is unavailable" }
         buffer.clear()
         buffer.put(sample.data, sample.offset, sample.size)
-        active.queueInputBuffer(index, 0, sample.size, presentationTimeOf(sample), flagsOf(sample))
+        val presentationTimeUs = presentationTimeOf(sample)
+        active.queueInputBuffer(index, 0, sample.size, presentationTimeUs, flagsOf(sample))
         pending = null
-        stats.framesQueued.incrementAndGet()
+        stats.frameQueued(presentationTimeUs, System.nanoTime())
         tunnel?.let { onTunnelFrameQueued(it, sample) }
     }
 

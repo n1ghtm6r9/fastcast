@@ -21,6 +21,7 @@ import dev.fastcast.client.debug.StreamTrial
 import dev.fastcast.client.decoder.DecoderSelector
 import dev.fastcast.client.decoder.SupportedCodecs
 import dev.fastcast.client.decoder.TunnelAudio
+import dev.fastcast.client.decoder.VideoMime
 import dev.fastcast.client.discovery.DiscoveredServer
 import dev.fastcast.client.display.DisplayModeChooser
 import dev.fastcast.client.display.DisplayModeOption
@@ -102,6 +103,7 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
         screen = DisplayModes.defaultDisplay(this)
         screenModeStore = ScreenModeStore(this)
         offer = StreamOffer(address, requestStream())
+        tunneled = requestedMode?.tunneled == true
         videoSurface = findViewById(R.id.video_surface)
         statusPanel = findViewById(R.id.status_panel)
         statusSpinner = findViewById(R.id.status_spinner)
@@ -207,24 +209,28 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
     override fun usualRefreshRate(): Float? = requestedMode?.refreshRate
 
     override fun streamTrial(trial: StreamTrial): String {
-        tunneled = trial.tunneled
         lastError = null
-        restream(StreamRequest(trial.width, trial.height, trial.fps, TRIAL_CODECS))
+        switchStream(StreamRequest(trial.width, trial.height, trial.fps, TUNNEL_CODECS), trial.tunneled)
         val path = if (trial.tunneled) TUNNELED_PATH else SURFACE_PATH
-        return "asked ${trial.width}x${trial.height}@${trial.fps} $path codecs ${TRIAL_CODECS.joinToString(",")}"
+        return "asked ${trial.width}x${trial.height}@${trial.fps} $path codecs ${TUNNEL_CODECS.joinToString(",")}"
     }
 
     override fun lastError(): String? = lastError
 
-    override fun streamUsual() {
-        val wasTunneled = tunneled
-        tunneled = false
-        if (wasTunneled && videoSurface.holder.surface.isValid) {
-            offer = StreamOffer(address, requestStream())
-            rebuildSurface()
-        } else {
-            restream(requestStream())
-        }
+    override fun streamUsual() = streamChosenMode()
+
+    private fun streamChosenMode() {
+        val request = requestStream()
+        switchStream(request, requestedMode?.tunneled == true)
+    }
+
+    private fun switchStream(request: StreamRequest?, throughTunnel: Boolean) {
+        val leavingTunnel = tunneled && !throughTunnel
+        tunneled = throughTunnel
+        offer = StreamOffer(address, request)
+        val surface = videoSurface.holder.surface
+        if (!surface.isValid) return
+        if (leavingTunnel) rebuildSurface() else startSession(surface)
     }
 
     private fun rebuildSurface() {
@@ -237,12 +243,6 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
         if (!rebuildingSurface) return
         rebuildingSurface = false
         handler.post { videoSurface.visibility = View.VISIBLE }
-    }
-
-    private fun restream(request: StreamRequest?) {
-        offer = StreamOffer(address, request)
-        val surface = videoSurface.holder.surface
-        if (surface.isValid) startSession(surface)
     }
 
     private fun leave() {
@@ -261,15 +261,14 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
     private fun stepScreenMode(delta: Int) {
         val next = ScreenModes.step(screenModes, requestedMode, delta) ?: return
         screenModeStore.save(next)
-        offer = StreamOffer(address, requestStream())
+        streamChosenMode()
         renderScreenRow()
-        val surface = videoSurface.holder.surface
-        if (surface.isValid) startSession(surface)
     }
 
     private fun renderScreenRow() {
         val mode = requestedMode ?: return
-        screenValue.text = getString(R.string.menu_screen_mode, mode.width, mode.height, mode.fps)
+        val format = if (mode.tunneled) R.string.menu_screen_mode_tunnel else R.string.menu_screen_mode
+        screenValue.text = getString(format, mode.width, mode.height, mode.fps)
         showStep(screenPrevious, ScreenModes.step(screenModes, mode, -1) != null)
         showStep(screenNext, ScreenModes.step(screenModes, mode, 1) != null)
     }
@@ -308,16 +307,19 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
         val display = screen ?: return null
         val modes = DisplayModes.supported(display)
         val sustains = { mode: DisplayModeOption -> hardwareCodecsAt(mode).isNotEmpty() }
-        screenModes = ScreenModes.offer(modes, sustains)
+        screenModes = ScreenModes.withTunnels(ScreenModes.offer(modes, sustains), ::canTunnel)
         val chosen = ScreenModes.saved(screenModes, screenModeStore.load()) ?: DisplayModeChooser.choose(modes, sustains)
         chosen?.let { PreferredDisplayMode.apply(window, it) }
         val mode = chosen ?: DisplayModes.active(display)
         requestedMode = mode
-        val codecs = hardwareCodecsAt(mode)
-        val tenBit = tenBitCodecsAt(mode)
-        modeSummary = ModeSummary.of(modes, codecs, tenBit)
+        val codecs = if (mode.tunneled) TUNNEL_CODECS else hardwareCodecsAt(mode)
+        val tenBit = if (mode.tunneled) emptySet() else tenBitCodecsAt(mode)
+        modeSummary = ModeSummary.of(modes, codecs, tenBit, screenModes.filter { it.tunneled })
         return StreamRequest(mode.width, mode.height, mode.fps, codecs, tenBit)
     }
+
+    private fun canTunnel(width: Int, height: Int, fps: Int): Boolean =
+        DecoderSelector.canTunnelInHardware(VideoMime.HEVC, width, height, fps)
 
     private fun hardwareCodecsAt(mode: DisplayModeOption): List<String> = SupportedCodecs.among { mime ->
         DecoderSelector.canDecodeInHardware(mime, mode.width, mode.height, mode.fps)
@@ -405,6 +407,7 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
             snapshot.megabitsPerSecond,
             snapshot.decoderName.ifEmpty { NO_DECODER },
             snapshot.droppedFrames,
+            snapshot.delayMs?.let { getString(R.string.stats_delay_ms, it) } ?: NO_DELAY,
         )
     }
 
@@ -417,6 +420,7 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
         private const val CONTROLS_HINT_MS = 4_000L
         private const val MILLISECONDS_PER_SECOND = 1_000.0
         private const val NO_DECODER = "-"
+        private const val NO_DELAY = "-"
         private const val REPORT_SEPARATOR = "; "
         private const val UNAVAILABLE_STEP_ALPHA = 0.35f
         private const val NO_STEP = 0
@@ -425,7 +429,7 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
         private const val NO_DEBUG_RUN = 0L
         private const val TUNNELED_PATH = "tunneled"
         private const val SURFACE_PATH = "surface"
-        private val TRIAL_CODECS = listOf(SupportedCodecs.HEVC)
+        private val TUNNEL_CODECS = listOf(SupportedCodecs.HEVC)
 
         fun createIntent(context: Context, server: DiscoveredServer): Intent =
             Intent(context, PlayerActivity::class.java)

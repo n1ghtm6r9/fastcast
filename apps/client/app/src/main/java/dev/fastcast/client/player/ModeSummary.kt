@@ -10,9 +10,18 @@ object ModeSummary {
     private const val RATE_SEPARATOR = "/"
     private const val SIZE_SEPARATOR = ", "
     private const val CODEC_SEPARATOR = ", "
+    private const val PART_SEPARATOR = "; "
 
-    fun of(modes: List<DisplayModeOption>, codecs: List<String>, tenBit: Set<String>): String =
-        "modes ${sizesOf(modes)}; ${codecsOf(codecs, tenBit)}"
+    fun of(
+        modes: List<DisplayModeOption>,
+        codecs: List<String>,
+        tenBit: Set<String>,
+        tunnels: List<DisplayModeOption> = emptyList(),
+    ): String = listOfNotNull("modes ${sizesOf(modes)}", tunnelsOf(tunnels), codecsOf(codecs, tenBit))
+        .joinToString(PART_SEPARATOR)
+
+    private fun tunnelsOf(tunnels: List<DisplayModeOption>): String? =
+        tunnels.takeIf { it.isNotEmpty() }?.let { "tunnel ${sizesOf(it)}" }
 
     private fun sizesOf(modes: List<DisplayModeOption>): String = modes
         .groupBy { it.width to it.height }

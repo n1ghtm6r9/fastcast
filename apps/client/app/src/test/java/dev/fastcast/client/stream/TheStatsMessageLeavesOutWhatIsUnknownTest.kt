@@ -15,6 +15,8 @@ class TheStatsMessageLeavesOutWhatIsUnknownTest {
         colorTransfer: Int? = null,
         error: String? = null,
         network: String? = null,
+        delayMs: Double? = null,
+        tunneled: Boolean = false,
     ): JSONObject = JSONObject(
         StatsMessage(
             decoder = "c2.mtk.hevc.decoder",
@@ -31,6 +33,8 @@ class TheStatsMessageLeavesOutWhatIsUnknownTest {
             colorTransfer = colorTransfer,
             error = error,
             network = network,
+            delayMs = delayMs,
+            tunneled = tunneled,
         ).toJson(),
     )
 
@@ -79,6 +83,26 @@ class TheStatsMessageLeavesOutWhatIsUnknownTest {
     @Test
     fun `a known receive buffer is present`() {
         assertEquals(8_388_608, messageWith(receiveBuffer = 8_388_608).getInt("receiveBuffer"))
+    }
+
+    @Test
+    fun `a delay the tv did not measure is left out`() {
+        assertFalse(messageWith().has("delayMs"))
+    }
+
+    @Test
+    fun `a measured delay is sent in tenths of a millisecond`() {
+        assertEquals(57.3, messageWith(delayMs = 57.26).getDouble("delayMs"), 0.0)
+    }
+
+    @Test
+    fun `a stream on the usual path leaves the video path flag out`() {
+        assertFalse(messageWith().has("tunneled"))
+    }
+
+    @Test
+    fun `a stream through the tv video path says so`() {
+        assertTrue(messageWith(tunneled = true).getBoolean("tunneled"))
     }
 
     @Test

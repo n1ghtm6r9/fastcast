@@ -12,4 +12,6 @@ class StatsSnapshot(
     val mime: String,
     val color: OutputColor,
     val receiveBufferBytes: Int = 0,
+    val delayMs: Double? = null,
+    val tunneled: Boolean = false,
 )

@@ -27,6 +27,7 @@ class PlayerSession(
     private val mainHandler = Handler(Looper.getMainLooper())
     private val stream = NativeStreamClient(offer::target, this)
     private val decoder = VideoDecoder(surface, this, tunnel = tunnel)
+    private val tunneled = tunnel != null
     private val throughput = ThroughputSampler(SystemClock.elapsedRealtime())
     private val reportedThroughput = ThroughputSampler(SystemClock.elapsedRealtime())
     private val reporter = StatsReporter(
@@ -121,7 +122,7 @@ class PlayerSession(
     }
 
     private fun snapshotOf(sampler: ThroughputSampler, nowMs: Long): StatsSnapshot {
-        val rates = sampler.sample(nowMs, stream.bytesReceived.get(), decoder.stats.framesRendered.get())
+        val rates = sampler.sample(nowMs, stream.bytesReceived.get(), decoder.stats.framesShown)
         return StatsSnapshot(
             width = videoWidth,
             height = videoHeight,
@@ -132,6 +133,8 @@ class PlayerSession(
             mime = decoder.stats.mime,
             color = decoder.stats.outputColor,
             receiveBufferBytes = stream.receiveBufferBytes(),
+            delayMs = decoder.stats.delays.medianMs(),
+            tunneled = tunneled,
         )
     }
 
