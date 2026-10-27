@@ -5,9 +5,11 @@ class FakeDebugHost(private val clock: FakeDebugClock) : DebugHost {
     val events = mutableListOf<String>()
     val sent = mutableListOf<String>()
     var playing = true
-    var fastStartsAfterMs: Long? = FAST_START_MS
+    var trialStartsAfterMs: Map<String, Long?> = emptyMap()
     var presentIntervalNanos = 8_333_333L
-    var shownResult: FastStreamResult? = null
+    var lastError: String? = null
+    var trialFacts = listOf("audio played 6.0 s")
+    var shownResults: List<TrialResult>? = null
         private set
     var sections = listOf(
         FactSection("device", listOf("model TV")),
@@ -41,7 +43,7 @@ class FakeDebugHost(private val clock: FakeDebugClock) : DebugHost {
 
     override fun counters(): DebugCounters {
         val frames = clock.nowMs * DECODED_PER_SECOND / MILLISECONDS_PER_SECOND
-        return DebugCounters(clock.nowNanos(), clock.nowMs * BYTES_PER_MILLISECOND, frames, frames, 0L)
+        return DebugCounters(clock.nowNanos(), clock.nowMs * BYTES_PER_MILLISECOND, frames, frames, frames, 0L)
     }
 
     override fun presentedSince(startNanos: Long): LongArray =
@@ -50,12 +52,18 @@ class FakeDebugHost(private val clock: FakeDebugClock) : DebugHost {
             .toList()
             .toLongArray()
 
-    override fun streamFast(): String {
-        events += "fast"
+    override fun streamTrial(trial: StreamTrial): String {
+        events += "trial ${trial.step}"
         playing = false
-        fastStartsAfterMs?.let { clock.after(it) { playing = true } }
-        return "asked 3840x2160@120"
+        val startsAfterMs = if (trial.step in trialStartsAfterMs) trialStartsAfterMs[trial.step] else TRIAL_START_MS
+        startsAfterMs?.let { clock.after(it) { playing = true } }
+        val path = if (trial.tunneled) " tunneled" else ""
+        return "asked ${trial.width}x${trial.height}@${trial.fps}$path"
     }
+
+    override fun trialFacts(): List<String> = trialFacts
+
+    override fun lastError(): String? = lastError
 
     override fun streamUsual() {
         events += "usual"
@@ -67,13 +75,13 @@ class FakeDebugHost(private val clock: FakeDebugClock) : DebugHost {
         events += "step ${step.name}"
     }
 
-    override fun showDone(result: FastStreamResult?) {
+    override fun showDone(results: List<TrialResult>) {
         events += "done"
-        shownResult = result
+        shownResults = results
     }
 
     companion object {
-        private const val FAST_START_MS = 2_000L
+        private const val TRIAL_START_MS = 2_000L
         private const val USUAL_START_MS = 1_000L
         private const val VSYNC_TICKS = 121
         private const val VSYNC_NANOS = 16_666_667L

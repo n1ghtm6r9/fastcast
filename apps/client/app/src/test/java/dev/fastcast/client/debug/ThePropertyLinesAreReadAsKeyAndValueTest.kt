@@ -33,4 +33,14 @@ class ThePropertyLinesAreReadAsKeyAndValueTest {
     fun `windows line endings are read too`() {
         assertEquals(listOf("vendor.hwc.fps=60"), PropertyLines.matching("[vendor.hwc.fps]: [60]\r\n"))
     }
+
+    @Test
+    fun `every property is read into a map whatever its name`() {
+        val output = "[ro.build.version.sdk]: [34]\n[vendor.hwc.fps]: [60]\nnot a property\n[persist.vendor.memc]: []\r\n"
+
+        assertEquals(
+            mapOf("ro.build.version.sdk" to "34", "vendor.hwc.fps" to "60", "persist.vendor.memc" to ""),
+            PropertyLines.all(output),
+        )
+    }
 }

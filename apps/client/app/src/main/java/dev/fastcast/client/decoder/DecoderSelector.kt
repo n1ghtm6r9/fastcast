@@ -20,6 +20,14 @@ object DecoderSelector {
         return DecoderChoice(best.name, supportsLowLatency(best, mime))
     }
 
+    fun selectTunneled(mime: String, probe: MediaFormat): DecoderChoice? {
+        val best = decodersFor(mime)
+            .filter { supportsTunnel(it, mime) }
+            .minByOrNull { penaltyOf(it, mime, probe) }
+            ?: return null
+        return DecoderChoice(best.name, supportsLowLatency(best, mime))
+    }
+
     fun canDecodeInHardware(mime: String, width: Int, height: Int, fps: Int): Boolean =
         decodersFor(mime).any { sustainsInHardware(it, mime, width, height, fps) }
 
@@ -75,6 +83,9 @@ object DecoderSelector {
     private fun supportsLowLatency(info: MediaCodecInfo, mime: String): Boolean =
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
             withCapabilities(info, mime, false) { it.isFeatureSupported(CodecCapabilities.FEATURE_LowLatency) }
+
+    private fun supportsTunnel(info: MediaCodecInfo, mime: String): Boolean =
+        withCapabilities(info, mime, false) { it.isFeatureSupported(CodecCapabilities.FEATURE_TunneledPlayback) }
 
     private fun <T> withCapabilities(
         info: MediaCodecInfo,

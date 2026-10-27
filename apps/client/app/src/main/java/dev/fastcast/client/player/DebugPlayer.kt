@@ -1,6 +1,7 @@
 package dev.fastcast.client.player
 
 import android.view.Surface
+import dev.fastcast.client.debug.StreamTrial
 
 interface DebugPlayer {
 
@@ -12,7 +13,9 @@ interface DebugPlayer {
 
     fun usualRefreshRate(): Float?
 
-    fun streamFast(): String
+    fun streamTrial(trial: StreamTrial): String
+
+    fun lastError(): String?
 
     fun streamUsual()
 }

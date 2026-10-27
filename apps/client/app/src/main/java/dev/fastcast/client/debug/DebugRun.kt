@@ -11,7 +11,7 @@ class DebugRun(
     private val outbox = ArrayDeque<String>()
     private var started = false
     private var finishing = false
-    private var result: FastStreamResult? = null
+    private val results = mutableListOf<TrialResult>()
 
     var isRunning = false
         private set
@@ -62,48 +62,55 @@ class DebugRun(
     private fun measureStream() {
         host.clearRefreshRate()
         host.showProgress(DebugStep.STREAM)
-        sampleVideo(STREAM_SAMPLE_MS, STREAM, emptyList()) { streamFast() }
+        sampleVideo(STREAM_SAMPLE_MS) { measurement ->
+            queue(STREAM, describe(measurement))
+            runTrial(0)
+        }
     }
 
-    private fun streamFast() {
-        host.showProgress(DebugStep.FAST)
-        val asked = host.streamFast()
+    private fun runTrial(index: Int) {
+        val trial = TRIALS.getOrNull(index) ?: return restore()
+        host.showProgress(trial.progress)
+        val asked = host.streamTrial(trial)
         val askedNanos = clock.nowNanos()
-        later(POLL_MS) { awaitFastVideo(asked, askedNanos) }
+        later(POLL_MS) { awaitTrialVideo(index, asked, askedNanos) }
     }
 
-    private fun awaitFastVideo(asked: String, askedNanos: Long) {
+    private fun awaitTrialVideo(index: Int, asked: String, askedNanos: Long) {
         when {
-            host.isPlaying() -> later(FAST_WARMUP_MS) { sampleFastVideo(asked) }
-            clock.nowNanos() - askedNanos >= FAST_START_TIMEOUT_MS * NANOS_PER_MILLISECOND -> {
-                queue(FAST, listOf(asked, NO_FAST_VIDEO))
-                restore()
+            host.isPlaying() -> later(TRIAL_WARMUP_MS) { sampleTrial(index, asked) }
+            clock.nowNanos() - askedNanos >= TRIAL_START_TIMEOUT_MS * NANOS_PER_MILLISECOND -> {
+                val failure = listOf(asked, NO_TRIAL_VIDEO) + listOfNotNull(host.lastError())
+                queue(TRIALS[index].step, failure + host.trialFacts())
+                runTrial(index + 1)
             }
-            else -> later(POLL_MS) { awaitFastVideo(asked, askedNanos) }
+            else -> later(POLL_MS) { awaitTrialVideo(index, asked, askedNanos) }
         }
     }
 
-    private fun sampleFastVideo(asked: String) {
-        sampleVideo(FAST_SAMPLE_MS, FAST, listOf(asked)) { sample ->
-            result = sample
-            restore()
+    private fun sampleTrial(index: Int, asked: String) {
+        val trial = TRIALS[index]
+        sampleVideo(TRIAL_SAMPLE_MS) { measurement ->
+            queue(trial.step, listOf(asked) + describe(measurement) + host.trialFacts())
+            measurement?.let { results += TrialResult(trial, it.rates.queuedPerSecond, it.presented.perSecond) }
+            runTrial(index + 1)
         }
     }
 
-    private fun sampleVideo(durationMs: Long, step: String, lead: List<String>, then: (FastStreamResult?) -> Unit) {
+    private fun sampleVideo(durationMs: Long, then: (VideoMeasurement?) -> Unit) {
         val from = host.counters()
         later(durationMs) {
             val to = host.counters()
-            if (from == null || to == null) {
-                queue(step, lead + NO_VIDEO)
-                then(null)
-            } else {
-                val rates = CounterRates.between(from, to)
-                val presented = FrameRhythm.of(host.presentedSince(from.nanos))
-                queue(step, lead + listOf(rates.describe(), presented.describe(PRESENTED), host.displayNow()))
-                then(FastStreamResult(rates.decodedPerSecond, presented.perSecond))
-            }
+            then(if (from != null && to != null) measure(from, to) else null)
         }
+    }
+
+    private fun measure(from: DebugCounters, to: DebugCounters): VideoMeasurement =
+        VideoMeasurement(CounterRates.between(from, to), FrameRhythm.of(host.presentedSince(from.nanos)))
+
+    private fun describe(measurement: VideoMeasurement?): List<String> {
+        if (measurement == null) return listOf(NO_VIDEO)
+        return listOf(measurement.rates.describe(), measurement.presented.describe(PRESENTED), host.displayNow())
     }
 
     private fun restore() {
@@ -135,7 +142,7 @@ class DebugRun(
 
     private fun finish() {
         isRunning = false
-        host.showDone(result)
+        host.showDone(results)
     }
 
     private fun later(delayMs: Long, task: () -> Unit) {
@@ -146,9 +153,9 @@ class DebugRun(
         private const val VSYNC_SAMPLE_MS = 2_000L
         private const val SETTLE_MS = 1_500L
         private const val STREAM_SAMPLE_MS = 5_000L
-        private const val FAST_START_TIMEOUT_MS = 20_000L
-        private const val FAST_WARMUP_MS = 3_000L
-        private const val FAST_SAMPLE_MS = 6_000L
+        private const val TRIAL_START_TIMEOUT_MS = 20_000L
+        private const val TRIAL_WARMUP_MS = 3_000L
+        private const val TRIAL_SAMPLE_MS = 6_000L
         private const val POLL_MS = 250L
         private const val PUMP_MS = 50L
         private const val MESSAGES_PER_PUMP = 4
@@ -156,12 +163,16 @@ class DebugRun(
         private const val VSYNC = "vsync"
         private const val ASK = "ask"
         private const val STREAM = "stream"
-        private const val FAST = "fast"
         private const val DONE = "done"
         private const val PRESENTED = "presented"
         private const val FINISHED = "finished"
         private const val NO_VIDEO = "no video"
-        private const val NO_FAST_VIDEO = "no video within 20 s"
+        private const val NO_TRIAL_VIDEO = "no video within 20 s"
         private val ASKED_RATES = floatArrayOf(120f, 144f)
+        private val TRIALS = listOf(
+            StreamTrial("fast1440", 2560, 1440, 120, tunneled = false, progress = DebugStep.FAST),
+            StreamTrial("tunnel1440", 2560, 1440, 120, tunneled = true, progress = DebugStep.TUNNEL),
+            StreamTrial("tunnel1080", 1920, 1080, 120, tunneled = true, progress = DebugStep.TUNNEL),
+        )
     }
 }

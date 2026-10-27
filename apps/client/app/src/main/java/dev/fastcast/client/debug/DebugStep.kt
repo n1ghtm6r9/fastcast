@@ -6,5 +6,6 @@ enum class DebugStep {
     ASK,
     STREAM,
     FAST,
+    TUNNEL,
     RESTORE,
 }

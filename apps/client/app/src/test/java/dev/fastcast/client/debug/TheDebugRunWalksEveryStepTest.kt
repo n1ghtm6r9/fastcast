@@ -3,7 +3,6 @@ package dev.fastcast.client.debug
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -25,7 +24,8 @@ class TheDebugRunWalksEveryStepTest {
         assertEquals(
             listOf(
                 "step FACTS", "step VSYNC", "vsync", "step ASK", "ask 120.0", "vsync", "ask 144.0", "vsync", "clear",
-                "step STREAM", "step FAST", "fast", "step RESTORE", "usual", "done",
+                "step STREAM", "step FAST", "trial fast1440", "step TUNNEL", "trial tunnel1440", "step TUNNEL",
+                "trial tunnel1080", "step RESTORE", "usual", "done",
             ),
             host.events,
         )
@@ -36,7 +36,12 @@ class TheDebugRunWalksEveryStepTest {
         runToTheEnd()
 
         val steps = host.sent.map { JSONObject(it).getString("step") }.distinct()
-        assertEquals(listOf("device", "display", "vsync", "ask120", "ask144", "stream", "fast", "done"), steps)
+        assertEquals(
+            listOf(
+                "device", "display", "vsync", "ask120", "ask144", "stream", "fast1440", "tunnel1440", "tunnel1080", "done",
+            ),
+            steps,
+        )
     }
 
     @Test
@@ -53,35 +58,52 @@ class TheDebugRunWalksEveryStepTest {
     }
 
     @Test
-    fun `the fast stream report names what was asked and what came`() {
+    fun `a trial report names what was asked, the rates and what the trial saw`() {
         runToTheEnd()
 
-        val fast = host.sent.map(::JSONObject).first { it.getString("step") == "fast" }.getString("text")
-        assertTrue(fast, fast.startsWith("asked 3840x2160@120; decoded 120.0/s"))
-        assertTrue(fast, fast.contains("presented: "))
+        val tunnel = textOf("tunnel1440")
+        assertTrue(tunnel, tunnel.startsWith("asked 2560x1440@120 tunneled; queued 120.0/s, decoded 120.0/s"))
+        assertTrue(tunnel, tunnel.contains("presented: "))
+        assertTrue(tunnel, tunnel.endsWith("; audio played 6.0 s"))
     }
 
     @Test
-    fun `the end shows the decoded and the presented rates of the fast stream`() {
+    fun `the end shows what every trial showed`() {
         host.presentIntervalNanos = 16_666_667L
 
         runToTheEnd()
 
-        val result = requireNotNull(host.shownResult)
-        assertEquals(120.0, result.decodedPerSecond, 0.5)
-        assertEquals(60.0, result.presentedPerSecond, 0.5)
+        val results = requireNotNull(host.shownResults)
+        assertEquals(listOf("fast1440", "tunnel1440", "tunnel1080"), results.map { it.trial.step })
+        results.forEach {
+            assertEquals(120.0, it.queuedPerSecond, 0.5)
+            assertEquals(60.0, it.presentedPerSecond, 0.5)
+        }
     }
 
     @Test
-    fun `a fast stream that never plays is reported and the usual stream comes back`() {
-        host.fastStartsAfterMs = null
+    fun `a trial that never plays is reported with the last error and the next trial still runs`() {
+        host.trialStartsAfterMs = mapOf("tunnel1440" to null)
+        host.lastError = "Decoder error: no tunnel"
 
         runToTheEnd()
 
-        val fast = host.sent.map(::JSONObject).first { it.getString("step") == "fast" }
-        assertTrue(fast.getString("text").contains("no video"))
-        assertEquals(listOf("fast", "step RESTORE", "usual", "done"), host.events.takeLast(4))
-        assertNull(host.shownResult)
+        assertEquals(
+            "asked 2560x1440@120 tunneled; no video within 20 s; Decoder error: no tunnel; audio played 6.0 s",
+            textOf("tunnel1440"),
+        )
+        assertEquals(listOf("trial tunnel1080", "step RESTORE", "usual", "done"), host.events.takeLast(4))
+        assertEquals(listOf("fast1440", "tunnel1080"), requireNotNull(host.shownResults).map { it.trial.step })
+    }
+
+    @Test
+    fun `when no trial plays the usual stream still comes back`() {
+        host.trialStartsAfterMs = mapOf("fast1440" to null, "tunnel1440" to null, "tunnel1080" to null)
+
+        runToTheEnd()
+
+        assertEquals(listOf("step RESTORE", "usual", "done"), host.events.takeLast(3))
+        assertEquals(emptyList<TrialResult>(), host.shownResults)
     }
 
     @Test
@@ -94,7 +116,7 @@ class TheDebugRunWalksEveryStepTest {
         clock.advanceBy(WHOLE_RUN_MS)
 
         assertEquals(sentBefore, host.sent.size)
-        assertFalse(host.events.contains("fast"))
+        assertFalse(host.events.any { it.startsWith("trial") })
         assertFalse(run.isRunning)
     }
 
@@ -108,7 +130,7 @@ class TheDebugRunWalksEveryStepTest {
         clock.advanceBy(WHOLE_RUN_MS)
 
         assertEquals(sentBefore, host.sent.size)
-        assertFalse(host.events.contains("fast"))
+        assertFalse(host.events.any { it.startsWith("trial") })
     }
 
     @Test
@@ -156,6 +178,9 @@ class TheDebugRunWalksEveryStepTest {
 
         assertFalse(run.isRunning)
     }
+
+    private fun textOf(step: String): String =
+        host.sent.map(::JSONObject).first { it.getString("step") == step }.getString("text")
 
     companion object {
         private const val WHOLE_RUN_MS = 120_000L

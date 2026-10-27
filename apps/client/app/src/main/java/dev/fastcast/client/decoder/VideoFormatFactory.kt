@@ -1,5 +1,6 @@
 package dev.fastcast.client.decoder
 
+import android.media.MediaCodecInfo.CodecCapabilities
 import android.media.MediaFormat
 import android.os.Build
 import dev.fastcast.client.stream.ConfigMessage
@@ -23,6 +24,7 @@ object VideoFormatFactory {
         config: ConfigMessage,
         parameters: CodecConfiguration,
         choice: DecoderChoice,
+        audioSessionId: Int? = null,
     ): MediaFormat = probe(mime, config).apply {
         parameters.csdBuffers.forEachIndexed { index, csd ->
             setByteBuffer("$CSD_KEY_PREFIX$index", ByteBuffer.wrap(csd))
@@ -30,10 +32,15 @@ object VideoFormatFactory {
         setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, maxInputSize(config))
         setInteger(MediaFormat.KEY_PRIORITY, REALTIME_PRIORITY)
         setInteger(MediaFormat.KEY_OPERATING_RATE, config.fps)
-        applyLowLatency(choice)
+        if (audioSessionId == null) applyLowLatency(choice) else applyTunnel(audioSessionId)
     }
 
     private fun maxInputSize(config: ConfigMessage): Int = maxOf(config.width * config.height, MIN_INPUT_SIZE)
+
+    private fun MediaFormat.applyTunnel(audioSessionId: Int) {
+        setFeatureEnabled(CodecCapabilities.FEATURE_TunneledPlayback, true)
+        setInteger(MediaFormat.KEY_AUDIO_SESSION_ID, audioSessionId)
+    }
 
     private fun MediaFormat.applyLowLatency(choice: DecoderChoice) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && choice.supportsLowLatency) {

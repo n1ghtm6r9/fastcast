@@ -6,6 +6,7 @@ import android.os.SystemClock
 import android.view.Surface
 import dev.fastcast.client.debug.DebugCounters
 import dev.fastcast.client.decoder.DecoderEvents
+import dev.fastcast.client.decoder.TunnelAudio
 import dev.fastcast.client.decoder.VideoDecoder
 import dev.fastcast.client.stream.ConfigMessage
 import dev.fastcast.client.stream.DiagnoseMessage
@@ -20,11 +21,12 @@ class PlayerSession(
     private val listener: PlayerSessionListener,
     displayLabel: () -> String,
     networkLabel: () -> String?,
+    tunnel: TunnelAudio? = null,
 ) : StreamListener, DecoderEvents {
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private val stream = NativeStreamClient(offer::target, this)
-    private val decoder = VideoDecoder(surface, this)
+    private val decoder = VideoDecoder(surface, this, tunnel = tunnel)
     private val throughput = ThroughputSampler(SystemClock.elapsedRealtime())
     private val reportedThroughput = ThroughputSampler(SystemClock.elapsedRealtime())
     private val reporter = StatsReporter(
@@ -66,12 +68,15 @@ class PlayerSession(
     fun debugCounters(): DebugCounters = DebugCounters(
         nanos = System.nanoTime(),
         bytes = stream.bytesReceived.get(),
+        queued = decoder.stats.framesQueued.get(),
         decoded = decoder.stats.framesDecoded.get(),
         rendered = decoder.stats.framesRendered.get(),
         dropped = decoder.stats.framesDropped.get(),
     )
 
     fun presentedSince(startNanos: Long): LongArray = decoder.stats.presented.since(startNanos)
+
+    fun tunnelFacts(): List<String> = decoder.tunnelFacts()
 
     override fun onConnecting() = postStatus(PlayerStatus.Connecting)
 

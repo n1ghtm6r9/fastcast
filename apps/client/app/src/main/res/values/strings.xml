@@ -35,7 +35,11 @@
     <string name="debug_step_ask">asking the screen for 120 and 144 Hz</string>
     <string name="debug_step_stream">measuring the usual stream</string>
     <string name="debug_step_fast">trying a 120 fps stream</string>
+    <string name="debug_step_tunnel">trying the TV\'s own video path at 120 fps</string>
     <string name="debug_step_restore">bringing the usual stream back</string>
-    <string name="debug_done_rates">Debug finished: decoded %1$.0f fps, shown %2$.0f fps. The details are in the server journal.</string>
     <string name="debug_done">Debug finished. The details are in the server journal.</string>
+    <string name="debug_trial_surface" translatable="false">%1$dp@%2$d</string>
+    <string name="debug_trial_tunnel">%1$dp@%2$d through the TV\'s own video path</string>
+    <string name="debug_trial_shown">%1$s: shown %2$.0f of %3$.0f fps</string>
+    <string name="debug_trial_unreported">%1$s: %2$.0f fps sent, the TV did not report how many it showed</string>
 </resources>

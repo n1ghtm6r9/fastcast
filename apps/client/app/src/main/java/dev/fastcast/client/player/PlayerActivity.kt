@@ -3,6 +3,7 @@ package dev.fastcast.client.player
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -16,8 +17,10 @@ import android.widget.TextView
 import dev.fastcast.client.R
 import dev.fastcast.client.debug.DebugRun
 import dev.fastcast.client.debug.HandlerClock
+import dev.fastcast.client.debug.StreamTrial
 import dev.fastcast.client.decoder.DecoderSelector
 import dev.fastcast.client.decoder.SupportedCodecs
+import dev.fastcast.client.decoder.TunnelAudio
 import dev.fastcast.client.discovery.DiscoveredServer
 import dev.fastcast.client.display.DisplayModeChooser
 import dev.fastcast.client.display.DisplayModeOption
@@ -79,6 +82,8 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
     private var playing = false
     private var debugRun: DebugRun? = null
     private var debugRunId = NO_DEBUG_RUN
+    private var tunneled = false
+    private var rebuildingSurface = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,7 +131,7 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
         scaleSmaller.setOnClickListener { askScale(-1) }
         scaleLarger.setOnClickListener { askScale(1) }
         findViewById<View>(R.id.player_root).setOnClickListener { openMenu() }
-        videoSurface.holder.addCallback(SurfaceLifecycle(::startSession, ::stopSession))
+        videoSurface.holder.addCallback(SurfaceLifecycle(::startSession, ::onSurfaceDestroyed))
         showStatus(PlayerStatus.Connecting)
     }
 
@@ -201,15 +206,38 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
 
     override fun usualRefreshRate(): Float? = requestedMode?.refreshRate
 
-    override fun streamFast(): String {
-        val usual = requestStream() ?: return NO_STREAM_REQUEST
-        val fast = StreamRequest(usual.width, usual.height, FAST_STREAM_FPS, usual.codecs, usual.tenBitCodecs)
-        restream(fast)
-        return "asked ${fast.width}x${fast.height}@${fast.fps} codecs ${fast.codecs.joinToString(",")} " +
-            "ten-bit ${fast.tenBitCodecs.joinToString(",")}"
+    override fun streamTrial(trial: StreamTrial): String {
+        tunneled = trial.tunneled
+        lastError = null
+        restream(StreamRequest(trial.width, trial.height, trial.fps, TRIAL_CODECS))
+        val path = if (trial.tunneled) TUNNELED_PATH else SURFACE_PATH
+        return "asked ${trial.width}x${trial.height}@${trial.fps} $path codecs ${TRIAL_CODECS.joinToString(",")}"
     }
 
-    override fun streamUsual() = restream(requestStream())
+    override fun lastError(): String? = lastError
+
+    override fun streamUsual() {
+        val wasTunneled = tunneled
+        tunneled = false
+        if (wasTunneled && videoSurface.holder.surface.isValid) {
+            offer = StreamOffer(address, requestStream())
+            rebuildSurface()
+        } else {
+            restream(requestStream())
+        }
+    }
+
+    private fun rebuildSurface() {
+        rebuildingSurface = true
+        videoSurface.visibility = View.GONE
+    }
+
+    private fun onSurfaceDestroyed() {
+        stopSession()
+        if (!rebuildingSurface) return
+        rebuildingSurface = false
+        handler.post { videoSurface.visibility = View.VISIBLE }
+    }
 
     private fun restream(request: StreamRequest?) {
         offer = StreamOffer(address, request)
@@ -313,8 +341,12 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
         stopSession()
         showStatus(PlayerStatus.Connecting)
         requestedMode?.let { FrameRateHint.apply(surface, it.refreshRate) }
-        session = PlayerSession(offer, surface, this, ::reportedDisplayLabel, ::networkLabel).also { it.start() }
+        session = PlayerSession(offer, surface, this, ::reportedDisplayLabel, ::networkLabel, tunnelAudio())
+            .also { it.start() }
     }
+
+    private fun tunnelAudio(): TunnelAudio? =
+        if (tunneled) TunnelAudio(getSystemService(AudioManager::class.java).generateAudioSessionId()) else null
 
     private fun stopSession() {
         session?.stop()
@@ -391,8 +423,9 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
         private const val SCALE_ANSWER_MS = 2_000L
         private const val SCALE_TOAST_MS = 1_500L
         private const val NO_DEBUG_RUN = 0L
-        private const val FAST_STREAM_FPS = 120
-        private const val NO_STREAM_REQUEST = "no stream request"
+        private const val TUNNELED_PATH = "tunneled"
+        private const val SURFACE_PATH = "surface"
+        private val TRIAL_CODECS = listOf(SupportedCodecs.HEVC)
 
         fun createIntent(context: Context, server: DiscoveredServer): Intent =
             Intent(context, PlayerActivity::class.java)

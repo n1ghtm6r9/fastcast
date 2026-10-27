@@ -7,11 +7,13 @@ import dev.fastcast.client.debug.DebugStep
 import dev.fastcast.client.debug.DecoderFacts
 import dev.fastcast.client.debug.DisplayFacts
 import dev.fastcast.client.debug.FactSection
-import dev.fastcast.client.debug.FastStreamResult
 import dev.fastcast.client.debug.FeatureFacts
 import dev.fastcast.client.debug.PlatformFacts
+import dev.fastcast.client.debug.PropertyChanges
 import dev.fastcast.client.debug.SettingsFacts
+import dev.fastcast.client.debug.StreamTrial
 import dev.fastcast.client.debug.SystemProps
+import dev.fastcast.client.debug.TrialResult
 import dev.fastcast.client.debug.VsyncMeter
 import dev.fastcast.client.display.DisplayModeOption
 import dev.fastcast.client.display.DisplayModes
@@ -24,15 +26,19 @@ class PlayerDebugHost(
 ) : DebugHost {
 
     private var savedWindowAsk: Pair<Int, Float>? = null
+    private var propsAtStart: Map<String, String> = emptyMap()
 
-    override fun factSections(): List<FactSection> = listOf(
-        PlatformFacts.of(activity),
-        DisplayFacts.of(activity),
-        DecoderFacts.of(),
-        SettingsFacts.of(activity),
-        SystemProps.of(),
-        FeatureFacts.of(activity),
-    )
+    override fun factSections(): List<FactSection> {
+        propsAtStart = SystemProps.snapshot()
+        return listOf(
+            PlatformFacts.of(activity),
+            DisplayFacts.of(activity),
+            DecoderFacts.of(),
+            SettingsFacts.of(activity),
+            SystemProps.of(),
+            FeatureFacts.of(activity),
+        )
+    }
 
     override fun measureVsync(durationMs: Long, done: (LongArray) -> Unit) = VsyncMeter.measure(durationMs, done)
 
@@ -76,13 +82,18 @@ class PlayerDebugHost(
     override fun presentedSince(startNanos: Long): LongArray =
         player.currentSession()?.presentedSince(startNanos) ?: LongArray(0)
 
-    override fun streamFast(): String = player.streamFast()
+    override fun streamTrial(trial: StreamTrial): String = player.streamTrial(trial)
+
+    override fun trialFacts(): List<String> =
+        player.currentSession()?.tunnelFacts().orEmpty() + PropertyChanges.between(propsAtStart, SystemProps.snapshot())
+
+    override fun lastError(): String? = player.lastError()
 
     override fun streamUsual() = player.streamUsual()
 
     override fun showProgress(step: DebugStep) = overlay.showProgress(step)
 
-    override fun showDone(result: FastStreamResult?) = overlay.showDone(result)
+    override fun showDone(results: List<TrialResult>) = overlay.showDone(results)
 
     private fun modeReaching(rate: Float): DisplayModeOption? {
         val display = DisplayModes.defaultDisplay(activity) ?: return null

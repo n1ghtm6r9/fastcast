@@ -20,11 +20,15 @@ interface DebugHost {
 
     fun presentedSince(startNanos: Long): LongArray
 
-    fun streamFast(): String
+    fun streamTrial(trial: StreamTrial): String
+
+    fun trialFacts(): List<String>
+
+    fun lastError(): String?
 
     fun streamUsual()
 
     fun showProgress(step: DebugStep)
 
-    fun showDone(result: FastStreamResult?)
+    fun showDone(results: List<TrialResult>)
 }

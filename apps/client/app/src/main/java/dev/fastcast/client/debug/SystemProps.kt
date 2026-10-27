@@ -8,6 +8,12 @@ object SystemProps {
     private const val GETPROP = "getprop"
     private const val WAIT_SECONDS = 3L
 
+    fun snapshot(): Map<String, String> = try {
+        PropertyLines.all(output())
+    } catch (e: Exception) {
+        emptyMap()
+    }
+
     fun of(): FactSection = FactSection(
         STEP,
         try {

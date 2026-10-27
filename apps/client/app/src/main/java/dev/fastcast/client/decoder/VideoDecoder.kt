@@ -2,6 +2,7 @@ package dev.fastcast.client.decoder
 
 import android.media.MediaCodec
 import android.media.MediaFormat
+import android.os.Build
 import android.os.Process
 import android.util.Log
 import android.view.Surface
@@ -15,6 +16,7 @@ class VideoDecoder(
     private val surface: Surface,
     private val events: DecoderEvents,
     val stats: DecoderStats = DecoderStats(),
+    private val tunnel: TunnelAudio? = null,
 ) {
 
     private val mailbox = LinkedBlockingQueue<Packet>()
@@ -50,6 +52,12 @@ class VideoDecoder(
         running = false
         thread?.join(JOIN_TIMEOUT_MS)
         thread = null
+    }
+
+    fun tunnelFacts(): List<String> {
+        val audio = tunnel ?: return emptyList()
+        val ready = if (stats.tunnelFrameReady) "ready" else "not reported"
+        return listOf("tunnel decoder ${stats.decoderName.ifEmpty { "none" }}", "first tunnel frame $ready", audio.describe())
     }
 
     private fun decodeLoop() {
@@ -109,7 +117,11 @@ class VideoDecoder(
 
     private fun configure(config: ConfigMessage) {
         firstFrameRendered = false
-        if (ConfigChange.needsNewDecoder(configured, codecRendered, config)) startCodec(config) else codec?.flush()
+        if (tunnel != null || ConfigChange.needsNewDecoder(configured, codecRendered, config)) {
+            startCodec(config)
+        } else {
+            codec?.flush()
+        }
         events.onConfigured()
     }
 
@@ -120,9 +132,8 @@ class VideoDecoder(
             ?: throw UnsupportedStreamException("Unsupported codec ${config.codec}")
         val parameters = CodecConfigurationParser.parse(mime, config.description)
             ?: throw UnsupportedStreamException("Invalid codec description")
-        val choice = DecoderSelector.select(mime, VideoFormatFactory.probe(mime, config))
-            ?: throw UnsupportedStreamException("No decoder for $mime")
-        val format = VideoFormatFactory.create(mime, config, parameters, choice)
+        val choice = chooseDecoder(mime, VideoFormatFactory.probe(mime, config))
+        val format = VideoFormatFactory.create(mime, config, parameters, choice, tunnel?.sessionId)
         val started = createCodec(choice.name, format, config.fps)
         codec = started
         configured = config
@@ -135,11 +146,18 @@ class VideoDecoder(
         events.onVideoSize(config.width, config.height)
     }
 
+    private fun chooseDecoder(mime: String, probe: MediaFormat): DecoderChoice = if (tunnel == null) {
+        DecoderSelector.select(mime, probe) ?: throw UnsupportedStreamException("No decoder for $mime")
+    } else {
+        DecoderSelector.selectTunneled(mime, probe) ?: throw UnsupportedStreamException("No tunneled decoder for $mime")
+    }
+
     private fun createCodec(name: String, format: MediaFormat, fps: Int): MediaCodec {
         val created = MediaCodec.createByCodecName(name)
         try {
             created.configure(format, surface, null, 0)
             created.setOnFrameRenderedListener({ _, _, nanoTime -> stats.presented.add(nanoTime) }, null)
+            if (tunnel != null) watchFirstTunnelFrame(created)
             FrameRateHint.apply(surface, fps.toFloat())
             created.start()
         } catch (e: Exception) {
@@ -147,6 +165,13 @@ class VideoDecoder(
             throw e
         }
         return created
+    }
+
+    private fun watchFirstTunnelFrame(created: MediaCodec) {
+        stats.tunnelFrameReady = false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            created.setOnFirstTunnelFrameReadyListener(null) { stats.tunnelFrameReady = true }
+        }
     }
 
     private fun inputCapacityOf(started: MediaCodec, requested: MediaFormat): Int {
@@ -163,8 +188,19 @@ class VideoDecoder(
         val buffer = checkNotNull(active.getInputBuffer(index)) { "Input buffer $index is unavailable" }
         buffer.clear()
         buffer.put(sample.data, sample.offset, sample.size)
-        active.queueInputBuffer(index, 0, sample.size, sample.presentationTimeUs, flagsOf(sample))
+        active.queueInputBuffer(index, 0, sample.size, presentationTimeOf(sample), flagsOf(sample))
         pending = null
+        stats.framesQueued.incrementAndGet()
+        tunnel?.let { onTunnelFrameQueued(it, sample) }
+    }
+
+    private fun presentationTimeOf(sample: VideoSample): Long =
+        if (tunnel == null) sample.presentationTimeUs else TunnelClock.videoTimeUs(sample.presentationTimeUs)
+
+    private fun onTunnelFrameQueued(audio: TunnelAudio, sample: VideoSample) {
+        audio.start(sample.presentationTimeUs)
+        codecRendered = true
+        announceFirstFrame()
     }
 
     private fun flagsOf(sample: VideoSample): Int = if (sample.keyframe) MediaCodec.BUFFER_FLAG_KEY_FRAME else 0
@@ -200,10 +236,13 @@ class VideoDecoder(
         active.releaseOutputBuffer(index, true)
         codecRendered = true
         stats.framesRendered.incrementAndGet()
-        if (!firstFrameRendered) {
-            firstFrameRendered = true
-            events.onFirstFrame()
-        }
+        announceFirstFrame()
+    }
+
+    private fun announceFirstFrame() {
+        if (firstFrameRendered) return
+        firstFrameRendered = true
+        events.onFirstFrame()
     }
 
     private fun onOutputFormatChanged(format: MediaFormat) {
@@ -222,7 +261,7 @@ class VideoDecoder(
         releaseCodec()
         pending = null
         backlog.clear()
-        events.onFailure(error.message ?: error.javaClass.simpleName)
+        events.onFailure(FailureText.of(error))
     }
 
     private fun releaseCodec() {
@@ -232,6 +271,7 @@ class VideoDecoder(
         codecRendered = false
         runQuietly(active::stop)
         runQuietly(active::release)
+        tunnel?.stop()
     }
 
     private companion object {
