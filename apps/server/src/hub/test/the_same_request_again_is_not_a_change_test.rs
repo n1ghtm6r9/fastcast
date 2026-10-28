@@ -8,6 +8,7 @@ fn the_same_request_again_is_not_a_change() {
         mode: None,
         codecs: vec![VideoCodec::Avc],
         ten_bit_codecs: Vec::new(),
+        noise: false,
     };
 
     assert!(hub.request(request.clone()));

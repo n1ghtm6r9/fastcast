@@ -8,6 +8,7 @@ fn avc_stays_at_eight_bits_whatever_the_viewer_offers() {
         mode: None,
         codecs: vec![VideoCodec::Avc, VideoCodec::Hevc],
         ten_bit_codecs: vec![VideoCodec::Avc, VideoCodec::Hevc],
+        noise: false,
     };
 
     assert_eq!(bit_depth_for(VideoCodec::Avc, &request), EIGHT_BIT_DEPTH);

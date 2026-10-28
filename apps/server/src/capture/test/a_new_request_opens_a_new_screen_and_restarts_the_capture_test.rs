@@ -23,6 +23,7 @@ async fn a_new_request_opens_a_new_screen_and_restarts_the_capture() {
         }),
         codecs: vec![VideoCodec::Hevc, VideoCodec::Avc],
         ten_bit_codecs: Vec::new(),
+        noise: false,
     };
 
     settle().await;

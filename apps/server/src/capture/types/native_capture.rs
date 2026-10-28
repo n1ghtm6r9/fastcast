@@ -1,6 +1,6 @@
 use crate::capture::{CaptureStats, FrameClock, KeyFrameGate, Picture, ReopenFailures};
 use crate::hub::Hub;
-use desktop::{Converter, Duplication, GpuDevice, OutputInfo};
+use desktop::{Converter, Duplication, GpuDevice, NoisePainter, OutputInfo};
 use media::VideoCodec;
 use nvenc::Encoder;
 use std::sync::atomic::AtomicBool;
@@ -9,6 +9,7 @@ use std::time::Instant;
 pub struct NativeCapture<'a> {
     pub(crate) encoder: Encoder,
     pub(crate) converter: Converter,
+    pub(crate) noise: Option<NoisePainter>,
     pub(crate) duplication: Option<Duplication>,
     pub(crate) device: GpuDevice,
     pub(crate) hub: &'a Hub,

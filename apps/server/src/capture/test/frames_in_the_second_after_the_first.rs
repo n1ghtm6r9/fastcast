@@ -12,6 +12,7 @@ pub async fn frames_in_the_second_after_the_first(fps: u32) -> usize {
     let pipeline = NativePipeline {
         codec: VideoCodec::Hevc,
         bit_depth: EIGHT_BIT_DEPTH,
+        noise: false,
     };
     let target = CaptureTarget { output: 0, fps };
     let mut subscription = hub.join();

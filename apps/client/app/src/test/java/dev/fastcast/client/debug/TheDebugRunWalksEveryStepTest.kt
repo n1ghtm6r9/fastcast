@@ -24,9 +24,9 @@ class TheDebugRunWalksEveryStepTest {
         assertEquals(
             listOf(
                 "step FACTS", "step VSYNC", "vsync", "step ASK", "ask 120.0", "vsync", "ask 144.0", "vsync", "clear",
-                "step STREAM", "hide", "step TUNNEL", "trial tunnel1440", "step TUNNEL", "trial tunnel1440hidden", "hide",
-                "step TUNNEL", "trial tunnel1080hidden", "hide", "step SURFACE", "trial surface2160", "step SURFACE",
-                "trial surface2160av1", "step RESTORE", "usual", "done",
+                "step STREAM", "hide", "step TUNNEL", "trial tunnel1440", "hide", "step TUNNEL", "trial tunnel1440noise",
+                "hide", "step SURFACE", "trial surface2160", "step SURFACE", "trial surface2160noise", "step RESTORE",
+                "usual", "done",
             ),
             host.events,
         )
@@ -46,7 +46,7 @@ class TheDebugRunWalksEveryStepTest {
         runToTheEnd()
 
         val shownPerTrial = host.countedAfterHidingMs.drop(2).chunked(2).map { counted -> counted.all { it == null } }
-        assertEquals(listOf(true, false, false, true, true), shownPerTrial)
+        assertEquals(listOf(false, false, true, true), shownPerTrial)
     }
 
     @Test
@@ -90,16 +90,15 @@ class TheDebugRunWalksEveryStepTest {
     }
 
     @Test
-    fun `one run tries the tunnel in 10 bits at 1440p shown and bare and at 1080p, then 4K in hevc and av1 the usual way`() {
+    fun `one run tries the 10-bit tunnel at 1440p and 4K hevc the usual way, each on the screen and on noise`() {
         runToTheEnd()
 
         assertEquals(
             listOf(
-                "2560x1440@120 hevc 10-bit tunneled REALTIME LOW_LATENCY uninspected text shown ON_RUNNING_CLOCK 8000",
-                "2560x1440@120 hevc 10-bit tunneled REALTIME LOW_LATENCY uninspected text hidden ON_RUNNING_CLOCK 8000",
-                "1920x1080@120 hevc 10-bit tunneled REALTIME LOW_LATENCY uninspected text hidden ON_RUNNING_CLOCK 8000",
-                "3840x2160@60 hevc 10-bit surface REALTIME LOW_LATENCY uninspected text shown ON_RUNNING_CLOCK 8000",
-                "3840x2160@60 av1 10-bit surface REALTIME LOW_LATENCY uninspected text shown ON_RUNNING_CLOCK 8000",
+                "2560x1440@120 hevc 10-bit tunneled REALTIME LOW_LATENCY uninspected text hidden ON_RUNNING_CLOCK 8000 screen",
+                "2560x1440@120 hevc 10-bit tunneled REALTIME LOW_LATENCY uninspected text hidden ON_RUNNING_CLOCK 8000 noise",
+                "3840x2160@60 hevc 10-bit surface REALTIME LOW_LATENCY uninspected text shown ON_RUNNING_CLOCK 8000 screen",
+                "3840x2160@60 hevc 10-bit surface REALTIME LOW_LATENCY uninspected text shown ON_RUNNING_CLOCK 8000 noise",
             ),
             host.trials.map(::describeTrial),
         )
@@ -111,8 +110,9 @@ class TheDebugRunWalksEveryStepTest {
         val text = if (trial.showsText) "text shown" else "text hidden"
         val depth = if (trial.tenBit) "10-bit" else "8-bit"
         val timing = trial.setup.timing
+        val picture = if (trial.noise) "noise" else "screen"
         return "${trial.width}x${trial.height}@${trial.fps} ${trial.codec} $depth $path ${trial.setup.pace} " +
-            "${trial.setup.tweak} $inspection $text ${timing.videoStart} ${timing.videoDelayUs}"
+            "${trial.setup.tweak} $inspection $text ${timing.videoStart} ${timing.videoDelayUs} $picture"
     }
 
     @Test
@@ -131,17 +131,17 @@ class TheDebugRunWalksEveryStepTest {
 
     @Test
     fun `a trial that never plays is reported with the last error and the next trial still runs`() {
-        host.trialStartsAfterMs = mapOf("tunnel1080hidden" to null)
+        host.trialStartsAfterMs = mapOf("tunnel1440noise" to null)
         host.lastError = "Decoder error: no tunnel"
 
         runToTheEnd()
 
         assertEquals(
-            "asked 1920x1080@120 tunneled; no video within 20 s; Decoder error: no tunnel; audio played 6.0 s",
-            textOf("tunnel1080hidden"),
+            "asked 2560x1440@120 tunneled; no video within 20 s; Decoder error: no tunnel; audio played 6.0 s",
+            textOf("tunnel1440noise"),
         )
-        assertEquals(listOf("trial surface2160av1", "step RESTORE", "usual", "done"), host.events.takeLast(4))
-        assertEquals(ALL_TRIALS - "tunnel1080hidden", requireNotNull(host.shownResults).map { it.trial.step })
+        assertEquals(listOf("trial surface2160noise", "step RESTORE", "usual", "done"), host.events.takeLast(4))
+        assertEquals(ALL_TRIALS - "tunnel1440noise", requireNotNull(host.shownResults).map { it.trial.step })
     }
 
     @Test
@@ -233,7 +233,7 @@ class TheDebugRunWalksEveryStepTest {
     companion object {
         private const val WHOLE_RUN_MS = 400_000L
         private val ALL_TRIALS = listOf(
-            "tunnel1440", "tunnel1440hidden", "tunnel1080hidden", "surface2160", "surface2160av1",
+            "tunnel1440", "tunnel1440noise", "surface2160", "surface2160noise",
         )
     }
 }

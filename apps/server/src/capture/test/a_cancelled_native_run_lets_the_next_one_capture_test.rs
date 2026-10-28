@@ -13,6 +13,7 @@ async fn a_cancelled_native_run_lets_the_next_one_capture() {
     let pipeline = NativePipeline {
         codec: VideoCodec::Hevc,
         bit_depth: EIGHT_BIT_DEPTH,
+        noise: false,
     };
     let target = capture_target();
     let mut subscription = hub.join();

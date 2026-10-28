@@ -1,4 +1,4 @@
-use crate::packet::Hello;
+use crate::packet::{HELLO_NOISE_FLAG, Hello};
 
 pub fn write_hello(hello: &Hello, out: &mut Vec<u8>) {
     let count = u8::try_from(hello.codecs.len()).unwrap_or(u8::MAX);
@@ -13,4 +13,6 @@ pub fn write_hello(hello: &Hello, out: &mut Vec<u8>) {
         out.push(support.codec as u8);
         out.push(support.max_bit_depth);
     }
+
+    out.push(if hello.noise { HELLO_NOISE_FLAG } else { 0 });
 }

@@ -9,7 +9,7 @@ mod gpu;
 
 pub use colour::{BitDepth, Planes, YCbCr, reference_planes, ycbcr_of};
 #[cfg(windows)]
-pub use converter::{Converter, read_planes};
+pub use converter::{Converter, NoisePainter, read_planes};
 pub use cursor::{
     CursorImage, CursorKind, POINTER_SHAPE_COLOR, POINTER_SHAPE_MASKED_COLOR,
     POINTER_SHAPE_MONOCHROME, composite_cursor, decode_cursor_shape,

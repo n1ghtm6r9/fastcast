@@ -19,6 +19,7 @@ async fn the_status_shows_what_the_tv_asked_for() {
         }),
         codecs: vec![VideoCodec::Hevc, VideoCodec::Avc],
         ten_bit_codecs: vec![VideoCodec::Hevc],
+        noise: false,
     };
 
     hub.request(request.clone());

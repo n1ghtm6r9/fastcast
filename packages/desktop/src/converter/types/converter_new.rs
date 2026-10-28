@@ -1,8 +1,8 @@
 use crate::colour::BitDepth;
 use crate::converter::{
-    CHROMA_SHADER_SOURCE, Converter, LUMA_SHADER_SOURCE, chroma_format, create_constant_buffer,
-    create_output_texture, create_pixel_shader, create_plane_target, create_rasterizer_state,
-    create_vertex_shader, luma_format,
+    CHROMA_SHADER_SOURCE, Converter, LUMA_SHADER_SOURCE, ShaderParameters, chroma_format,
+    create_constant_buffer, create_output_texture, create_pixel_shader, create_plane_target,
+    create_rasterizer_state, create_vertex_shader, luma_format,
 };
 use crate::gpu::{DesktopError, GpuDevice, require_even_size};
 
@@ -25,7 +25,7 @@ impl Converter {
             luma_shader: create_pixel_shader(device, LUMA_SHADER_SOURCE)?,
             chroma_shader: create_pixel_shader(device, CHROMA_SHADER_SOURCE)?,
             rasterizer: create_rasterizer_state(device)?,
-            constants: create_constant_buffer(device)?,
+            constants: create_constant_buffer::<ShaderParameters>(device)?,
             luma_target: create_plane_target(device, &output, luma_format(depth))?,
             chroma_target: create_plane_target(device, &output, chroma_format(depth))?,
             output,

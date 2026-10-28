@@ -22,6 +22,7 @@ async fn the_screen_is_opened_for_what_the_viewer_asked() {
         }),
         codecs: vec![VideoCodec::Hevc],
         ten_bit_codecs: Vec::new(),
+        noise: false,
     };
 
     hub.request(request.clone());

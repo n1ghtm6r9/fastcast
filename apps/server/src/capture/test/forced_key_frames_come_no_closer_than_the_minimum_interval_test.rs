@@ -18,6 +18,7 @@ async fn forced_key_frames_come_no_closer_than_the_minimum_interval() {
     let pipeline = NativePipeline {
         codec: VideoCodec::Hevc,
         bit_depth: EIGHT_BIT_DEPTH,
+        noise: false,
     };
     let target = capture_target();
     let mut subscription = hub.join();

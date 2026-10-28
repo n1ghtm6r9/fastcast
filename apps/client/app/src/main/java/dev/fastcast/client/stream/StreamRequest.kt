@@ -6,4 +6,5 @@ class StreamRequest(
     val fps: Int,
     val codecs: List<String>,
     val tenBitCodecs: Set<String> = emptySet(),
+    val noise: Boolean = false,
 )

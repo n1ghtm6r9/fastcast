@@ -7,4 +7,5 @@ pub struct Hello {
     pub height: u16,
     pub fps: u16,
     pub codecs: Vec<CodecSupport>,
+    pub noise: bool,
 }

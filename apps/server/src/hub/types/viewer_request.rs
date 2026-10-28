@@ -6,4 +6,5 @@ pub struct ViewerRequest {
     pub mode: Option<DisplayMode>,
     pub codecs: Vec<VideoCodec>,
     pub ten_bit_codecs: Vec<VideoCodec>,
+    pub noise: bool,
 }

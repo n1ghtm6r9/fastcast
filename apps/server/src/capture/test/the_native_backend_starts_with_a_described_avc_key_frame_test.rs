@@ -13,6 +13,7 @@ async fn the_native_backend_starts_with_a_described_avc_key_frame() {
     let pipeline = NativePipeline {
         codec: VideoCodec::Avc,
         bit_depth: EIGHT_BIT_DEPTH,
+        noise: false,
     };
     let target = capture_target();
     let mut subscription = hub.join();

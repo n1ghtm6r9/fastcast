@@ -23,6 +23,7 @@ async fn a_request_for_other_codecs_in_the_same_mode_keeps_the_screen() {
         }),
         codecs: vec![VideoCodec::Hevc, VideoCodec::Avc],
         ten_bit_codecs: vec![VideoCodec::Hevc],
+        noise: false,
     };
     let eight_bit = ViewerRequest {
         ten_bit_codecs: Vec::new(),

@@ -28,6 +28,7 @@ object NativeLink {
         height: Int,
         fps: Int,
         codecs: IntArray,
+        noise: Boolean,
     ): Long
 
     @JvmStatic

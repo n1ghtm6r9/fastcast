@@ -13,6 +13,7 @@ async fn the_native_backend_streams_ten_bit_hevc_as_main_10() {
     let pipeline = NativePipeline {
         codec: VideoCodec::Hevc,
         bit_depth: TEN_BIT_DEPTH,
+        noise: false,
     };
     let target = capture_target();
     let mut subscription = hub.join();

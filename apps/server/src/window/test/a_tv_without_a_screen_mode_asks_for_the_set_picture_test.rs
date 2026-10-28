@@ -13,6 +13,7 @@ fn a_tv_without_a_screen_mode_asks_for_the_set_picture() {
             mode: None,
             codecs: vec![VideoCodec::Avc],
             ten_bit_codecs: Vec::new(),
+            noise: false,
         },
         ..running_status()
     };

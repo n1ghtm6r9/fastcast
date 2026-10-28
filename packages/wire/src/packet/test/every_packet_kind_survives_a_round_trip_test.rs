@@ -32,6 +32,7 @@ fn every_packet_kind_survives_a_round_trip() {
                     max_bit_depth: 8,
                 },
             ],
+            noise: true,
         }),
         Packet::Welcome(Welcome {
             nonce: 5,

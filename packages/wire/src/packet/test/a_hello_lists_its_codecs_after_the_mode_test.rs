@@ -17,6 +17,7 @@ fn a_hello_lists_its_codecs_after_the_mode() {
                 max_bit_depth: 8,
             },
         ],
+        noise: false,
     };
     let mut out = Vec::new();
 
@@ -32,7 +33,7 @@ fn a_hello_lists_its_codecs_after_the_mode() {
     assert_eq!(
         out[12..],
         [
-            0x44, 0x33, 0x22, 0x11, 0x00, 0x0F, 0x70, 0x08, 120, 0, 2, 2, 10, 1, 8
+            0x44, 0x33, 0x22, 0x11, 0x00, 0x0F, 0x70, 0x08, 120, 0, 2, 2, 10, 1, 8, 0
         ]
     );
 }

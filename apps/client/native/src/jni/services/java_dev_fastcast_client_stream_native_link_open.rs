@@ -1,6 +1,6 @@
 use crate::jni::{guarded, ints_of, register_link, string_of};
 use crate::link::{Link, LinkTarget, hello_of};
-use jni_sys::{JNIEnv, jclass, jint, jintArray, jlong, jstring};
+use jni_sys::{JNIEnv, jboolean, jclass, jint, jintArray, jlong, jstring};
 use std::net::{IpAddr, SocketAddr};
 
 #[allow(non_snake_case)]
@@ -15,6 +15,7 @@ pub extern "system" fn Java_dev_fastcast_client_stream_NativeLink_open(
     height: jint,
     fps: jint,
     codecs: jintArray,
+    noise: jboolean,
 ) -> jlong {
     guarded(0, || {
         let Some(host) = string_of(env, host) else {
@@ -27,7 +28,14 @@ pub extern "system" fn Java_dev_fastcast_client_stream_NativeLink_open(
             Ok(port) if port > 0 => port,
             _ => return 0,
         };
-        let hello = hello_of(nonce as u32, width, height, fps, &ints_of(env, codecs));
+        let hello = hello_of(
+            nonce as u32,
+            width,
+            height,
+            fps,
+            &ints_of(env, codecs),
+            noise,
+        );
         let target = LinkTarget {
             server: SocketAddr::new(address, port),
             hello,

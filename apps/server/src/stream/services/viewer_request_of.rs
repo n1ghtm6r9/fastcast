@@ -24,5 +24,6 @@ pub fn viewer_request_of(hello: &Hello, default_fps: u32) -> ViewerRequest {
         mode,
         codecs: codecs_of(&hello.codecs),
         ten_bit_codecs: ten_bit_codecs_of(&hello.codecs),
+        noise: hello.noise,
     }
 }

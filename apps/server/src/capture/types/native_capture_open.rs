@@ -1,11 +1,11 @@
 use crate::capture::{
     CaptureStats, CaptureTarget, FrameClock, KeyFrameGate, NativeCapture, NativeError,
-    NativePipeline, Picture, ReopenFailures, converter_depth_of, encoder_codec_of,
-    encoder_preset_for, nvidia_output_for, raise_capture_priorities,
+    NativePipeline, Picture, ReopenFailures, converter_depth_of, encoder_settings_for,
+    nvidia_output_for, raise_capture_priorities,
 };
 use crate::hub::Hub;
-use desktop::{Converter, Duplication, GpuDevice, list_outputs};
-use nvenc::{Encoder, EncoderSettings};
+use desktop::{Converter, Duplication, GpuDevice, NoisePainter, list_outputs};
+use nvenc::Encoder;
 use std::sync::atomic::AtomicBool;
 use std::time::Instant;
 use tracing::info;
@@ -31,30 +31,28 @@ impl<'a> NativeCapture<'a> {
             converter_depth_of(pipeline.bit_depth),
         )
         .map_err(NativeError::Desktop)?;
-        let preset = encoder_preset_for(size.0, size.1, target.fps);
+        let settings = encoder_settings_for(pipeline, size, target.fps, bitrate_kbps);
 
         info!(
             "encoding {}x{} {}-bit at {} fps with NVENC preset P{}",
-            size.0, size.1, pipeline.bit_depth, target.fps, preset
+            size.0, size.1, pipeline.bit_depth, target.fps, settings.preset
         );
 
-        let encoder = Encoder::open(
-            device.device(),
-            &EncoderSettings {
-                codec: encoder_codec_of(pipeline.codec),
-                width: size.0,
-                height: size.1,
-                fps: target.fps,
-                bitrate_kbps,
-                bit_depth: pipeline.bit_depth,
-                preset,
-            },
-        )
-        .map_err(NativeError::Encoder)?;
+        let encoder = Encoder::open(device.device(), &settings).map_err(NativeError::Encoder)?;
+        let noise = pipeline
+            .noise
+            .then(|| NoisePainter::new(&device))
+            .transpose()
+            .map_err(NativeError::Desktop)?;
+
+        if noise.is_some() {
+            info!("the TV asked for noise: every frame is new random pixels instead of the screen");
+        }
 
         Ok(Self {
             encoder,
             converter,
+            noise,
             duplication: Some(duplication),
             device,
             hub,

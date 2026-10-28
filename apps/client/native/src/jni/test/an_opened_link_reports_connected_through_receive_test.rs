@@ -22,6 +22,7 @@ fn an_opened_link_reports_connected_through_receive() {
                 codec: Codec::Hevc,
                 max_bit_depth: 8,
             }],
+            noise: true,
         }
     );
 

@@ -14,6 +14,7 @@ async fn a_new_request_replaces_the_last_one_and_wakes_the_watchers() {
         }),
         codecs: vec![VideoCodec::Hevc, VideoCodec::Avc],
         ten_bit_codecs: Vec::new(),
+        noise: false,
     };
 
     assert!(hub.request(request.clone()));

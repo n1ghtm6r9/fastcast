@@ -21,6 +21,7 @@ async fn the_native_backend_prepares_ten_bit_hevc_when_the_tv_decodes_it() {
         NativePipeline {
             codec: VideoCodec::Hevc,
             bit_depth: TEN_BIT_DEPTH,
+            noise: false,
         }
     );
 }

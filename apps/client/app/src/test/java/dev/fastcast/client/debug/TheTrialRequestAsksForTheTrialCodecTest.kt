@@ -2,6 +2,8 @@ package dev.fastcast.client.debug
 
 import dev.fastcast.client.decoder.DecoderSetup
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class TheTrialRequestAsksForTheTrialCodecTest {
@@ -23,8 +25,14 @@ class TheTrialRequestAsksForTheTrialCodecTest {
         assertEquals(emptySet<String>(), request.tenBitCodecs)
     }
 
-    private fun trial(codec: String, tenBit: Boolean): StreamTrial = StreamTrial(
+    @Test
+    fun `a noise trial asks the server for noise instead of the screen`() {
+        assertTrue(TrialRequest.of(trial("hevc", tenBit = true, noise = true)).noise)
+        assertFalse(TrialRequest.of(trial("hevc", tenBit = true, noise = false)).noise)
+    }
+
+    private fun trial(codec: String, tenBit: Boolean, noise: Boolean = false): StreamTrial = StreamTrial(
         "trial", 3840, 2160, 60, codec, tenBit, tunneled = false, DecoderSetup.USUAL, showsText = false,
-        DebugStep.SURFACE,
+        DebugStep.SURFACE, noise,
     )
 }

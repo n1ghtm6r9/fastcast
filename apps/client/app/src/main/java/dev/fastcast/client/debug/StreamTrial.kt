@@ -13,4 +13,5 @@ class StreamTrial(
     val setup: DecoderSetup,
     val showsText: Boolean,
     val progress: DebugStep,
+    val noise: Boolean = false,
 )

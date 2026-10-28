@@ -16,6 +16,7 @@ async fn a_key_frame_request_is_answered_with_an_avc_key_frame() {
     let pipeline = NativePipeline {
         codec: VideoCodec::Avc,
         bit_depth: EIGHT_BIT_DEPTH,
+        noise: false,
     };
     let target = capture_target();
     let mut subscription = hub.join();

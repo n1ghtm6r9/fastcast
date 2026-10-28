@@ -7,5 +7,6 @@ pub fn hello_of(width: u16, height: u16, fps: u16, codecs: Vec<CodecSupport>) ->
         height,
         fps,
         codecs,
+        noise: false,
     }
 }

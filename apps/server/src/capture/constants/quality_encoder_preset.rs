@@ -1,1 +1,0 @@
-pub const QUALITY_ENCODER_PRESET: u8 = 4;

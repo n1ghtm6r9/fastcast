@@ -18,6 +18,7 @@ fn the_status_shows_what_the_connected_tv_asked_for() {
             }),
             codecs: vec![VideoCodec::Av1, VideoCodec::Hevc, VideoCodec::Avc],
             ten_bit_codecs: vec![VideoCodec::Av1, VideoCodec::Hevc],
+            noise: false,
         },
         ..running_status()
     };

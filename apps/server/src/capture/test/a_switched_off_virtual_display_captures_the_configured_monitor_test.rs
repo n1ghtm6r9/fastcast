@@ -19,6 +19,7 @@ async fn a_switched_off_virtual_display_captures_the_configured_monitor() {
         }),
         codecs: vec![VideoCodec::Hevc, VideoCodec::Avc],
         ten_bit_codecs: Vec::new(),
+        noise: false,
     };
 
     let screen = open_screen(&settings, &request, |_| Some(60)).await;

@@ -23,6 +23,7 @@ async fn a_new_request_ends_the_wait_before_a_retry() {
         }),
         codecs: vec![VideoCodec::Hevc, VideoCodec::Avc],
         ten_bit_codecs: Vec::new(),
+        noise: false,
     };
 
     settle().await;

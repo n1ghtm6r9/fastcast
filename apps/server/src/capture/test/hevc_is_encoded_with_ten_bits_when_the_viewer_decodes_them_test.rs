@@ -8,6 +8,7 @@ fn hevc_is_encoded_with_ten_bits_when_the_viewer_decodes_them() {
         mode: None,
         codecs: vec![VideoCodec::Hevc],
         ten_bit_codecs: vec![VideoCodec::Hevc],
+        noise: false,
     };
 
     assert_eq!(bit_depth_for(VideoCodec::Hevc, &request), TEN_BIT_DEPTH);

@@ -14,5 +14,6 @@ pub fn a_hello(width: u16, height: u16, fps: u16, codecs: &[Codec]) -> Hello {
                 max_bit_depth: 8,
             })
             .collect(),
+        noise: false,
     }
 }

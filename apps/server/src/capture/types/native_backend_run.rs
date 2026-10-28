@@ -18,6 +18,7 @@ impl CaptureBackend for NativeBackend {
         Ok(NativePipeline {
             codec,
             bit_depth: bit_depth_for(codec, request),
+            noise: request.noise,
         })
     }
 

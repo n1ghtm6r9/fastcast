@@ -4,4 +4,5 @@ use media::VideoCodec;
 pub struct NativePipeline {
     pub codec: VideoCodec,
     pub bit_depth: u8,
+    pub noise: bool,
 }

@@ -68,14 +68,6 @@ mod scripted_probe_probe;
 mod sequence_header_tag;
 mod settle;
 #[cfg(windows)]
-mod the_capture_process_refuses_power_throttling_test;
-#[cfg(windows)]
-mod the_capture_process_runs_above_normal_test;
-#[cfg(windows)]
-mod the_capture_thread_runs_at_the_highest_priority_test;
-mod the_priority_line_names_every_raised_priority_test;
-mod the_priority_line_tells_which_priority_failed_and_why_test;
-#[cfg(windows)]
 mod try_lock_gpu_slot;
 pub use an_avc_key_frame::*;
 pub use an_hevc_key_frame::*;
@@ -303,6 +295,8 @@ mod before_any_picture_the_wait_is_one_interval_test;
 mod dropping_the_guard_sets_the_stop_flag_test;
 mod every_encoder_has_its_own_ffmpeg_codec_name_test;
 mod every_hevc_encoder_is_tried_before_falling_back_to_avc_test;
+#[cfg(windows)]
+mod every_mode_encodes_with_the_fastest_nvenc_preset_test;
 mod failed_reopens_stay_quiet_between_log_lines_test;
 mod ffmpeg_has_encoders_for_avc_and_hevc_only_test;
 mod ffmpeg_is_stopped_five_seconds_after_the_last_viewer_leaves_test;
@@ -328,8 +322,8 @@ mod native_capture_off_windows_says_it_needs_windows_test;
 mod no_key_frame_is_wanted_without_a_request_test;
 mod no_picture_exists_before_the_first_one_arrives_test;
 mod no_viewers_means_ffmpeg_is_never_started_test;
-mod pixel_rates_above_four_k_sixty_use_the_fastest_preset_test;
-mod pixel_rates_up_to_four_k_sixty_keep_the_quality_preset_test;
+#[cfg(windows)]
+mod noise_fills_every_frame_up_to_the_bitrate_test;
 mod probing_with_a_missing_ffmpeg_is_an_error_not_a_failed_probe_test;
 mod reopens_that_keep_failing_give_up_after_the_give_up_time_test;
 mod spinning_does_not_return_before_the_deadline_test;
@@ -346,7 +340,13 @@ mod the_capture_line_tells_how_far_waits_overran_test;
 mod the_capture_line_tells_how_long_encoding_took_test;
 mod the_capture_line_tells_the_longest_pause_between_frames_test;
 mod the_capture_line_waits_five_seconds_test;
+#[cfg(windows)]
+mod the_capture_process_refuses_power_throttling_test;
+#[cfg(windows)]
+mod the_capture_process_runs_above_normal_test;
 mod the_capture_shows_the_scale_of_the_screen_it_runs_on_test;
+#[cfg(windows)]
+mod the_capture_thread_runs_at_the_highest_priority_test;
 mod the_configured_rate_is_what_the_config_announces_test;
 #[cfg(windows)]
 mod the_default_ffmpeg_comes_from_the_first_directory_that_has_it_test;
@@ -368,6 +368,7 @@ mod the_native_backend_encodes_av1_when_it_is_chosen_and_the_tv_decodes_it_test;
 mod the_native_backend_encodes_av1_when_the_tv_decodes_nothing_else_test;
 mod the_native_backend_encodes_the_chosen_codec_when_the_tv_decodes_it_test;
 mod the_native_backend_prefers_hevc_when_the_tv_decodes_it_test;
+mod the_native_backend_prepares_noise_when_the_tv_asks_for_it_test;
 mod the_native_backend_prepares_ten_bit_hevc_when_the_tv_decodes_it_test;
 mod the_native_backend_replaces_a_chosen_codec_the_tv_cannot_decode_test;
 #[cfg(windows)]
@@ -386,6 +387,8 @@ mod the_no_encoder_error_names_every_encoder_tried_test;
 mod the_numbered_output_of_an_nvidia_adapter_is_taken_test;
 mod the_nvenc_pipeline_uses_the_documented_arguments_test;
 mod the_output_and_the_rate_come_from_the_target_and_the_bitrate_from_the_settings_test;
+mod the_priority_line_names_every_raised_priority_test;
+mod the_priority_line_tells_which_priority_failed_and_why_test;
 mod the_probe_encodes_one_black_frame_with_the_chosen_codec_test;
 mod the_qsv_pipeline_uses_the_documented_arguments_test;
 mod the_same_picture_skips_the_native_backend_after_it_failed_test;

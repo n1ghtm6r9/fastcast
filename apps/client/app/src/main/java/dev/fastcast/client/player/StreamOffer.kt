@@ -19,7 +19,7 @@ class StreamOffer(
     fun target(): StreamTarget = StreamTarget(
         host = address.substringBeforeLast(HOST_PORT_SEPARATOR),
         port = portOfAddress(),
-        request = request?.let { StreamRequest(it.width, it.height, it.fps, codecs, tenBitCodecs) },
+        request = request?.let { StreamRequest(it.width, it.height, it.fps, codecs, tenBitCodecs, it.noise) },
     )
 
     @Synchronized

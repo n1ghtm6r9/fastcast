@@ -6,6 +6,16 @@ impl NativeCapture<'_> {
         let shown = self.pending_shown.take();
         let arrived = self.pending_arrived.take();
         let force = key_frame_wanted(&self.key_frames, self.hub, at);
+        let since_start = at.saturating_duration_since(self.started);
+
+        if let Some(noise) = &self.noise {
+            noise.paint(
+                &self.device,
+                &self.converter,
+                since_start.as_micros() as u32,
+            );
+        }
+
         let encoding = Instant::now();
         let encoded = self
             .encoder
@@ -21,7 +31,7 @@ impl NativeCapture<'_> {
             return Ok(());
         }
 
-        let timestamp_ms = at.saturating_duration_since(self.started).as_millis() as u32;
+        let timestamp_ms = since_start.as_millis() as u32;
 
         let published = publish_encoded_frame(
             self.hub,

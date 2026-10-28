@@ -3,7 +3,7 @@ use wire::{Codec, CodecSupport, Hello};
 
 #[test]
 fn the_hello_carries_the_mode_and_codecs() {
-    let hello = hello_of(7, 3840, 2160, 120, &[2, 10, 1, 8]);
+    let hello = hello_of(7, 3840, 2160, 120, &[2, 10, 1, 8], false);
 
     assert_eq!(
         hello,
@@ -22,6 +22,7 @@ fn the_hello_carries_the_mode_and_codecs() {
                     max_bit_depth: 8,
                 },
             ],
+            noise: false,
         }
     );
 }

@@ -13,6 +13,7 @@ async fn the_native_backend_streams_av1_at_ten_bits() {
     let pipeline = NativePipeline {
         codec: VideoCodec::Av1,
         bit_depth: TEN_BIT_DEPTH,
+        noise: false,
     };
     let target = capture_target();
     let mut subscription = hub.join();

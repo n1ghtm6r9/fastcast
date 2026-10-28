@@ -11,5 +11,6 @@ pub fn another_request() -> ViewerRequest {
         }),
         codecs: vec![VideoCodec::Hevc, VideoCodec::Avc],
         ten_bit_codecs: Vec::new(),
+        noise: false,
     }
 }

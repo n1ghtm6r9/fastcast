@@ -1,4 +1,4 @@
-use crate::packet::{ByteReader, CodecSupport, Hello, codec_from_id};
+use crate::packet::{ByteReader, CodecSupport, HELLO_NOISE_FLAG, Hello, codec_from_id};
 
 pub fn decode_hello(reader: &mut ByteReader<'_>) -> Option<Hello> {
     let nonce = reader.read_u32()?;
@@ -20,11 +20,14 @@ pub fn decode_hello(reader: &mut ByteReader<'_>) -> Option<Hello> {
         }
     }
 
+    let flags = reader.read_u8().unwrap_or(0);
+
     Some(Hello {
         nonce,
         width,
         height,
         fps,
         codecs,
+        noise: flags & HELLO_NOISE_FLAG != 0,
     })
 }

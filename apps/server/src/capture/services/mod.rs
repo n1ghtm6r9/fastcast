@@ -10,7 +10,8 @@ mod duration_spread;
 mod encoder_args;
 #[cfg(windows)]
 mod encoder_codec_of;
-mod encoder_preset_for;
+#[cfg(windows)]
+mod encoder_settings_for;
 mod ended_before_the_first_frame;
 mod ffmpeg_args;
 mod ffmpeg_command;
@@ -90,7 +91,8 @@ pub use duration_spread::*;
 pub use encoder_args::*;
 #[cfg(windows)]
 pub use encoder_codec_of::*;
-pub use encoder_preset_for::*;
+#[cfg(windows)]
+pub use encoder_settings_for::*;
 pub use ended_before_the_first_frame::*;
 pub use ffmpeg_args::*;
 pub use ffmpeg_command::*;

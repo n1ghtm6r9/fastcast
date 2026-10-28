@@ -10,5 +10,6 @@ object TrialRequest {
         trial.fps,
         listOf(trial.codec),
         if (trial.tenBit) setOf(trial.codec) else emptySet(),
+        trial.noise,
     )
 }

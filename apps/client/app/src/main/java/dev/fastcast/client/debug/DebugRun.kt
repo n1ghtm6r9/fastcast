@@ -183,21 +183,20 @@ class DebugRun(
         private const val NO_TRIAL_VIDEO = "no video within 20 s"
         private val ASKED_RATES = floatArrayOf(120f, 144f)
         private val TRIALS = listOf(
-            tunnelAt120("tunnel1440", 2560, 1440, showsText = true),
-            tunnelAt120("tunnel1440hidden", 2560, 1440, showsText = false),
-            tunnelAt120("tunnel1080hidden", 1920, 1080, showsText = false),
-            surfaceAt2160("surface2160", SupportedCodecs.HEVC),
-            surfaceAt2160("surface2160av1", SupportedCodecs.AV1),
+            tunnelAt1440("tunnel1440", noise = false),
+            tunnelAt1440("tunnel1440noise", noise = true),
+            surfaceAt2160("surface2160", noise = false),
+            surfaceAt2160("surface2160noise", noise = true),
         )
 
-        private fun tunnelAt120(step: String, width: Int, height: Int, showsText: Boolean): StreamTrial = StreamTrial(
-            step, width, height, 120, SupportedCodecs.HEVC, tenBit = true, tunneled = true, DecoderSetup.USUAL, showsText,
-            DebugStep.TUNNEL,
+        private fun tunnelAt1440(step: String, noise: Boolean): StreamTrial = StreamTrial(
+            step, 2560, 1440, 120, SupportedCodecs.HEVC, tenBit = true, tunneled = true, DecoderSetup.USUAL,
+            showsText = false, DebugStep.TUNNEL, noise,
         )
 
-        private fun surfaceAt2160(step: String, codec: String): StreamTrial = StreamTrial(
-            step, 3840, 2160, 60, codec, tenBit = true, tunneled = false, DecoderSetup.USUAL, showsText = true,
-            DebugStep.SURFACE,
+        private fun surfaceAt2160(step: String, noise: Boolean): StreamTrial = StreamTrial(
+            step, 3840, 2160, 60, SupportedCodecs.HEVC, tenBit = true, tunneled = false, DecoderSetup.USUAL,
+            showsText = true, DebugStep.SURFACE, noise,
         )
     }
 }

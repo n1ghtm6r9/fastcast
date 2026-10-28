@@ -8,5 +8,6 @@ pub fn a_bare_hello() -> Hello {
         height: 0,
         fps: 0,
         codecs: Vec::new(),
+        noise: false,
     }
 }

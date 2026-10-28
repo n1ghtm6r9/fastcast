@@ -1,6 +1,7 @@
 mod datagram_limit;
 mod feedback_size;
 mod header_size;
+mod hello_noise_flag;
 mod keyframe_flag;
 mod keyframe_needed_flag;
 mod magic;
@@ -10,6 +11,7 @@ mod shard_size;
 pub use datagram_limit::*;
 pub use feedback_size::*;
 pub use header_size::*;
+pub use hello_noise_flag::*;
 pub use keyframe_flag::*;
 pub use keyframe_needed_flag::*;
 pub use magic::*;

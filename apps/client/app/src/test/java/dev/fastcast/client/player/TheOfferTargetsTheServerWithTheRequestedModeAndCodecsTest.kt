@@ -3,6 +3,7 @@ package dev.fastcast.client.player
 import dev.fastcast.client.stream.StreamRequest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class TheOfferTargetsTheServerWithTheRequestedModeAndCodecsTest {
@@ -25,6 +26,13 @@ class TheOfferTargetsTheServerWithTheRequestedModeAndCodecsTest {
         assertEquals(2160, request.height)
         assertEquals(120, request.fps)
         assertEquals(listOf("hevc", "avc"), request.codecs)
+    }
+
+    @Test
+    fun `the target keeps asking for noise`() {
+        val noisy = StreamOffer("192.168.0.10:3278", StreamRequest(2560, 1440, 120, listOf("hevc"), noise = true))
+
+        assertTrue(requireNotNull(noisy.target().request).noise)
     }
 
     @Test
