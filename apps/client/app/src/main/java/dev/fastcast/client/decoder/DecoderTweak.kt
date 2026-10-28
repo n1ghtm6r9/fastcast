@@ -3,13 +3,14 @@ package dev.fastcast.client.decoder
 enum class DecoderTweak {
     NONE,
     LOW_LATENCY,
+    LOW_LATENCY_GAME_LIVE,
     MEDIATEK_GAME,
     MEDIATEK_GAME_LIVE,
     MEDIATEK_REAL_TIME,
     ;
 
     val lowLatency: Boolean
-        get() = this == LOW_LATENCY
+        get() = this == LOW_LATENCY || this == LOW_LATENCY_GAME_LIVE
 
     val usesStandardLowLatency: Boolean
         get() = !playsAsGame
@@ -19,11 +20,11 @@ enum class DecoderTweak {
     fun vendorValues(): Map<String, Number> = when (this) {
         MEDIATEK_GAME, MEDIATEK_GAME_LIVE -> GAME_VALUES
         MEDIATEK_REAL_TIME -> REAL_TIME_VALUES
-        NONE, LOW_LATENCY -> emptyMap()
+        NONE, LOW_LATENCY, LOW_LATENCY_GAME_LIVE -> emptyMap()
     }
 
     fun liveVendorValues(): Map<String, Number> = when (this) {
-        MEDIATEK_GAME_LIVE -> GAME_VALUES
+        MEDIATEK_GAME_LIVE, LOW_LATENCY_GAME_LIVE -> GAME_VALUES
         MEDIATEK_REAL_TIME -> REAL_TIME_VALUES
         NONE, LOW_LATENCY, MEDIATEK_GAME -> emptyMap()
     }

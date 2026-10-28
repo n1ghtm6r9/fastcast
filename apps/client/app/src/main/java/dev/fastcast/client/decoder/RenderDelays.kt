@@ -12,10 +12,12 @@ class RenderDelays(private val capacity: Int) {
     }
 
     @Synchronized
-    fun rendered(ptsUs: Long, nanos: Long) {
-        val queuedNanos = queuedAt.remove(ptsUs) ?: return
-        delays.addLast(nanos - queuedNanos)
+    fun rendered(ptsUs: Long, nanos: Long): Long? {
+        val queuedNanos = queuedAt.remove(ptsUs) ?: return null
+        val delayNanos = nanos - queuedNanos
+        delays.addLast(delayNanos)
         if (delays.size > capacity) delays.removeFirst()
+        return delayNanos
     }
 
     @Synchronized

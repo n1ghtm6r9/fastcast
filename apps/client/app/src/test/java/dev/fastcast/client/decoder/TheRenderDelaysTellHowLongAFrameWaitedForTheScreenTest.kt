@@ -31,6 +31,19 @@ class TheRenderDelaysTellHowLongAFrameWaitedForTheScreenTest {
     }
 
     @Test
+    fun `a shown frame tells how long it waited`() {
+        val delays = RenderDelays(capacity = 8)
+        delays.queued(1_000L, 5_000_000L)
+
+        assertEquals(20_000_000L, delays.rendered(1_000L, 25_000_000L))
+    }
+
+    @Test
+    fun `a frame shown without being queued tells nothing`() {
+        assertNull(RenderDelays(capacity = 8).rendered(1_000L, 25_000_000L))
+    }
+
+    @Test
     fun `a frame shown without being queued is not counted`() {
         val delays = RenderDelays(capacity = 8)
         delays.rendered(1_000L, 5_000_000L)

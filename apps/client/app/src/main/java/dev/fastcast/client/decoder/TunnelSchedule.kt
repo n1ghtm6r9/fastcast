@@ -44,13 +44,16 @@ class TunnelSchedule(private val videoDelayUs: Long = TunnelClock.VIDEO_DELAY_US
         !anchored || (clockUs != null && !onClock) || frameUs < lastFrameUs || frameUs - lastFrameUs > TIMELINE_JUMP_US
 
     private fun anchor(frameUs: Long, clockUs: Long?) {
-        offsetUs = (clockUs ?: TunnelClock.AUDIO_START_US) + videoDelayUs - frameUs
+        offsetUs = dueUs(clockUs) - frameUs
         anchored = true
         onClock = clockUs != null
         slackUs = videoDelayUs.toDouble()
         anchors++
         if (onClock) clockAnchors++
     }
+
+    private fun dueUs(clockUs: Long?): Long =
+        if (clockUs == null) TunnelClock.AUDIO_START_US + maxOf(videoDelayUs, 0L) else clockUs + videoDelayUs
 
     private fun follow(sampleUs: Long) {
         slackUs += (sampleUs - slackUs) / SMOOTHING_FRAMES

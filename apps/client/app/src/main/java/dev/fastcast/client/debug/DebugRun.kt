@@ -3,7 +3,6 @@ package dev.fastcast.client.debug
 import dev.fastcast.client.decoder.DecoderPace
 import dev.fastcast.client.decoder.DecoderSetup
 import dev.fastcast.client.decoder.DecoderTweak
-import dev.fastcast.client.decoder.TunnelClock
 import dev.fastcast.client.decoder.TunnelTiming
 import dev.fastcast.client.decoder.VideoStart
 import java.util.ArrayDeque
@@ -185,19 +184,21 @@ class DebugRun(
         private const val FINISHED = "finished"
         private const val NO_VIDEO = "no video"
         private const val NO_TRIAL_VIDEO = "no video within 20 s"
-        private const val LONG_VIDEO_DELAY_US = 16_000L
-        private const val SHORT_VIDEO_DELAY_US = 4_000L
         private const val NO_VIDEO_DELAY_US = 0L
+        private const val SHORT_PAST_US = -16_000L
+        private const val LONG_PAST_US = -48_000L
+        private const val FAR_PAST_US = -200_000L
+        private const val PROBED_FRAMES = 5
         private val ASKED_RATES = floatArrayOf(120f, 144f)
         private val TRIALS = listOf(
             tunnelAt1440("tunnel1440", DecoderSetup.USUAL, showsText = true),
             tunnelAt1440("tunnel1440hidden", DecoderSetup.USUAL, showsText = false),
-            tunnelAt1440("tunnel1440atonce", timed(TunnelClock.VIDEO_DELAY_US, VideoStart.AT_ONCE), showsText = true),
-            tunnelAt1440("tunnel1440delay16", timed(LONG_VIDEO_DELAY_US, VideoStart.ON_RUNNING_CLOCK), showsText = true),
-            tunnelAt1440("tunnel1440delay4", timed(SHORT_VIDEO_DELAY_US, VideoStart.ON_RUNNING_CLOCK), showsText = true),
-            tunnelAt1440("tunnel1440delay0", timed(NO_VIDEO_DELAY_US, VideoStart.ON_RUNNING_CLOCK), showsText = true),
-            tunnelAt1440("tunnel1440lowlatency", tweaked(DecoderTweak.LOW_LATENCY), showsText = true),
-            tunnelAt1440("tunnel1440game", tweaked(DecoderTweak.MEDIATEK_GAME_LIVE), showsText = true),
+            tunnelAt1440("tunnel1440delay0", delayed(NO_VIDEO_DELAY_US), showsText = true),
+            tunnelAt1440("tunnel1440past16", delayed(SHORT_PAST_US), showsText = true),
+            tunnelAt1440("tunnel1440past48", delayed(LONG_PAST_US), showsText = true),
+            tunnelAt1440("tunnel1440past200", delayed(FAR_PAST_US), showsText = true),
+            tunnelAt1440("tunnel1440gamelowlatency", tweaked(DecoderTweak.LOW_LATENCY_GAME_LIVE), showsText = true),
+            tunnelAt1440("tunnel1440decodeonly", decodingOnly(PROBED_FRAMES), showsText = true),
             StreamTrial(
                 "tunnel1080hidden", 1920, 1080, 120, tunneled = true, DecoderSetup.USUAL, showsText = false,
                 DebugStep.TUNNEL,
@@ -207,9 +208,13 @@ class DebugRun(
         private fun tunnelAt1440(step: String, setup: DecoderSetup, showsText: Boolean): StreamTrial =
             StreamTrial(step, 2560, 1440, 120, tunneled = true, setup, showsText, DebugStep.TUNNEL)
 
-        private fun timed(videoDelayUs: Long, videoStart: VideoStart): DecoderSetup = DecoderSetup(
-            DecoderPace.REALTIME, DecoderTweak.NONE, inspectsVendorParameters = false,
-            TunnelTiming(videoDelayUs, videoStart),
+        private fun delayed(videoDelayUs: Long): DecoderSetup = DecoderSetup(
+            DecoderPace.REALTIME, DecoderSetup.USUAL.tweak, inspectsVendorParameters = false,
+            TunnelTiming(videoDelayUs, VideoStart.ON_RUNNING_CLOCK),
+        )
+
+        private fun decodingOnly(frames: Int): DecoderSetup = DecoderSetup(
+            DecoderPace.REALTIME, DecoderSetup.USUAL.tweak, inspectsVendorParameters = false, decodeOnlyFrames = frames,
         )
 
         private fun tweaked(tweak: DecoderTweak): DecoderSetup =

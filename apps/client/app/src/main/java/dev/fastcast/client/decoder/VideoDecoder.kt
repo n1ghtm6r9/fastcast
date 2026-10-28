@@ -25,6 +25,7 @@ class VideoDecoder(
     private val bufferInfo = MediaCodec.BufferInfo()
     private val schedule = TunnelSchedule(setup.timing.videoDelayUs)
     private val start = TunnelStart(setup.timing.videoStart.clockWaitNanos)
+    private val probe = DecodeOnlyProbe(setup.decodeOnlyFrames)
 
     private var thread: Thread? = null
     private var codec: MediaCodec? = null
@@ -151,6 +152,7 @@ class VideoDecoder(
         stats.codecStarts.incrementAndGet()
         schedule.restart()
         start.restart()
+        probe.restart()
         tunnel?.start()
         nalLengthSize = parameters.nalLengthSize
         inputCapacity = inputCapacityOf(started, format)
@@ -186,7 +188,7 @@ class VideoDecoder(
 
     private fun onFramePresented(ptsUs: Long, nanoTime: Long) {
         stats.framePresented(ptsUs, nanoTime)
-        tunnel?.clockUs(nanoTime)?.let { stats.lateness.add(it - ptsUs) }
+        tunnel?.clockUs(nanoTime)?.let { stats.frameLate(it - ptsUs) }
     }
 
     private fun applyLiveVendorValues(created: MediaCodec) {
@@ -245,7 +247,16 @@ class VideoDecoder(
         announceFirstFrame()
     }
 
-    private fun flagsOf(sample: VideoSample): Int = if (sample.keyframe) MediaCodec.BUFFER_FLAG_KEY_FRAME else 0
+    private fun flagsOf(sample: VideoSample): Int = keyframeFlag(sample) or decodeOnlyFlag(sample)
+
+    private fun keyframeFlag(sample: VideoSample): Int = if (sample.keyframe) MediaCodec.BUFFER_FLAG_KEY_FRAME else 0
+
+    private fun decodeOnlyFlag(sample: VideoSample): Int {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return 0
+        if (tunnel == null || sample.keyframe || !probe.decodesOnly(System.nanoTime())) return 0
+        stats.framesDecodedOnly.incrementAndGet()
+        return MediaCodec.BUFFER_FLAG_DECODE_ONLY
+    }
 
     private fun drainCodec() {
         val active = codec ?: return

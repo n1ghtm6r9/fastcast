@@ -47,6 +47,16 @@ class TheTunnelVideoIsAnchoredToTheRunningAudioClockTest {
     }
 
     @Test
+    fun `a video delay below zero times the frames behind the running clock`() {
+        assertEquals(CLOCK_US - 16_000L, TunnelSchedule(-16_000L).presentationUs(8_000L, CLOCK_US))
+    }
+
+    @Test
+    fun `before the clock runs a frame is never due before the audio starts`() {
+        assertEquals(TunnelClock.AUDIO_START_US, TunnelSchedule(-16_000L).presentationUs(8_000L, null))
+    }
+
+    @Test
     fun `a stream that starts its time again is anchored afresh`() {
         schedule.presentationUs(60_000_000L, CLOCK_US)
         val clockUs = CLOCK_US + 8_333L

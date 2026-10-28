@@ -5,9 +5,10 @@ class DecoderSetup(
     val tweak: DecoderTweak,
     val inspectsVendorParameters: Boolean,
     val timing: TunnelTiming = TunnelTiming.USUAL,
+    val decodeOnlyFrames: Int = 0,
 ) {
 
     companion object {
-        val USUAL = DecoderSetup(DecoderPace.REALTIME, DecoderTweak.NONE, inspectsVendorParameters = false)
+        val USUAL = DecoderSetup(DecoderPace.REALTIME, DecoderTweak.LOW_LATENCY, inspectsVendorParameters = false)
     }
 }

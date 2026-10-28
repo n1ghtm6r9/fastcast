@@ -45,6 +45,15 @@ class TheDecoderTweakChangesOneThingAboutDecodingTest {
     }
 
     @Test
+    fun `low latency as a game live keeps the standard hint and asks for the game modes once the decoder runs`() {
+        assertTrue(DecoderTweak.LOW_LATENCY_GAME_LIVE.lowLatency)
+        assertTrue(DecoderTweak.LOW_LATENCY_GAME_LIVE.usesStandardLowLatency)
+        assertNull(DecoderTweak.LOW_LATENCY_GAME_LIVE.operatingRate(120))
+        assertEquals(emptyMap<String, Number>(), DecoderTweak.LOW_LATENCY_GAME_LIVE.vendorValues())
+        assertEquals(GAME, DecoderTweak.LOW_LATENCY_GAME_LIVE.liveVendorValues())
+    }
+
+    @Test
     fun `forcing real time asks the MediaTek decoder for it before and after it starts`() {
         assertFalse(DecoderTweak.MEDIATEK_REAL_TIME.lowLatency)
         assertTrue(DecoderTweak.MEDIATEK_REAL_TIME.usesStandardLowLatency)

@@ -25,9 +25,9 @@ class TheDebugRunWalksEveryStepTest {
             listOf(
                 "step FACTS", "step VSYNC", "vsync", "step ASK", "ask 120.0", "vsync", "ask 144.0", "vsync", "clear",
                 "step STREAM", "hide", "step TUNNEL", "trial tunnel1440", "step TUNNEL", "trial tunnel1440hidden", "hide",
-                "step TUNNEL", "trial tunnel1440atonce", "step TUNNEL", "trial tunnel1440delay16", "step TUNNEL",
-                "trial tunnel1440delay4", "step TUNNEL", "trial tunnel1440delay0", "step TUNNEL",
-                "trial tunnel1440lowlatency", "step TUNNEL", "trial tunnel1440game", "step TUNNEL",
+                "step TUNNEL", "trial tunnel1440delay0", "step TUNNEL", "trial tunnel1440past16", "step TUNNEL",
+                "trial tunnel1440past48", "step TUNNEL", "trial tunnel1440past200", "step TUNNEL",
+                "trial tunnel1440gamelowlatency", "step TUNNEL", "trial tunnel1440decodeonly", "step TUNNEL",
                 "trial tunnel1080hidden", "hide", "step RESTORE", "usual", "done",
             ),
             host.events,
@@ -76,27 +76,27 @@ class TheDebugRunWalksEveryStepTest {
     fun `a trial report names what was asked, the rates and what the trial saw`() {
         runToTheEnd()
 
-        val tunnel = textOf("tunnel1440game")
+        val tunnel = textOf("tunnel1440gamelowlatency")
         assertTrue(tunnel, tunnel.startsWith("asked 2560x1440@120 tunneled; queued 120.0/s, decoded 120.0/s"))
         assertTrue(tunnel, tunnel.contains("presented: "))
         assertTrue(tunnel, tunnel.endsWith("; audio played 6.0 s"))
     }
 
     @Test
-    fun `one run tries the usual tunnel, starting at once, other video delays, decoder tweaks and 1080p`() {
+    fun `one run tries the usual tunnel, video delays down to frames already due, game modes, decode only and 1080p`() {
         runToTheEnd()
 
         assertEquals(
             listOf(
-                "2560x1440@120 tunneled REALTIME NONE uninspected text shown ON_RUNNING_CLOCK 8000",
-                "2560x1440@120 tunneled REALTIME NONE uninspected text hidden ON_RUNNING_CLOCK 8000",
-                "2560x1440@120 tunneled REALTIME NONE uninspected text shown AT_ONCE 8000",
-                "2560x1440@120 tunneled REALTIME NONE uninspected text shown ON_RUNNING_CLOCK 16000",
-                "2560x1440@120 tunneled REALTIME NONE uninspected text shown ON_RUNNING_CLOCK 4000",
-                "2560x1440@120 tunneled REALTIME NONE uninspected text shown ON_RUNNING_CLOCK 0",
-                "2560x1440@120 tunneled REALTIME LOW_LATENCY uninspected text shown ON_RUNNING_CLOCK 8000",
-                "2560x1440@120 tunneled REALTIME MEDIATEK_GAME_LIVE uninspected text shown ON_RUNNING_CLOCK 8000",
-                "1920x1080@120 tunneled REALTIME NONE uninspected text hidden ON_RUNNING_CLOCK 8000",
+                "2560x1440@120 tunneled REALTIME LOW_LATENCY uninspected text shown ON_RUNNING_CLOCK 8000 decode only 0",
+                "2560x1440@120 tunneled REALTIME LOW_LATENCY uninspected text hidden ON_RUNNING_CLOCK 8000 decode only 0",
+                "2560x1440@120 tunneled REALTIME LOW_LATENCY uninspected text shown ON_RUNNING_CLOCK 0 decode only 0",
+                "2560x1440@120 tunneled REALTIME LOW_LATENCY uninspected text shown ON_RUNNING_CLOCK -16000 decode only 0",
+                "2560x1440@120 tunneled REALTIME LOW_LATENCY uninspected text shown ON_RUNNING_CLOCK -48000 decode only 0",
+                "2560x1440@120 tunneled REALTIME LOW_LATENCY uninspected text shown ON_RUNNING_CLOCK -200000 decode only 0",
+                "2560x1440@120 tunneled REALTIME LOW_LATENCY_GAME_LIVE uninspected text shown ON_RUNNING_CLOCK 8000 decode only 0",
+                "2560x1440@120 tunneled REALTIME LOW_LATENCY uninspected text shown ON_RUNNING_CLOCK 8000 decode only 5",
+                "1920x1080@120 tunneled REALTIME LOW_LATENCY uninspected text hidden ON_RUNNING_CLOCK 8000 decode only 0",
             ),
             host.trials.map(::describeTrial),
         )
@@ -108,7 +108,7 @@ class TheDebugRunWalksEveryStepTest {
         val text = if (trial.showsText) "text shown" else "text hidden"
         val timing = trial.setup.timing
         return "${trial.width}x${trial.height}@${trial.fps} $path ${trial.setup.pace} ${trial.setup.tweak} $inspection $text " +
-            "${timing.videoStart} ${timing.videoDelayUs}"
+            "${timing.videoStart} ${timing.videoDelayUs} decode only ${trial.setup.decodeOnlyFrames}"
     }
 
     @Test
@@ -127,17 +127,17 @@ class TheDebugRunWalksEveryStepTest {
 
     @Test
     fun `a trial that never plays is reported with the last error and the next trial still runs`() {
-        host.trialStartsAfterMs = mapOf("tunnel1440atonce" to null)
+        host.trialStartsAfterMs = mapOf("tunnel1440past16" to null)
         host.lastError = "Decoder error: no tunnel"
 
         runToTheEnd()
 
         assertEquals(
             "asked 2560x1440@120 tunneled; no video within 20 s; Decoder error: no tunnel; audio played 6.0 s",
-            textOf("tunnel1440atonce"),
+            textOf("tunnel1440past16"),
         )
         assertEquals(listOf("trial tunnel1080hidden", "hide", "step RESTORE", "usual", "done"), host.events.takeLast(5))
-        assertEquals(ALL_TRIALS - "tunnel1440atonce", requireNotNull(host.shownResults).map { it.trial.step })
+        assertEquals(ALL_TRIALS - "tunnel1440past16", requireNotNull(host.shownResults).map { it.trial.step })
     }
 
     @Test
@@ -229,8 +229,8 @@ class TheDebugRunWalksEveryStepTest {
     companion object {
         private const val WHOLE_RUN_MS = 400_000L
         private val ALL_TRIALS = listOf(
-            "tunnel1440", "tunnel1440hidden", "tunnel1440atonce", "tunnel1440delay16", "tunnel1440delay4",
-            "tunnel1440delay0", "tunnel1440lowlatency", "tunnel1440game", "tunnel1080hidden",
+            "tunnel1440", "tunnel1440hidden", "tunnel1440delay0", "tunnel1440past16", "tunnel1440past48",
+            "tunnel1440past200", "tunnel1440gamelowlatency", "tunnel1440decodeonly", "tunnel1080hidden",
         )
     }
 }
