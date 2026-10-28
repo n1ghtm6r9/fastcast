@@ -1,6 +1,7 @@
 mod amf_args;
 mod auto_encoder_order;
 mod avc_profile_args;
+mod capture_report_interval;
 mod color_conversion_filter;
 mod create_no_window;
 mod exit_wait_timeout;
@@ -43,6 +44,7 @@ mod x264_args;
 pub use amf_args::*;
 pub use auto_encoder_order::*;
 pub use avc_profile_args::*;
+pub use capture_report_interval::*;
 pub use color_conversion_filter::*;
 pub use create_no_window::*;
 pub use exit_wait_timeout::*;

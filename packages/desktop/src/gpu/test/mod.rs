@@ -1,3 +1,4 @@
+mod a_device_raises_its_gpu_thread_priority_test;
 mod first_attached_output;
 mod first_output_device;
 pub use first_attached_output::*;
@@ -20,3 +21,4 @@ mod the_desktop_has_an_attached_output_test;
 mod the_extent_of_a_rectangle_spanning_the_origin_is_its_full_length_test;
 mod the_extent_of_an_inverted_rectangle_is_zero_test;
 mod the_outputs_of_each_adapter_are_numbered_from_zero_test;
+mod the_process_schedules_its_gpu_work_high_test;

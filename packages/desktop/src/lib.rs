@@ -17,4 +17,7 @@ pub use cursor::{
 #[cfg(windows)]
 pub use duplication::{Duplication, FrameUpdate, PointerState, present_age};
 #[cfg(windows)]
-pub use gpu::{AdapterLuid, DesktopError, GpuDevice, NVIDIA_VENDOR_ID, OutputInfo, list_outputs};
+pub use gpu::{
+    AdapterLuid, DesktopError, GpuDevice, NVIDIA_VENDOR_ID, OutputInfo, list_outputs,
+    raise_gpu_scheduling,
+};

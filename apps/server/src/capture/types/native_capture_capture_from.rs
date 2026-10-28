@@ -5,11 +5,17 @@ use tracing::info;
 
 impl NativeCapture<'_> {
     pub(crate) fn capture_from(&mut self, mut duplication: Duplication) -> Result<(), NativeError> {
-        let acquired = duplication.acquire(&self.device, self.clock.until_repeat(Instant::now()));
+        let asked = Instant::now();
+        let timeout = self.clock.until_repeat(asked);
+        let acquired = duplication.acquire(&self.device, timeout);
         let arrived = Instant::now();
 
         match acquired {
             Ok(Some(update)) => {
+                if self.pending_arrived.is_some() {
+                    self.stats.replaced();
+                }
+
                 self.picture.arrived();
                 self.pending_arrived = Some(arrived);
                 self.pending_shown =
@@ -25,6 +31,8 @@ impl NativeCapture<'_> {
                 Ok(())
             }
             Ok(None) => {
+                self.stats
+                    .waited(arrived.saturating_duration_since(asked + timeout));
                 self.convert_waiting(&duplication)?;
                 self.duplication = Some(duplication);
 

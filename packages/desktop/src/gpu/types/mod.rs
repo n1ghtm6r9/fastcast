@@ -5,6 +5,7 @@ mod gpu_device;
 mod gpu_device_context;
 mod gpu_device_device;
 mod gpu_device_new;
+mod gpu_device_raise_priority;
 mod gpu_device_vendor_id;
 mod output_info;
 pub use adapter_luid::*;

@@ -6,10 +6,12 @@ impl NativeCapture<'_> {
         let shown = self.pending_shown.take();
         let arrived = self.pending_arrived.take();
         let force = key_frame_wanted(&self.key_frames, self.hub, at);
+        let encoding = Instant::now();
         let encoded = self
             .encoder
             .encode(self.converter.output(), force)
             .map_err(NativeError::Encoder)?;
+        let took = encoding.elapsed();
 
         if encoded.keyframe {
             self.key_frames.forced(at);
@@ -34,6 +36,8 @@ impl NativeCapture<'_> {
             Some(arrived) => self.clock.encoded_picture(arrived, at),
             None => self.clock.encoded(at),
         }
+
+        self.stats.encoded(at, took, arrived.is_some());
 
         if published {
             self.frames += 1;

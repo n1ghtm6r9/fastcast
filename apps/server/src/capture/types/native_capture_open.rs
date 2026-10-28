@@ -1,6 +1,7 @@
 use crate::capture::{
-    CaptureTarget, FrameClock, KeyFrameGate, NativeCapture, NativeError, NativePipeline, Picture,
-    ReopenFailures, converter_depth_of, encoder_codec_of, encoder_preset_for, nvidia_output_for,
+    CaptureStats, CaptureTarget, FrameClock, KeyFrameGate, NativeCapture, NativeError,
+    NativePipeline, Picture, ReopenFailures, converter_depth_of, encoder_codec_of,
+    encoder_preset_for, nvidia_output_for, raise_capture_priorities,
 };
 use crate::hub::Hub;
 use desktop::{Converter, Duplication, GpuDevice, list_outputs};
@@ -20,6 +21,7 @@ impl<'a> NativeCapture<'a> {
         let outputs = list_outputs().map_err(NativeError::Desktop)?;
         let output = nvidia_output_for(target, &outputs)?.clone();
         let device = GpuDevice::new(output.adapter_luid).map_err(NativeError::Desktop)?;
+        info!("{}", raise_capture_priorities(&device));
         let duplication = Duplication::new(&device, &output).map_err(NativeError::Desktop)?;
         let size = (duplication.width(), duplication.height());
         let converter = Converter::new(
@@ -69,6 +71,7 @@ impl<'a> NativeCapture<'a> {
             frames: 0,
             pending_shown: None,
             pending_arrived: None,
+            stats: CaptureStats::new(Instant::now()),
         })
     }
 }

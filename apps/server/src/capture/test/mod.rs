@@ -68,6 +68,14 @@ mod scripted_probe_probe;
 mod sequence_header_tag;
 mod settle;
 #[cfg(windows)]
+mod the_capture_process_refuses_power_throttling_test;
+#[cfg(windows)]
+mod the_capture_process_runs_above_normal_test;
+#[cfg(windows)]
+mod the_capture_thread_runs_at_the_highest_priority_test;
+mod the_priority_line_names_every_raised_priority_test;
+mod the_priority_line_tells_which_priority_failed_and_why_test;
+#[cfg(windows)]
 mod try_lock_gpu_slot;
 pub use an_avc_key_frame::*;
 pub use an_hevc_key_frame::*;
@@ -330,6 +338,14 @@ mod ten_bits_ask_the_converter_for_ten_bit_output_test;
 mod the_amf_pipeline_uses_the_documented_arguments_test;
 mod the_auto_choice_runs_the_native_backend_when_it_prepares_test;
 mod the_auto_codec_choice_tries_the_codecs_in_the_order_the_tv_lists_them_test;
+mod the_capture_line_counts_frames_and_new_pictures_per_second_test;
+mod the_capture_line_counts_pictures_replaced_before_encoding_test;
+mod the_capture_line_says_what_was_not_measured_test;
+mod the_capture_line_starts_over_after_each_report_test;
+mod the_capture_line_tells_how_far_waits_overran_test;
+mod the_capture_line_tells_how_long_encoding_took_test;
+mod the_capture_line_tells_the_longest_pause_between_frames_test;
+mod the_capture_line_waits_five_seconds_test;
 mod the_capture_shows_the_scale_of_the_screen_it_runs_on_test;
 mod the_configured_rate_is_what_the_config_announces_test;
 #[cfg(windows)]
@@ -349,6 +365,7 @@ mod the_hub_is_cleared_when_the_last_viewer_has_left_and_ffmpeg_is_stopped_test;
 mod the_keyframe_interval_is_the_rate_times_the_seconds_test;
 mod the_last_picture_is_repeated_a_quarter_interval_after_its_turn_test;
 mod the_native_backend_encodes_av1_when_it_is_chosen_and_the_tv_decodes_it_test;
+mod the_native_backend_encodes_av1_when_the_tv_decodes_nothing_else_test;
 mod the_native_backend_encodes_the_chosen_codec_when_the_tv_decodes_it_test;
 mod the_native_backend_prefers_hevc_when_the_tv_decodes_it_test;
 mod the_native_backend_prepares_ten_bit_hevc_when_the_tv_decodes_it_test;

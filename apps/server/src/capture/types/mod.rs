@@ -1,6 +1,11 @@
 mod capture_backend;
 mod capture_error;
 mod capture_report;
+mod capture_stats;
+mod capture_stats_encoded;
+mod capture_stats_line;
+mod capture_stats_replaced;
+mod capture_stats_waited;
 mod capture_target;
 mod encoder_picker;
 mod encoder_picker_forget_failures;
@@ -44,6 +49,8 @@ mod native_capture_reopen;
 #[cfg(windows)]
 mod native_capture_repeat;
 #[cfg(windows)]
+mod native_capture_report;
+#[cfg(windows)]
 mod native_capture_run;
 #[cfg(windows)]
 mod native_capture_stopped;
@@ -80,6 +87,7 @@ mod watch_outcome;
 pub use capture_backend::*;
 pub use capture_error::*;
 pub use capture_report::*;
+pub use capture_stats::*;
 pub use capture_target::*;
 pub use encoder_picker::*;
 pub use failed_reopen::*;

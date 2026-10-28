@@ -11,6 +11,8 @@ impl NativeCapture<'_> {
                     }
                 }
             }
+
+            self.report();
         }
 
         Ok(())

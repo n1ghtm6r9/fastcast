@@ -6,6 +6,7 @@ mod codecs_or_avc;
 mod codecs_to_try;
 #[cfg(windows)]
 mod converter_depth_of;
+mod duration_spread;
 mod encoder_args;
 #[cfg(windows)]
 mod encoder_codec_of;
@@ -33,12 +34,21 @@ mod open_virtual_display;
 mod pick_codec_and_encoder;
 mod pick_encoder;
 mod prepare_while_watched;
+mod priority_line;
 mod probe_args;
 mod probe_encoder;
 mod profile_args_of;
 mod publish_encoded_frame;
 mod pump_frames;
+#[cfg(windows)]
+mod raise_capture_priorities;
+#[cfg(windows)]
+mod raise_process_priority;
+#[cfg(windows)]
+mod raise_thread_priority;
 mod rate_control_args;
+#[cfg(windows)]
+mod refuse_power_throttling;
 mod release_screen;
 #[cfg(windows)]
 mod reopen_step_of;
@@ -76,6 +86,7 @@ pub use codecs_or_avc::*;
 pub use codecs_to_try::*;
 #[cfg(windows)]
 pub use converter_depth_of::*;
+pub use duration_spread::*;
 pub use encoder_args::*;
 #[cfg(windows)]
 pub use encoder_codec_of::*;
@@ -103,12 +114,21 @@ pub use open_virtual_display::*;
 pub use pick_codec_and_encoder::*;
 pub use pick_encoder::*;
 pub use prepare_while_watched::*;
+pub use priority_line::*;
 pub use probe_args::*;
 pub use probe_encoder::*;
 pub use profile_args_of::*;
 pub use publish_encoded_frame::*;
 pub use pump_frames::*;
+#[cfg(windows)]
+pub use raise_capture_priorities::*;
+#[cfg(windows)]
+pub use raise_process_priority::*;
+#[cfg(windows)]
+pub use raise_thread_priority::*;
 pub use rate_control_args::*;
+#[cfg(windows)]
+pub use refuse_power_throttling::*;
 pub use release_screen::*;
 #[cfg(windows)]
 pub use reopen_step_of::*;

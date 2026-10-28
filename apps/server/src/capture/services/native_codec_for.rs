@@ -5,6 +5,7 @@ pub fn native_codec_for(choice: CodecChoice, offered: &[VideoCodec]) -> VideoCod
     match choice.codec() {
         Some(chosen) if offered.contains(&chosen) => chosen,
         _ if offered.contains(&VideoCodec::Hevc) => VideoCodec::Hevc,
-        _ => VideoCodec::Avc,
+        _ if offered.contains(&VideoCodec::Avc) => VideoCodec::Avc,
+        _ => offered.first().copied().unwrap_or(VideoCodec::Avc),
     }
 }
