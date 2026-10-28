@@ -1,5 +1,6 @@
 mod adapter_luid;
 mod desktop_error;
+mod desktop_error_is_temporary;
 mod gpu_device;
 mod gpu_device_context;
 mod gpu_device_device;

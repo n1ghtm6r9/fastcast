@@ -40,6 +40,7 @@ mod publish_encoded_frame;
 mod pump_frames;
 mod rate_control_args;
 mod release_screen;
+#[cfg(windows)]
 mod reopen_step_of;
 mod request_changed;
 mod rescaled;
@@ -107,6 +108,7 @@ pub use publish_encoded_frame::*;
 pub use pump_frames::*;
 pub use rate_control_args::*;
 pub use release_screen::*;
+#[cfg(windows)]
 pub use reopen_step_of::*;
 pub use request_changed::*;
 pub use rescaled::*;

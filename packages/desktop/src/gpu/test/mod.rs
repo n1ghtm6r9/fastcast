@@ -3,6 +3,8 @@ mod first_output_device;
 pub use first_attached_output::*;
 pub use first_output_device::*;
 
+mod a_desktop_error_that_needs_a_new_device_is_not_temporary_test;
+mod a_desktop_that_comes_back_on_its_own_is_temporary_test;
 mod a_device_opens_on_the_adapter_of_an_output_test;
 mod a_plain_desktop_error_has_no_source_test;
 mod a_wide_name_ends_at_its_first_nul_test;
