@@ -36,7 +36,6 @@
     <string name="debug_step_vsync">measuring the screen refresh</string>
     <string name="debug_step_ask">asking the screen for 120 and 144 Hz</string>
     <string name="debug_step_stream">measuring the usual stream</string>
-    <string name="debug_step_fast">trying a 120 fps stream</string>
     <string name="debug_step_tunnel">trying the TV\'s own video path at 120 fps</string>
     <string name="debug_step_restore">bringing the usual stream back</string>
     <string name="debug_done">Debug finished. The details are in the server journal.</string>

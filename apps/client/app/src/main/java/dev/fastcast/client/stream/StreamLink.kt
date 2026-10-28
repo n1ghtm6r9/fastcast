@@ -14,6 +14,8 @@ interface StreamLink {
 
     fun socketDrops(link: Long): Int
 
+    fun inboxDrops(link: Long): Int
+
     fun takeLongestPauseMs(link: Long): Int
 
     fun requestKeyFrame(link: Long)

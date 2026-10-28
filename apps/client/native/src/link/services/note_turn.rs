@@ -1,10 +1,10 @@
-use crate::link::{LinkShared, LinkState};
+use crate::link::LinkShared;
 use std::sync::atomic::Ordering;
 use std::time::Instant;
 
-pub(crate) fn note_turn(shared: &LinkShared, state: &mut LinkState, now: Instant) {
-    let pause = now.saturating_duration_since(state.last_turn);
-    state.last_turn = now;
+pub(crate) fn note_turn(shared: &LinkShared, last_turn: &mut Instant, now: Instant) {
+    let pause = now.saturating_duration_since(*last_turn);
+    *last_turn = now;
 
     let pause_ms = u32::try_from(pause.as_millis()).unwrap_or(u32::MAX);
     shared

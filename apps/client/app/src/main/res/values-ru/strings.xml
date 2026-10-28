@@ -28,7 +28,6 @@
     <string name="debug_step_vsync">измеряю частоту экрана</string>
     <string name="debug_step_ask">прошу у экрана 120 и 144 Гц</string>
     <string name="debug_step_stream">измеряю обычный поток</string>
-    <string name="debug_step_fast">пробую поток 120 кадров/с</string>
     <string name="debug_step_tunnel">пробую собственный видеотракт ТВ на 120 кадрах/с</string>
     <string name="debug_step_restore">возвращаю обычный поток</string>
     <string name="debug_done">Отладка завершена. Подробности в журнале сервера.</string>

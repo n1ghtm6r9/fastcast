@@ -10,7 +10,7 @@ object TunnelClock {
     private const val NANOS_PER_MILLISECOND = 1_000_000L
 
     const val AUDIO_START_US = 1_000_000_000_000L
-    const val VIDEO_DELAY_US = 50_000L
+    const val VIDEO_DELAY_US = 8_000L
     const val SAMPLE_RATE = 48_000
     const val CHUNK_MS = 10L
     const val CHUNK_BYTES = (SAMPLE_RATE * CHUNK_MS / MILLISECONDS_PER_SECOND).toInt() * CHANNELS * BYTES_PER_SAMPLE

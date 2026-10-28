@@ -15,5 +15,6 @@ class StatsSnapshot(
     val delayMs: Double? = null,
     val tunneled: Boolean = false,
     val socketDrops: Int? = null,
+    val inboxDrops: Int? = null,
     val linkPauseMs: Int? = null,
 )

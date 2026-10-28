@@ -7,7 +7,11 @@ import org.junit.Test
 
 class TheStatsMessageCarriesTheLinkCountersTest {
 
-    private fun messageWith(socketDrops: Int? = null, linkPauseMs: Int? = null): JSONObject = JSONObject(
+    private fun messageWith(
+        socketDrops: Int? = null,
+        inboxDrops: Int? = null,
+        linkPauseMs: Int? = null,
+    ): JSONObject = JSONObject(
         StatsMessage(
             decoder = "c2.mtk.hevc.decoder",
             mime = "video/hevc",
@@ -18,6 +22,7 @@ class TheStatsMessageCarriesTheLinkCountersTest {
             dropped = 0L,
             display = "2560x1440@120",
             socketDrops = socketDrops,
+            inboxDrops = inboxDrops,
             linkPauseMs = linkPauseMs,
         ).toJson(),
     )
@@ -35,6 +40,16 @@ class TheStatsMessageCarriesTheLinkCountersTest {
     @Test
     fun `a socket that dropped nothing still says so`() {
         assertEquals(0, messageWith(socketDrops = 0).getInt("socketDrops"))
+    }
+
+    @Test
+    fun `inbox drops the tv cannot count are left out`() {
+        assertFalse(messageWith().has("inboxDrops"))
+    }
+
+    @Test
+    fun `counted inbox drops are sent`() {
+        assertEquals(23, messageWith(inboxDrops = 23).getInt("inboxDrops"))
     }
 
     @Test

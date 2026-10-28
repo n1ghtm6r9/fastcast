@@ -7,9 +7,9 @@ fn pacing_spreads_a_frame_over_half_its_interval() {
     let sender = loopback_stream_socket();
     let peer = bind_peer();
     let address = peer.local_addr().expect("a bound socket has an address");
-    let datagrams = datagrams_of_shards(64);
+    let datagrams = datagrams_of_shards(400);
 
-    assert_eq!(datagrams.len(), 64);
+    assert_eq!(datagrams.len(), 400);
 
     let started = Instant::now();
 

@@ -5,7 +5,6 @@ enum class DebugStep {
     VSYNC,
     ASK,
     STREAM,
-    FAST,
     TUNNEL,
     RESTORE,
 }

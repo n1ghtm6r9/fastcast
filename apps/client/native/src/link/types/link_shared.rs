@@ -9,4 +9,5 @@ pub struct LinkShared {
     pub stop: AtomicBool,
     pub key_frame_requested: AtomicBool,
     pub longest_pause_ms: AtomicU32,
+    pub inbox_drops: AtomicU32,
 }

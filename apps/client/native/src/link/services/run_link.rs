@@ -1,46 +1,26 @@
 use crate::link::{
-    LinkFlow, LinkShared, LinkState, LinkTarget, RECEIVE_BUFFER_BYTES, deliver_frames, end_link,
-    is_quiet_read_error, note_turn, read_datagram, send_bye, send_feedback, send_hello,
-    take_datagram,
+    INBOX_DATAGRAMS, LINK_THREAD_PRIORITY, LinkShared, LinkTarget, drain_socket, end_link,
+    raise_thread_priority, serve_datagrams,
 };
 use std::net::UdpSocket;
 use std::sync::Arc;
-use std::sync::atomic::Ordering;
-use std::time::Instant;
+use std::sync::mpsc::sync_channel;
+use std::thread;
 
 pub fn run_link(socket: Arc<UdpSocket>, target: LinkTarget, shared: Arc<LinkShared>) {
-    let mut state = LinkState::new(Instant::now());
-    let mut buffer = [0u8; RECEIVE_BUFFER_BYTES];
+    let (inbox, datagrams) = sync_channel(INBOX_DATAGRAMS);
 
-    while !shared.stop.load(Ordering::Acquire) {
-        note_turn(&shared, &mut state, Instant::now());
-        send_hello(&socket, &target, &shared, &mut state, Instant::now());
+    thread::scope(|scope| {
+        let serving = thread::Builder::new()
+            .name("fastcast-frames".to_string())
+            .spawn_scoped(scope, || {
+                raise_thread_priority(LINK_THREAD_PRIORITY);
+                serve_datagrams(&socket, &target, &shared, datagrams);
+            });
 
-        let flow = match read_datagram(&socket, &mut buffer) {
-            Ok((length, from)) => take_datagram(
-                &buffer[..length],
-                from,
-                &target,
-                &shared,
-                &mut state,
-                Instant::now(),
-            ),
-            Err(error) if is_quiet_read_error(&error) => LinkFlow::Continue,
-            Err(error) => {
-                end_link(&shared, &error.to_string());
-                LinkFlow::Leave
-            }
-        };
-
-        if flow == LinkFlow::Leave {
-            return;
+        match serving {
+            Ok(serving) => drain_socket(&socket, &shared, inbox, || serving.is_finished()),
+            Err(error) => end_link(&shared, &error.to_string()),
         }
-
-        let now = Instant::now();
-
-        deliver_frames(&shared, &mut state, now);
-        send_feedback(&socket, &target, &shared, &mut state, now);
-    }
-
-    send_bye(&socket, &target, &shared, &state);
+    });
 }

@@ -6,7 +6,7 @@ import org.junit.Test
 
 class TheTunnelScheduleTellsHowItTimedTheVideoTest {
 
-    private val schedule = TunnelSchedule()
+    private val schedule = TunnelSchedule(DELAY_US)
 
     @Test
     fun `a fresh schedule has timed nothing`() {
@@ -41,5 +41,6 @@ class TheTunnelScheduleTellsHowItTimedTheVideoTest {
 
     private companion object {
         const val CLOCK_US = TunnelClock.AUDIO_START_US + 2_000_000L
+        const val DELAY_US = 50_000L
     }
 }

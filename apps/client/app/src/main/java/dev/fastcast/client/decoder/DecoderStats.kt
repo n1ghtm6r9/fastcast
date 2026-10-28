@@ -12,6 +12,7 @@ class DecoderStats {
     val presented = PresentTimes(PRESENTED_CAPACITY)
     val framesPresented = AtomicLong()
     val delays = RenderDelays(DELAY_CAPACITY)
+    val lateness = FrameLateness(DELAY_CAPACITY)
 
     @Volatile
     var decoderName: String = ""

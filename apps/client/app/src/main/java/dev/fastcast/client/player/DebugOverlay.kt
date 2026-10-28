@@ -53,7 +53,6 @@ class DebugOverlay(
         DebugStep.VSYNC -> R.string.debug_step_vsync
         DebugStep.ASK -> R.string.debug_step_ask
         DebugStep.STREAM -> R.string.debug_step_stream
-        DebugStep.FAST -> R.string.debug_step_fast
         DebugStep.TUNNEL -> R.string.debug_step_tunnel
         DebugStep.RESTORE -> R.string.debug_step_restore
     }

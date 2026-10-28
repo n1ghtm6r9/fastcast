@@ -21,6 +21,7 @@ class StatsMessage(
     val delayMs: Double? = null,
     val tunneled: Boolean = false,
     val socketDrops: Int? = null,
+    val inboxDrops: Int? = null,
     val linkPauseMs: Int? = null,
 ) {
 
@@ -51,6 +52,7 @@ class StatsMessage(
             .put(DISPLAY, texts.getValue(DISPLAY))
         receiveBuffer?.let { json.put(RECEIVE_BUFFER, it) }
         socketDrops?.let { json.put(SOCKET_DROPS, it) }
+        inboxDrops?.let { json.put(INBOX_DROPS, it) }
         linkPauseMs?.let { json.put(LINK_PAUSE_MS, it) }
         colorStandard?.let { json.put(COLOR_STANDARD, it) }
         colorRange?.let { json.put(COLOR_RANGE, it) }
@@ -85,6 +87,7 @@ class StatsMessage(
         private const val DISPLAY = "display"
         private const val RECEIVE_BUFFER = "receiveBuffer"
         private const val SOCKET_DROPS = "socketDrops"
+        private const val INBOX_DROPS = "inboxDrops"
         private const val LINK_PAUSE_MS = "linkPauseMs"
         private const val COLOR_STANDARD = "colorStandard"
         private const val COLOR_RANGE = "colorRange"

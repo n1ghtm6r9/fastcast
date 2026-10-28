@@ -41,6 +41,29 @@ class TheNativeStreamClientReportsTheCountersOfItsLinkTest {
     }
 
     @Test
+    fun `no inbox drops are known before the client has a link`() {
+        assertNull(client.inboxDrops())
+    }
+
+    @Test
+    fun `the inbox drops of the open link are reported`() {
+        client.start()
+        val handle = link.accept()
+
+        link.dropInInbox(handle, 23)
+
+        assertEquals(23, client.inboxDrops())
+    }
+
+    @Test
+    fun `inbox drops the link cannot count are not known`() {
+        client.start()
+        link.accept()
+
+        assertNull(client.inboxDrops())
+    }
+
+    @Test
     fun `no pause is known before the client has a link`() {
         assertNull(client.takeLongestPauseMs())
     }
@@ -60,11 +83,13 @@ class TheNativeStreamClientReportsTheCountersOfItsLinkTest {
         client.start()
         val handle = link.accept()
         link.dropOnSocket(handle, 417)
+        link.dropInInbox(handle, 23)
         link.pauseFor(handle, 140)
 
         client.stop()
 
         assertNull(client.socketDrops())
+        assertNull(client.inboxDrops())
         assertNull(client.takeLongestPauseMs())
     }
 }

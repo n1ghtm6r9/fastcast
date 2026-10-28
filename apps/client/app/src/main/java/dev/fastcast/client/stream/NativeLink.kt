@@ -46,6 +46,9 @@ object NativeLink {
     external fun socketDrops(link: Long): Int
 
     @JvmStatic
+    external fun inboxDrops(link: Long): Int
+
+    @JvmStatic
     external fun takeLongestPauseMs(link: Long): Int
 
     @JvmStatic

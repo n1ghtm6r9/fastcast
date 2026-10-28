@@ -147,6 +147,7 @@ class PlayerSession(
             delayMs = decoder.stats.delays.medianMs(),
             tunneled = tunneled,
             socketDrops = stream.socketDrops(),
+            inboxDrops = stream.inboxDrops(),
             linkPauseMs = linkPauseMs,
         )
     }

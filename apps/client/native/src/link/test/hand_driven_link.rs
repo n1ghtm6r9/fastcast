@@ -10,4 +10,5 @@ pub(crate) struct HandDrivenLink {
     pub(crate) shared: LinkShared,
     pub(crate) state: LinkState,
     pub(crate) start: Instant,
+    pub(crate) last_turn: Instant,
 }

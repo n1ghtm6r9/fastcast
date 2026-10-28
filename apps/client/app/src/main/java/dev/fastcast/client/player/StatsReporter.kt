@@ -66,6 +66,7 @@ class StatsReporter(
                 delayMs = current.delayMs,
                 tunneled = current.tunneled,
                 socketDrops = current.socketDrops,
+                inboxDrops = current.inboxDrops,
                 linkPauseMs = current.linkPauseMs,
             )
             send(message.toJson())

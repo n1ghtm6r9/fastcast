@@ -53,6 +53,7 @@ class TunnelAudio(val sessionId: Int) {
         sampler = null
     }
 
+    @Synchronized
     fun clockUs(nowNanos: Long): Long? {
         val active = track ?: return null
         val clock = sampler ?: return null

@@ -33,6 +33,8 @@ object NativeStreamLink : StreamLink {
 
     override fun socketDrops(link: Long): Int = NativeLink.socketDrops(link)
 
+    override fun inboxDrops(link: Long): Int = NativeLink.inboxDrops(link)
+
     override fun takeLongestPauseMs(link: Long): Int = NativeLink.takeLongestPauseMs(link)
 
     override fun requestKeyFrame(link: Long) = NativeLink.requestKeyFrame(link)

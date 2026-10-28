@@ -17,6 +17,7 @@ impl HandDrivenLink {
             shared: LinkShared::default(),
             state: LinkState::new(start),
             start,
+            last_turn: start,
         }
     }
 }

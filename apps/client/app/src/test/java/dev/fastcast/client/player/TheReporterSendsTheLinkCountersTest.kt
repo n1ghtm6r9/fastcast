@@ -11,9 +11,16 @@ class TheReporterSendsTheLinkCountersTest {
 
     private val sink = RecordingStatsSink()
     private val socketDrops = AtomicReference<Int?>(417)
+    private val inboxDrops = AtomicReference<Int?>(23)
     private val linkPauseMs = AtomicReference<Int?>(140)
     private val reporter = StatsReporter(
-        snapshot = { aStatsSnapshot(socketDrops = socketDrops.get(), linkPauseMs = linkPauseMs.get()) },
+        snapshot = {
+            aStatsSnapshot(
+                socketDrops = socketDrops.get(),
+                inboxDrops = inboxDrops.get(),
+                linkPauseMs = linkPauseMs.get(),
+            )
+        },
         display = { "2560x1440@120" },
         send = sink::send,
         intervalMs = 60_000L,
@@ -32,6 +39,13 @@ class TheReporterSendsTheLinkCountersTest {
     }
 
     @Test
+    fun `a report carries the inbox drops of the link`() {
+        reporter.reportNow()
+
+        assertEquals(23, sink.next().getInt("inboxDrops"))
+    }
+
+    @Test
     fun `a report carries the longest pause of the link`() {
         reporter.reportNow()
 
@@ -41,12 +55,14 @@ class TheReporterSendsTheLinkCountersTest {
     @Test
     fun `a report leaves out the counters the link does not know`() {
         socketDrops.set(null)
+        inboxDrops.set(null)
         linkPauseMs.set(null)
 
         reporter.reportNow()
 
         val json = sink.next()
         assertFalse(json.has("socketDrops"))
+        assertFalse(json.has("inboxDrops"))
         assertFalse(json.has("linkPauseMs"))
     }
 }

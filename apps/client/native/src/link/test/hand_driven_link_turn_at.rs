@@ -4,6 +4,6 @@ use std::time::Duration;
 
 impl HandDrivenLink {
     pub(crate) fn turn_at(&mut self, at: Duration) {
-        note_turn(&self.shared, &mut self.state, self.start + at);
+        note_turn(&self.shared, &mut self.last_turn, self.start + at);
     }
 }

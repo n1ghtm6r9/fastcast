@@ -54,7 +54,7 @@ class TunnelSchedule(private val videoDelayUs: Long = TunnelClock.VIDEO_DELAY_US
 
     private fun follow(sampleUs: Long) {
         slackUs += (sampleUs - slackUs) / SMOOTHING_FRAMES
-        if (abs(slackUs - videoDelayUs) <= videoDelayUs / 2.0) return
+        if (abs(slackUs - videoDelayUs) <= maxOf(videoDelayUs / 2.0, MIN_DRIFT_US)) return
         offsetUs += (videoDelayUs - slackUs).roundToLong()
         slackUs = videoDelayUs.toDouble()
         retimes++
@@ -63,6 +63,7 @@ class TunnelSchedule(private val videoDelayUs: Long = TunnelClock.VIDEO_DELAY_US
     private companion object {
         const val SMOOTHING_FRAMES = 512.0
         const val TIMELINE_JUMP_US = 1_000_000L
+        const val MIN_DRIFT_US = 2_000.0
         const val MICROS_PER_MILLISECOND = 1_000.0
         const val DESCRIPTION = "video anchors %d (%d on the running audio clock), retimes %d, slack %.1f ms"
     }

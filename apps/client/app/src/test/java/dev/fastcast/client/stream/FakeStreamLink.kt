@@ -19,6 +19,7 @@ class FakeStreamLink : StreamLink {
     private val closedLinks = CopyOnWriteArrayList<Long>()
     private val keyFrameRequests = CopyOnWriteArrayList<Long>()
     private val socketDropCounts = ConcurrentHashMap<Long, Int>()
+    private val inboxDropCounts = ConcurrentHashMap<Long, Int>()
     private val longestPauses = ConcurrentHashMap<Long, Int>()
 
     val targets: List<StreamTarget>
@@ -83,6 +84,13 @@ class FakeStreamLink : StreamLink {
 
     fun dropOnSocket(handle: Long, count: Int) {
         socketDropCounts[handle] = count
+    }
+
+    override fun inboxDrops(link: Long): Int =
+        if (inboxes.containsKey(link)) inboxDropCounts[link] ?: UNKNOWN_COUNT else UNKNOWN_COUNT
+
+    fun dropInInbox(handle: Long, count: Int) {
+        inboxDropCounts[handle] = count
     }
 
     override fun takeLongestPauseMs(link: Long): Int =

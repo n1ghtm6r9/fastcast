@@ -24,6 +24,7 @@ class VideoDecoder(
     private val backlog = PacketBacklog(MAX_QUEUED_PACKETS, stats.framesDropped, events::onKeyframeNeeded)
     private val bufferInfo = MediaCodec.BufferInfo()
     private val schedule = TunnelSchedule(setup.timing.videoDelayUs)
+    private val start = TunnelStart(setup.timing.videoStart.clockWaitNanos)
 
     private var thread: Thread? = null
     private var codec: MediaCodec? = null
@@ -59,7 +60,7 @@ class VideoDecoder(
 
     fun tunnelFacts(): List<String> {
         val audio = tunnel ?: return emptyList()
-        return TunnelFacts.of(stats, audio.describe(), schedule.describe())
+        return TunnelFacts.of(stats, audio.describe(), schedule.describe()) + start.describe()
     }
 
     private fun decodeLoop() {
@@ -109,7 +110,15 @@ class VideoDecoder(
             backlog.awaitKeyframe()
             return discard()
         }
-        return sample
+        return if (admitted(sample)) sample else discard()
+    }
+
+    private fun admitted(sample: VideoSample): Boolean {
+        val audio = tunnel ?: return true
+        val nowNanos = System.nanoTime()
+        val step = start.stepFor(sample.keyframe, audio.clockUs(nowNanos) != null, nowNanos)
+        if (step == TunnelStep.ASK_FOR_KEYFRAME) events.onKeyframeNeeded()
+        return step == TunnelStep.QUEUE
     }
 
     private fun discard(): VideoSample? {
@@ -141,7 +150,8 @@ class VideoDecoder(
         configured = config
         stats.codecStarts.incrementAndGet()
         schedule.restart()
-        if (setup.timing.audioStart == AudioStart.WITH_DECODER) tunnel?.start()
+        start.restart()
+        tunnel?.start()
         nalLengthSize = parameters.nalLengthSize
         inputCapacity = inputCapacityOf(started, format)
         stats.decoderName = choice.name
@@ -162,7 +172,7 @@ class VideoDecoder(
         try {
             created.configure(format, surface, null, 0)
             inspectVendorParameters(created)
-            created.setOnFrameRenderedListener({ _, ptsUs, nanoTime -> stats.framePresented(ptsUs, nanoTime) }, null)
+            created.setOnFrameRenderedListener({ _, ptsUs, nanoTime -> onFramePresented(ptsUs, nanoTime) }, null)
             if (tunnel != null) watchFirstTunnelFrame(created)
             FrameRateHint.apply(surface, fps.toFloat())
             created.start()
@@ -172,6 +182,11 @@ class VideoDecoder(
         }
         applyLiveVendorValues(created)
         return created
+    }
+
+    private fun onFramePresented(ptsUs: Long, nanoTime: Long) {
+        stats.framePresented(ptsUs, nanoTime)
+        tunnel?.clockUs(nanoTime)?.let { stats.lateness.add(it - ptsUs) }
     }
 
     private fun applyLiveVendorValues(created: MediaCodec) {
@@ -217,7 +232,7 @@ class VideoDecoder(
         active.queueInputBuffer(index, 0, sample.size, presentationTimeUs, flagsOf(sample))
         pending = null
         stats.frameQueued(presentationTimeUs, System.nanoTime())
-        tunnel?.let(::onTunnelFrameQueued)
+        if (tunnel != null) onTunnelFrameQueued()
     }
 
     private fun presentationTimeOf(sample: VideoSample): Long {
@@ -225,8 +240,7 @@ class VideoDecoder(
         return schedule.presentationUs(sample.presentationTimeUs, audio.clockUs(System.nanoTime()))
     }
 
-    private fun onTunnelFrameQueued(audio: TunnelAudio) {
-        if (setup.timing.audioStart == AudioStart.WITH_FIRST_FRAME) audio.start()
+    private fun onTunnelFrameQueued() {
         codecRendered = true
         announceFirstFrame()
     }

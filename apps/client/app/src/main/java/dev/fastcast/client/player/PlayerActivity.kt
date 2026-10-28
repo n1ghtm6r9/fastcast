@@ -216,7 +216,7 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
         val path = if (trial.tunneled) TUNNELED_PATH else SURFACE_PATH
         val timing = trial.setup.timing
         val decoderAsk = "${trial.setup.pace.name.lowercase()} ${trial.setup.tweak.name.lowercase()} " +
-            "audio ${timing.audioStart.name.lowercase()} video delay ${timing.videoDelayUs / MICROS_PER_MILLISECOND} ms"
+            "start ${timing.videoStart.name.lowercase()} video delay ${timing.videoDelayUs / MICROS_PER_MILLISECOND} ms"
         return "asked ${trial.width}x${trial.height}@${trial.fps} $path $decoderAsk codecs ${TUNNEL_CODECS.joinToString(",")}"
     }
 
