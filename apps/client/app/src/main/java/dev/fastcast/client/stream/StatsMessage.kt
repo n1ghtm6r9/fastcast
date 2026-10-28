@@ -20,6 +20,8 @@ class StatsMessage(
     val error: String? = null,
     val delayMs: Double? = null,
     val tunneled: Boolean = false,
+    val socketDrops: Int? = null,
+    val linkPauseMs: Int? = null,
 ) {
 
     fun toJson(): String {
@@ -48,6 +50,8 @@ class StatsMessage(
             .put(DROPPED, dropped)
             .put(DISPLAY, texts.getValue(DISPLAY))
         receiveBuffer?.let { json.put(RECEIVE_BUFFER, it) }
+        socketDrops?.let { json.put(SOCKET_DROPS, it) }
+        linkPauseMs?.let { json.put(LINK_PAUSE_MS, it) }
         colorStandard?.let { json.put(COLOR_STANDARD, it) }
         colorRange?.let { json.put(COLOR_RANGE, it) }
         colorTransfer?.let { json.put(COLOR_TRANSFER, it) }
@@ -80,6 +84,8 @@ class StatsMessage(
         private const val DROPPED = "dropped"
         private const val DISPLAY = "display"
         private const val RECEIVE_BUFFER = "receiveBuffer"
+        private const val SOCKET_DROPS = "socketDrops"
+        private const val LINK_PAUSE_MS = "linkPauseMs"
         private const val COLOR_STANDARD = "colorStandard"
         private const val COLOR_RANGE = "colorRange"
         private const val COLOR_TRANSFER = "colorTransfer"

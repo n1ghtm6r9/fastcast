@@ -12,6 +12,10 @@ interface StreamLink {
 
     fun receiveBufferBytes(link: Long): Int
 
+    fun socketDrops(link: Long): Int
+
+    fun takeLongestPauseMs(link: Long): Int
+
     fun requestKeyFrame(link: Long)
 
     fun close(link: Long)

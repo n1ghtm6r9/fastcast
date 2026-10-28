@@ -34,7 +34,7 @@ class PlayerSession(
     private val throughput = ThroughputSampler(SystemClock.elapsedRealtime())
     private val reportedThroughput = ThroughputSampler(SystemClock.elapsedRealtime())
     private val reporter = StatsReporter(
-        snapshot = { snapshotOf(reportedThroughput, SystemClock.elapsedRealtime()) },
+        snapshot = { snapshotOf(reportedThroughput, SystemClock.elapsedRealtime(), stream.takeLongestPauseMs()) },
         display = displayLabel,
         send = stream::send,
         network = networkLabel,
@@ -63,7 +63,7 @@ class PlayerSession(
         decoder.stop()
     }
 
-    fun snapshot(nowMs: Long): StatsSnapshot = snapshotOf(throughput, nowMs)
+    fun snapshot(nowMs: Long): StatsSnapshot = snapshotOf(throughput, nowMs, linkPauseMs = null)
 
     fun askScale(step: Int): Boolean = stream.askScale(step)
 
@@ -127,7 +127,7 @@ class PlayerSession(
         reporter.reportFailure(message, stream::reconnect)
     }
 
-    private fun snapshotOf(sampler: ThroughputSampler, nowMs: Long): StatsSnapshot {
+    private fun snapshotOf(sampler: ThroughputSampler, nowMs: Long, linkPauseMs: Int?): StatsSnapshot {
         val rates = sampler.sample(
             nowMs,
             stream.bytesReceived.get(),
@@ -146,6 +146,8 @@ class PlayerSession(
             receiveBufferBytes = stream.receiveBufferBytes(),
             delayMs = decoder.stats.delays.medianMs(),
             tunneled = tunneled,
+            socketDrops = stream.socketDrops(),
+            linkPauseMs = linkPauseMs,
         )
     }
 

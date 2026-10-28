@@ -18,6 +18,8 @@ class FakeStreamLink : StreamLink {
     private val openedTargets = CopyOnWriteArrayList<StreamTarget>()
     private val closedLinks = CopyOnWriteArrayList<Long>()
     private val keyFrameRequests = CopyOnWriteArrayList<Long>()
+    private val socketDropCounts = ConcurrentHashMap<Long, Int>()
+    private val longestPauses = ConcurrentHashMap<Long, Int>()
 
     val targets: List<StreamTarget>
         get() = openedTargets.toList()
@@ -76,6 +78,20 @@ class FakeStreamLink : StreamLink {
 
     fun receiveBufferOf(handle: Long): Int = RECEIVE_BUFFER_BASE_BYTES + handle.toInt()
 
+    override fun socketDrops(link: Long): Int =
+        if (inboxes.containsKey(link)) socketDropCounts[link] ?: UNKNOWN_COUNT else UNKNOWN_COUNT
+
+    fun dropOnSocket(handle: Long, count: Int) {
+        socketDropCounts[handle] = count
+    }
+
+    override fun takeLongestPauseMs(link: Long): Int =
+        if (inboxes.containsKey(link)) longestPauses.remove(link) ?: NO_PAUSE_MS else UNKNOWN_COUNT
+
+    fun pauseFor(handle: Long, pauseMs: Int) {
+        longestPauses[handle] = pauseMs
+    }
+
     override fun requestKeyFrame(link: Long) {
         keyFrameRequests.add(link)
     }
@@ -100,6 +116,8 @@ class FakeStreamLink : StreamLink {
     private companion object {
         const val NO_HANDLE = 0L
         const val RECEIVE_BUFFER_BASE_BYTES = 4_194_304
+        const val UNKNOWN_COUNT = -1
+        const val NO_PAUSE_MS = 0
         const val ACCEPT_TIMEOUT_MS = 5_000L
         const val SENT_TIMEOUT_MS = 5_000L
     }

@@ -15,6 +15,8 @@ fun aStatsSnapshot(
     receiveBufferBytes: Int = 8_388_608,
     delayMs: Double? = null,
     tunneled: Boolean = false,
+    socketDrops: Int? = null,
+    linkPauseMs: Int? = null,
 ): StatsSnapshot = StatsSnapshot(
     width = width,
     height = height,
@@ -27,4 +29,6 @@ fun aStatsSnapshot(
     receiveBufferBytes = receiveBufferBytes,
     delayMs = delayMs,
     tunneled = tunneled,
+    socketDrops = socketDrops,
+    linkPauseMs = linkPauseMs,
 )

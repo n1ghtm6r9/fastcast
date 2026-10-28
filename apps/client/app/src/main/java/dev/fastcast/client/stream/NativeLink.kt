@@ -43,6 +43,12 @@ object NativeLink {
     external fun receiveBufferBytes(link: Long): Int
 
     @JvmStatic
+    external fun socketDrops(link: Long): Int
+
+    @JvmStatic
+    external fun takeLongestPauseMs(link: Long): Int
+
+    @JvmStatic
     external fun requestKeyFrame(link: Long)
 
     @JvmStatic

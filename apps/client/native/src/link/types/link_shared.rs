@@ -8,4 +8,5 @@ pub struct LinkShared {
     pub next_sequence: AtomicU32,
     pub stop: AtomicBool,
     pub key_frame_requested: AtomicBool,
+    pub longest_pause_ms: AtomicU32,
 }

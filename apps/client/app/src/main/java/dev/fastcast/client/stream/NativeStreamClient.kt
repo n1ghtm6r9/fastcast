@@ -56,6 +56,14 @@ class NativeStreamClient(
         if (handle == NO_HANDLE) UNKNOWN_BUFFER else link.receiveBufferBytes(handle)
     }
 
+    fun socketDrops(): Int? = synchronized(lock) {
+        if (handle == NO_HANDLE) null else link.socketDrops(handle).takeIf { it >= 0 }
+    }
+
+    fun takeLongestPauseMs(): Int? = synchronized(lock) {
+        if (handle == NO_HANDLE) null else link.takeLongestPauseMs(handle)
+    }
+
     fun requestKeyFrame() {
         synchronized(lock) {
             if (handle != NO_HANDLE) link.requestKeyFrame(handle)

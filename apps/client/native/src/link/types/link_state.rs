@@ -9,4 +9,5 @@ pub struct LinkState {
     pub next_hello: Instant,
     pub next_feedback: Instant,
     pub reported_losses: u32,
+    pub last_turn: Instant,
 }

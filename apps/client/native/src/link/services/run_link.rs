@@ -1,6 +1,7 @@
 use crate::link::{
     LinkFlow, LinkShared, LinkState, LinkTarget, RECEIVE_BUFFER_BYTES, deliver_frames, end_link,
-    is_quiet_read_error, read_datagram, send_bye, send_feedback, send_hello, take_datagram,
+    is_quiet_read_error, note_turn, read_datagram, send_bye, send_feedback, send_hello,
+    take_datagram,
 };
 use std::net::UdpSocket;
 use std::sync::Arc;
@@ -12,6 +13,7 @@ pub fn run_link(socket: Arc<UdpSocket>, target: LinkTarget, shared: Arc<LinkShar
     let mut buffer = [0u8; RECEIVE_BUFFER_BYTES];
 
     while !shared.stop.load(Ordering::Acquire) {
+        note_turn(&shared, &mut state, Instant::now());
         send_hello(&socket, &target, &shared, &mut state, Instant::now());
 
         let flow = match read_datagram(&socket, &mut buffer) {

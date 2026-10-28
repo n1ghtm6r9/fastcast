@@ -11,6 +11,7 @@ impl LinkState {
             next_hello: now,
             next_feedback: now,
             reported_losses: 0,
+            last_turn: now,
         }
     }
 }
