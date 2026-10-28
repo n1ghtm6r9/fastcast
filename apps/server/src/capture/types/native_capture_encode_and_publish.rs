@@ -3,6 +3,7 @@ use std::time::Instant;
 
 impl NativeCapture<'_> {
     pub(crate) fn encode_and_publish(&mut self, at: Instant) -> Result<(), NativeError> {
+        let shown = self.pending_shown.take();
         let force = key_frame_wanted(&self.key_frames, self.hub, at);
         let encoded = self
             .encoder
@@ -26,6 +27,7 @@ impl NativeCapture<'_> {
             encoded.keyframe,
             &encoded.data,
             timestamp_ms,
+            shown,
         )?;
         self.clock.encoded(at);
 

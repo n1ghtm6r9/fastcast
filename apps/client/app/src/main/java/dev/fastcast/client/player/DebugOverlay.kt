@@ -54,6 +54,7 @@ class DebugOverlay(
         DebugStep.ASK -> R.string.debug_step_ask
         DebugStep.STREAM -> R.string.debug_step_stream
         DebugStep.TUNNEL -> R.string.debug_step_tunnel
+        DebugStep.SURFACE -> R.string.debug_step_surface
         DebugStep.RESTORE -> R.string.debug_step_restore
     }
 

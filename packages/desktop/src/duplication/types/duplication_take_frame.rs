@@ -29,6 +29,7 @@ impl Duplication {
         Ok(FrameUpdate {
             desktop,
             pointer: moved || reshaped,
+            presented: info.LastPresentTime,
         })
     }
 }

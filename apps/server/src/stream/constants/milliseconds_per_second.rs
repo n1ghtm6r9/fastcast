@@ -1,0 +1,1 @@
+pub const MILLISECONDS_PER_SECOND: f64 = 1_000.0;

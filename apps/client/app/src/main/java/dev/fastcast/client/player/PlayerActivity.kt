@@ -18,6 +18,7 @@ import dev.fastcast.client.R
 import dev.fastcast.client.debug.DebugRun
 import dev.fastcast.client.debug.HandlerClock
 import dev.fastcast.client.debug.StreamTrial
+import dev.fastcast.client.debug.TrialRequest
 import dev.fastcast.client.decoder.DecoderSelector
 import dev.fastcast.client.decoder.DecoderSetup
 import dev.fastcast.client.decoder.SupportedCodecs
@@ -212,12 +213,13 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
 
     override fun streamTrial(trial: StreamTrial): String {
         lastError = null
-        switchStream(StreamRequest(trial.width, trial.height, trial.fps, TUNNEL_CODECS), trial.tunneled, trial.setup)
+        switchStream(TrialRequest.of(trial), trial.tunneled, trial.setup)
         val path = if (trial.tunneled) TUNNELED_PATH else SURFACE_PATH
         val timing = trial.setup.timing
         val decoderAsk = "${trial.setup.pace.name.lowercase()} ${trial.setup.tweak.name.lowercase()} " +
             "start ${timing.videoStart.name.lowercase()} video delay ${timing.videoDelayUs / MICROS_PER_MILLISECOND} ms"
-        return "asked ${trial.width}x${trial.height}@${trial.fps} $path $decoderAsk codecs ${TUNNEL_CODECS.joinToString(",")}"
+        val depth = if (trial.tenBit) TEN_BIT else EIGHT_BIT
+        return "asked ${trial.width}x${trial.height}@${trial.fps} $path $decoderAsk codec ${trial.codec} $depth"
     }
 
     override fun lastError(): String? = lastError
@@ -436,6 +438,8 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
         private const val TUNNELED_PATH = "tunneled"
         private const val MICROS_PER_MILLISECOND = 1_000L
         private const val SURFACE_PATH = "surface"
+        private const val TEN_BIT = "10-bit"
+        private const val EIGHT_BIT = "8-bit"
         private val TUNNEL_CODECS = listOf(SupportedCodecs.HEVC)
 
         fun createIntent(context: Context, server: DiscoveredServer): Intent =

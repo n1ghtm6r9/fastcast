@@ -22,7 +22,7 @@ class TheTunnelFactsTellHowTheTunnelRanTest {
                 "first tunnel frame ready",
                 "codec started 2 times",
                 "frames shown 25.0 ms after queueing and 3.0 ms after their time, 90% within 7.0 ms",
-                "after queueing per second: none; after their time per second: none; 0 frames decoded only",
+                "after queueing per second: none; after their time per second: none",
                 "audio clock",
                 "video anchors",
             ),
@@ -40,10 +40,9 @@ class TheTunnelFactsTellHowTheTunnelRanTest {
             stats.framePresented(ptsUs, waitedMs * 1_000_000L)
             stats.frameLate((waitedMs - 14L) * 1_000L)
         }
-        stats.framesDecodedOnly.set(1L)
 
         assertEquals(
-            "after queueing per second: 36 28 ms; after their time per second: 22 14 ms; 1 frames decoded only",
+            "after queueing per second: 36 28 ms; after their time per second: 22 14 ms",
             TunnelFacts.of(stats, "audio", "video")[4],
         )
     }
@@ -56,7 +55,7 @@ class TheTunnelFactsTellHowTheTunnelRanTest {
                 "first tunnel frame not reported",
                 "codec started 0 times",
                 "no frame shown after queueing, no frame timed",
-                "after queueing per second: none; after their time per second: none; 0 frames decoded only",
+                "after queueing per second: none; after their time per second: none",
                 "audio",
                 "video",
             ),

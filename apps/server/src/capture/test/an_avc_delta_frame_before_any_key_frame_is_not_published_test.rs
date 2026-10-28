@@ -16,6 +16,7 @@ fn an_avc_delta_frame_before_any_key_frame_is_not_published() {
         false,
         &annex_b_of(&[&[0x41, 0x9A, 0x24, 0x6C]]),
         0,
+        None,
     )
     .expect("a delta frame needs no description");
 

@@ -15,6 +15,6 @@ pub use cursor::{
     POINTER_SHAPE_MONOCHROME, composite_cursor, decode_cursor_shape,
 };
 #[cfg(windows)]
-pub use duplication::{Duplication, FrameUpdate, PointerState};
+pub use duplication::{Duplication, FrameUpdate, PointerState, present_age};
 #[cfg(windows)]
 pub use gpu::{AdapterLuid, DesktopError, GpuDevice, NVIDIA_VENDOR_ID, OutputInfo, list_outputs};

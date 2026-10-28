@@ -51,6 +51,8 @@ pub fn run_session(
         for frame in &gop {
             deliver_frame(&mut sender, &mut cursor, frame);
         }
+
+        control.forget_sent();
     } else {
         hub.request_key_frame();
     }

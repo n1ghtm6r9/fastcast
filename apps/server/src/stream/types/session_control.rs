@@ -1,4 +1,6 @@
+use std::sync::Mutex;
 use std::sync::atomic::{AtomicBool, AtomicU8, AtomicU32};
+use std::time::Duration;
 use tokio::sync::Notify;
 use wire::BASE_FEC_PERCENT;
 
@@ -9,6 +11,7 @@ pub struct SessionControl {
     pub(crate) peer_highest_frame: AtomicU32,
     pub(crate) fec_percent: AtomicU8,
     pub(crate) wake: Notify,
+    pub(crate) sent_delays: Mutex<Vec<Duration>>,
 }
 
 impl SessionControl {
@@ -20,6 +23,7 @@ impl SessionControl {
             peer_highest_frame: AtomicU32::new(0),
             fec_percent: AtomicU8::new(BASE_FEC_PERCENT),
             wake: Notify::new(),
+            sent_delays: Mutex::new(Vec::new()),
         }
     }
 }

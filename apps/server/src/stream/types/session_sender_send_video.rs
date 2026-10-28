@@ -12,6 +12,10 @@ impl SessionSender {
 
         let number = self.send_frame(&outgoing, frame.config.fps);
 
+        if let Some(shown) = frame.shown {
+            self.control.sent(shown.elapsed());
+        }
+
         if frame.key {
             self.last_key_frame = Some(number);
         }

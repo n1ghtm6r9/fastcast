@@ -16,6 +16,7 @@ fn a_key_frame_without_parameter_sets_is_refused() {
         true,
         &annex_b_of(&[&[0x26, 0x01, 0xAF, 0x08]]),
         0,
+        None,
     );
 
     assert!(matches!(result, Err(NativeError::UndescribableStream)));

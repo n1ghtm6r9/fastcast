@@ -1,4 +1,4 @@
-use crate::capture::{NativeCapture, NativeError, spin_until};
+use crate::capture::{NativeCapture, NativeError, shown_at, spin_until};
 use desktop::{DesktopError, Duplication};
 use std::time::Instant;
 use tracing::info;
@@ -9,8 +9,10 @@ impl NativeCapture<'_> {
         let arrived = Instant::now();
 
         match acquired {
-            Ok(Some(_)) => {
+            Ok(Some(update)) => {
                 self.picture.arrived();
+                self.pending_shown =
+                    shown_at(update.presented, Instant::now()).or(self.pending_shown);
 
                 if self.clock.may_encode(arrived) {
                     self.convert_waiting(&duplication)?;

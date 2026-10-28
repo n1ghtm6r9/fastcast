@@ -1,4 +1,4 @@
-use crate::stream::ReceiverState;
+use crate::stream::{ReceiverState, sent_line};
 use std::net::SocketAddr;
 use std::time::Instant;
 use tracing::info;
@@ -31,7 +31,9 @@ impl ReceiverState {
         entry.control.report(feedback, entry.fec.percent());
 
         if let Some(line) = entry.link.record(feedback, entry.fec.percent(), now) {
-            info!("viewer {peer} link: {line}");
+            let sent = sent_line(&mut entry.control.take_sent());
+
+            info!("viewer {peer} link: {line}{sent}");
         }
     }
 }

@@ -6,6 +6,7 @@ mod hub_diagnose;
 mod hub_join;
 mod hub_lock_state;
 mod hub_publish;
+mod hub_publish_shown;
 mod hub_report;
 mod hub_request;
 mod hub_request_key_frame;

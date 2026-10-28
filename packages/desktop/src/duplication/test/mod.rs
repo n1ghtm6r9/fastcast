@@ -6,6 +6,10 @@ pub use frame_bytes::*;
 pub use has_visible_pixel::*;
 
 mod a_captured_frame_has_visible_content_test;
+mod a_desktop_image_tells_when_the_screen_showed_it_test;
+mod a_few_ticks_last_their_share_of_a_second_test;
+mod a_frame_never_presented_has_no_age_test;
+mod a_frame_presented_just_now_is_young_test;
 mod a_frame_without_a_mouse_update_keeps_the_pointer_test;
 mod a_mouse_update_moves_the_pointer_test;
 mod a_part_of_a_millisecond_is_dropped_test;
@@ -19,3 +23,5 @@ mod an_unrotated_output_is_accepted_test;
 mod other_failures_keep_the_failed_call_and_the_cause_test;
 mod shape_generations_are_never_reused_test;
 mod the_desktop_image_arrives_in_a_texture_of_the_output_size_test;
+mod ticks_before_now_or_without_a_frequency_last_nothing_test;
+mod ticks_of_one_second_last_a_second_test;

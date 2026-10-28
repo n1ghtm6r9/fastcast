@@ -9,8 +9,16 @@ fn an_avc_delta_frame_after_a_key_frame_shares_its_config() {
     let hub = Hub::new();
     let mut subscription = hub.join();
 
-    publish_encoded_frame(&hub, VideoCodec::Avc, 60, true, &an_avc_key_frame(), 0)
-        .expect("the key frame describes the stream");
+    publish_encoded_frame(
+        &hub,
+        VideoCodec::Avc,
+        60,
+        true,
+        &an_avc_key_frame(),
+        0,
+        None,
+    )
+    .expect("the key frame describes the stream");
 
     publish_encoded_frame(
         &hub,
@@ -19,6 +27,7 @@ fn an_avc_delta_frame_after_a_key_frame_shares_its_config() {
         false,
         &annex_b_of(&[&[0x41, 0x9A, 0x24, 0x6C]]),
         16,
+        None,
     )
     .expect("a delta frame needs no description");
 

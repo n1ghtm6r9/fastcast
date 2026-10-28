@@ -4,8 +4,9 @@ object SupportedCodecs {
 
     const val AV1 = "av1"
     const val HEVC = "hevc"
+    const val AVC = "avc"
 
-    private val BEST_FIRST = listOf(VideoMime.AV1 to AV1, VideoMime.HEVC to HEVC, VideoMime.AVC to "avc")
+    private val BEST_FIRST = listOf(VideoMime.AV1 to AV1, VideoMime.HEVC to HEVC, VideoMime.AVC to AVC)
 
     fun among(canDecode: (mime: String) -> Boolean): List<String> =
         BEST_FIRST.filter { (mime, _) -> canDecode(mime) }.map { (_, name) -> name }

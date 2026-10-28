@@ -57,6 +57,8 @@ mod saved_path_dirs_unsupported;
 #[cfg(windows)]
 mod saved_path_of;
 mod serve_screen_scale;
+#[cfg(windows)]
+mod shown_at;
 mod spawn_capture_worker;
 mod spawn_error_of;
 mod spawn_ffmpeg;
@@ -125,6 +127,8 @@ pub use saved_path_dirs_unsupported::*;
 #[cfg(windows)]
 pub use saved_path_of::*;
 pub use serve_screen_scale::*;
+#[cfg(windows)]
+pub use shown_at::*;
 pub use spawn_capture_worker::*;
 pub use spawn_error_of::*;
 pub use spawn_ffmpeg::*;

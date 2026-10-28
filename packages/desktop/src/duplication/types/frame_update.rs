@@ -2,4 +2,5 @@
 pub struct FrameUpdate {
     pub desktop: bool,
     pub pointer: bool,
+    pub presented: i64,
 }

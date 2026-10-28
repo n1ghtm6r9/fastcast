@@ -7,5 +7,6 @@ pub fn frame_under(config: &Arc<StreamConfig>, key: bool) -> Frame {
         key,
         wire: Bytes::from_static(&[1, 2, 3]),
         config: config.clone(),
+        shown: None,
     }
 }

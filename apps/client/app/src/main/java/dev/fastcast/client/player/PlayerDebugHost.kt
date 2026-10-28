@@ -84,9 +84,9 @@ class PlayerDebugHost(
 
     override fun streamTrial(trial: StreamTrial): String = player.streamTrial(trial)
 
-    override fun trialFacts(): List<String> {
+    override fun pathFacts(): List<String> {
         val session = player.currentSession()
-        return session?.tunnelFacts().orEmpty() + session?.codecFacts().orEmpty() +
+        return session?.pathFacts().orEmpty() + session?.codecFacts().orEmpty() +
             PropertyChanges.between(propsAtStart, SystemProps.snapshot())
     }
 

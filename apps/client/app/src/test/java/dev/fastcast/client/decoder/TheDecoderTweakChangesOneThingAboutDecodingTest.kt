@@ -45,12 +45,12 @@ class TheDecoderTweakChangesOneThingAboutDecodingTest {
     }
 
     @Test
-    fun `low latency as a game live keeps the standard hint and asks for the game modes once the decoder runs`() {
-        assertTrue(DecoderTweak.LOW_LATENCY_GAME_LIVE.lowLatency)
-        assertTrue(DecoderTweak.LOW_LATENCY_GAME_LIVE.usesStandardLowLatency)
-        assertNull(DecoderTweak.LOW_LATENCY_GAME_LIVE.operatingRate(120))
-        assertEquals(emptyMap<String, Number>(), DecoderTweak.LOW_LATENCY_GAME_LIVE.vendorValues())
-        assertEquals(GAME, DecoderTweak.LOW_LATENCY_GAME_LIVE.liveVendorValues())
+    fun `low latency at full speed keeps the standard hint and asks the decoder to run as fast as it can`() {
+        assertTrue(DecoderTweak.LOW_LATENCY_FULL_SPEED.lowLatency)
+        assertTrue(DecoderTweak.LOW_LATENCY_FULL_SPEED.usesStandardLowLatency)
+        assertEquals(32_767, DecoderTweak.LOW_LATENCY_FULL_SPEED.operatingRate(120))
+        assertEquals(emptyMap<String, Number>(), DecoderTweak.LOW_LATENCY_FULL_SPEED.vendorValues())
+        assertEquals(emptyMap<String, Number>(), DecoderTweak.LOW_LATENCY_FULL_SPEED.liveVendorValues())
     }
 
     @Test

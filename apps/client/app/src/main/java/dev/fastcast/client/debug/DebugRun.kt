@@ -3,8 +3,7 @@ package dev.fastcast.client.debug
 import dev.fastcast.client.decoder.DecoderPace
 import dev.fastcast.client.decoder.DecoderSetup
 import dev.fastcast.client.decoder.DecoderTweak
-import dev.fastcast.client.decoder.TunnelTiming
-import dev.fastcast.client.decoder.VideoStart
+import dev.fastcast.client.decoder.SupportedCodecs
 import java.util.ArrayDeque
 import kotlin.math.roundToInt
 
@@ -69,7 +68,7 @@ class DebugRun(
         host.showProgress(DebugStep.STREAM)
         hideThenWarmUp {
             sampleVideo(STREAM_SAMPLE_MS) { measurement ->
-                queue(STREAM, describe(measurement))
+                queue(STREAM, describe(measurement) + host.pathFacts())
                 runTrial(0)
             }
         }
@@ -88,7 +87,7 @@ class DebugRun(
             host.isPlaying() -> warmUp(TRIALS[index]) { sampleTrial(index, asked) }
             clock.nowNanos() - askedNanos >= TRIAL_START_TIMEOUT_MS * NANOS_PER_MILLISECOND -> {
                 val failure = listOf(asked, NO_TRIAL_VIDEO) + listOfNotNull(host.lastError())
-                queue(TRIALS[index].step, failure + host.trialFacts())
+                queue(TRIALS[index].step, failure + host.pathFacts())
                 runTrial(index + 1)
             }
             else -> later(POLL_MS) { awaitTrialVideo(index, asked, askedNanos) }
@@ -107,7 +106,7 @@ class DebugRun(
     private fun sampleTrial(index: Int, asked: String) {
         val trial = TRIALS[index]
         sampleVideo(TRIAL_SAMPLE_MS) { measurement ->
-            queue(trial.step, listOf(asked) + describe(measurement) + host.trialFacts())
+            queue(trial.step, listOf(asked) + describe(measurement) + host.pathFacts())
             measurement?.let { results += TrialResult(trial, it.rates.queuedPerSecond, it.presented.perSecond) }
             runTrial(index + 1)
         }
@@ -184,37 +183,32 @@ class DebugRun(
         private const val FINISHED = "finished"
         private const val NO_VIDEO = "no video"
         private const val NO_TRIAL_VIDEO = "no video within 20 s"
-        private const val NO_VIDEO_DELAY_US = 0L
-        private const val SHORT_PAST_US = -16_000L
-        private const val LONG_PAST_US = -48_000L
-        private const val FAR_PAST_US = -200_000L
-        private const val PROBED_FRAMES = 5
         private val ASKED_RATES = floatArrayOf(120f, 144f)
         private val TRIALS = listOf(
-            tunnelAt1440("tunnel1440", DecoderSetup.USUAL, showsText = true),
-            tunnelAt1440("tunnel1440hidden", DecoderSetup.USUAL, showsText = false),
-            tunnelAt1440("tunnel1440delay0", delayed(NO_VIDEO_DELAY_US), showsText = true),
-            tunnelAt1440("tunnel1440past16", delayed(SHORT_PAST_US), showsText = true),
-            tunnelAt1440("tunnel1440past48", delayed(LONG_PAST_US), showsText = true),
-            tunnelAt1440("tunnel1440past200", delayed(FAR_PAST_US), showsText = true),
-            tunnelAt1440("tunnel1440gamelowlatency", tweaked(DecoderTweak.LOW_LATENCY_GAME_LIVE), showsText = true),
-            tunnelAt1440("tunnel1440decodeonly", decodingOnly(PROBED_FRAMES), showsText = true),
-            StreamTrial(
-                "tunnel1080hidden", 1920, 1080, 120, tunneled = true, DecoderSetup.USUAL, showsText = false,
-                DebugStep.TUNNEL,
+            tunnelAt1440("tunnel1440", SupportedCodecs.HEVC, tenBit = false, DecoderSetup.USUAL, showsText = true),
+            tunnelAt1440("tunnel1440hidden", SupportedCodecs.HEVC, tenBit = false, DecoderSetup.USUAL, showsText = false),
+            tunnelAt1440(
+                "tunnel1440fullspeed", SupportedCodecs.HEVC, tenBit = false, tweaked(DecoderTweak.LOW_LATENCY_FULL_SPEED),
+                showsText = true,
             ),
+            tunnelAt1440("tunnel1440avc", SupportedCodecs.AVC, tenBit = false, DecoderSetup.USUAL, showsText = true),
+            tunnelAt1440("tunnel1440main10", SupportedCodecs.HEVC, tenBit = true, DecoderSetup.USUAL, showsText = true),
+            tenBitAt2160("tunnel2160", SupportedCodecs.HEVC, tunneled = true),
+            tenBitAt2160("surface2160", SupportedCodecs.HEVC, tunneled = false),
+            tenBitAt2160("surface2160av1", SupportedCodecs.AV1, tunneled = false),
         )
 
-        private fun tunnelAt1440(step: String, setup: DecoderSetup, showsText: Boolean): StreamTrial =
-            StreamTrial(step, 2560, 1440, 120, tunneled = true, setup, showsText, DebugStep.TUNNEL)
+        private fun tunnelAt1440(
+            step: String,
+            codec: String,
+            tenBit: Boolean,
+            setup: DecoderSetup,
+            showsText: Boolean,
+        ): StreamTrial = StreamTrial(step, 2560, 1440, 120, codec, tenBit, tunneled = true, setup, showsText, DebugStep.TUNNEL)
 
-        private fun delayed(videoDelayUs: Long): DecoderSetup = DecoderSetup(
-            DecoderPace.REALTIME, DecoderSetup.USUAL.tweak, inspectsVendorParameters = false,
-            TunnelTiming(videoDelayUs, VideoStart.ON_RUNNING_CLOCK),
-        )
-
-        private fun decodingOnly(frames: Int): DecoderSetup = DecoderSetup(
-            DecoderPace.REALTIME, DecoderSetup.USUAL.tweak, inspectsVendorParameters = false, decodeOnlyFrames = frames,
+        private fun tenBitAt2160(step: String, codec: String, tunneled: Boolean): StreamTrial = StreamTrial(
+            step, 3840, 2160, 60, codec, tenBit = true, tunneled, DecoderSetup.USUAL, showsText = false,
+            if (tunneled) DebugStep.TUNNEL else DebugStep.SURFACE,
         )
 
         private fun tweaked(tweak: DecoderTweak): DecoderSetup =

@@ -23,4 +23,5 @@ pub struct NativeCapture<'a> {
     pub(crate) started: Instant,
     pub(crate) picture: Picture,
     pub(crate) frames: u64,
+    pub(crate) pending_shown: Option<Instant>,
 }

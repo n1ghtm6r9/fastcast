@@ -67,6 +67,7 @@ impl<'a> NativeCapture<'a> {
             started: Instant::now(),
             picture: Picture::default(),
             frames: 0,
+            pending_shown: None,
         })
     }
 }

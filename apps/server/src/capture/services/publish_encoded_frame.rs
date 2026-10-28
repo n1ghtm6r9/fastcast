@@ -1,6 +1,7 @@
 use crate::capture::NativeError;
 use crate::hub::{Hub, stream_config_from_record};
 use media::{VideoCodec, split_access_unit};
+use std::time::Instant;
 
 pub fn publish_encoded_frame(
     hub: &Hub,
@@ -9,6 +10,7 @@ pub fn publish_encoded_frame(
     keyframe: bool,
     annex_b: &[u8],
     timestamp_ms: u32,
+    shown: Option<Instant>,
 ) -> Result<bool, NativeError> {
     if annex_b.is_empty() {
         return Ok(false);
@@ -28,7 +30,7 @@ pub fn publish_encoded_frame(
         None => {}
     }
 
-    hub.publish(keyframe, timestamp_ms, &access_unit.payload);
+    hub.publish_shown(keyframe, timestamp_ms, &access_unit.payload, shown);
 
     Ok(true)
 }

@@ -31,4 +31,14 @@ class TheDecoderStatsCountTheFramesTheScreenShowedTest {
 
         assertEquals(30.0, requireNotNull(stats.delays.medianMs()), 1e-9)
     }
+
+    @Test
+    fun `a decoded frame is counted and timed from when it was queued`() {
+        val stats = DecoderStats()
+        stats.frameQueued(7L, 1_000_000L)
+        stats.frameDecoded(7L, 5_000_000L)
+
+        assertEquals(1L, stats.framesDecoded.get())
+        assertEquals(4.0, requireNotNull(stats.decodeDelays.medianMs()), 1e-9)
+    }
 }

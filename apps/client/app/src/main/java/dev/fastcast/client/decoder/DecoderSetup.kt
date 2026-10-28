@@ -5,7 +5,6 @@ class DecoderSetup(
     val tweak: DecoderTweak,
     val inspectsVendorParameters: Boolean,
     val timing: TunnelTiming = TunnelTiming.USUAL,
-    val decodeOnlyFrames: Int = 0,
 ) {
 
     companion object {

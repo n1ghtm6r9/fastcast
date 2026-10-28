@@ -8,8 +8,16 @@ fn an_encoded_key_frame_describes_the_stream_before_it_is_published() {
     let hub = Hub::new();
     let mut subscription = hub.join();
 
-    publish_encoded_frame(&hub, VideoCodec::Hevc, 120, true, &an_hevc_key_frame(), 7)
-        .expect("the key frame describes the stream");
+    publish_encoded_frame(
+        &hub,
+        VideoCodec::Hevc,
+        120,
+        true,
+        &an_hevc_key_frame(),
+        7,
+        None,
+    )
+    .expect("the key frame describes the stream");
 
     let frame = subscription
         .frames

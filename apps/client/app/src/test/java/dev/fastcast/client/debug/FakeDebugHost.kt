@@ -9,7 +9,7 @@ class FakeDebugHost(private val clock: FakeDebugClock) : DebugHost {
     var trialStartsAfterMs: Map<String, Long?> = emptyMap()
     var presentIntervalNanos = 8_333_333L
     var lastError: String? = null
-    var trialFacts = listOf("audio played 6.0 s")
+    var pathFacts = listOf("audio played 6.0 s")
     var shownResults: List<TrialResult>? = null
         private set
     val countedAfterHidingMs = mutableListOf<Long?>()
@@ -67,7 +67,7 @@ class FakeDebugHost(private val clock: FakeDebugClock) : DebugHost {
         return "asked ${trial.width}x${trial.height}@${trial.fps}$path"
     }
 
-    override fun trialFacts(): List<String> = trialFacts
+    override fun pathFacts(): List<String> = pathFacts
 
     override fun lastError(): String? = lastError
 

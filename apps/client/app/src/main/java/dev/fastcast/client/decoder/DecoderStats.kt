@@ -8,11 +8,11 @@ class DecoderStats {
     val framesDecoded = AtomicLong()
     val framesRendered = AtomicLong()
     val framesDropped = AtomicLong()
-    val framesDecodedOnly = AtomicLong()
     val codecStarts = AtomicLong()
     val presented = PresentTimes(PRESENTED_CAPACITY)
     val framesPresented = AtomicLong()
     val delays = RenderDelays(DELAY_CAPACITY)
+    val decodeDelays = RenderDelays(DELAY_CAPACITY)
     val lateness = FrameLateness(DELAY_CAPACITY)
     val delayTrend = MedianTrend(TREND_GROUP_FRAMES, TREND_GROUPS)
     val latenessTrend = MedianTrend(TREND_GROUP_FRAMES, TREND_GROUPS)
@@ -35,6 +35,12 @@ class DecoderStats {
     fun frameQueued(ptsUs: Long, nanos: Long) {
         framesQueued.incrementAndGet()
         delays.queued(ptsUs, nanos)
+        decodeDelays.queued(ptsUs, nanos)
+    }
+
+    fun frameDecoded(ptsUs: Long, nanos: Long) {
+        framesDecoded.incrementAndGet()
+        decodeDelays.rendered(ptsUs, nanos)
     }
 
     fun framePresented(ptsUs: Long, nanos: Long) {

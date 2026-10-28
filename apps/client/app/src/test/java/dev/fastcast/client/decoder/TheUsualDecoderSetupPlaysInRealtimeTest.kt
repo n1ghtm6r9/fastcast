@@ -14,11 +14,6 @@ class TheUsualDecoderSetupPlaysInRealtimeTest {
     }
 
     @Test
-    fun `the usual stream shows every frame it decodes`() {
-        assertEquals(0, DecoderSetup.USUAL.decodeOnlyFrames)
-    }
-
-    @Test
     fun `the usual tunnel starts its video on the running audio clock and shows each frame 8 ms after it`() {
         assertEquals(VideoStart.ON_RUNNING_CLOCK, DecoderSetup.USUAL.timing.videoStart)
         assertEquals(8_000L, DecoderSetup.USUAL.timing.videoDelayUs)

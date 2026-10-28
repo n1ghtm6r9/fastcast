@@ -22,7 +22,7 @@ interface DebugHost {
 
     fun streamTrial(trial: StreamTrial): String
 
-    fun trialFacts(): List<String>
+    fun pathFacts(): List<String>
 
     fun lastError(): String?
 

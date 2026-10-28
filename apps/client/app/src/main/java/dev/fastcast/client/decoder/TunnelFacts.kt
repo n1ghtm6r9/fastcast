@@ -1,7 +1,6 @@
 package dev.fastcast.client.decoder
 
 import java.util.Locale
-import kotlin.math.roundToLong
 
 object TunnelFacts {
 
@@ -14,32 +13,20 @@ object TunnelFacts {
     private const val NOTHING_AFTER_QUEUEING = "no frame shown after queueing"
     private const val LATENESS = " and %.1f ms after their time, 90%% within %.1f ms"
     private const val NOTHING_TIMED = ", no frame timed"
-    private const val PER_SECOND = "after queueing per second: %s; after their time per second: %s; %d frames decoded only"
-    private const val MILLISECONDS = " ms"
-    private const val MICROS_PER_MILLISECOND = 1_000.0
+    private const val PER_SECOND = "after queueing per second: %s; after their time per second: %s"
 
     fun of(stats: DecoderStats, audio: String, schedule: String): List<String> = listOf(
         "tunnel decoder ${stats.decoderName.ifEmpty { NONE }}",
         "first tunnel frame ${if (stats.tunnelFrameReady) READY else NOT_REPORTED}",
         "codec started ${stats.codecStarts.get()} times",
         afterQueueing(stats.delays) + lateness(stats.lateness),
-        perSecond(stats),
+        PER_SECOND.format(Locale.ROOT, DelayTrendText.of(stats.delayTrend), DelayTrendText.of(stats.latenessTrend)),
         audio,
         schedule,
     )
 
     private fun afterQueueing(delays: RenderDelays): String =
         delays.medianMs()?.let { AFTER_QUEUEING.format(Locale.ROOT, it) } ?: NOTHING_AFTER_QUEUEING
-
-    private fun perSecond(stats: DecoderStats): String = PER_SECOND.format(
-        Locale.ROOT, trendOf(stats.delayTrend), trendOf(stats.latenessTrend), stats.framesDecodedOnly.get(),
-    )
-
-    private fun trendOf(trend: MedianTrend): String {
-        val medians = trend.medians()
-        if (medians.isEmpty()) return NONE
-        return medians.joinToString(" ", postfix = MILLISECONDS) { (it / MICROS_PER_MILLISECOND).roundToLong().toString() }
-    }
 
     private fun lateness(lateness: FrameLateness): String {
         val median = lateness.percentileMs(MEDIAN) ?: return NOTHING_TIMED

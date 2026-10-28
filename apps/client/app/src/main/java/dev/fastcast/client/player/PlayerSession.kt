@@ -80,7 +80,7 @@ class PlayerSession(
 
     fun presentedSince(startNanos: Long): LongArray = decoder.stats.presented.since(startNanos)
 
-    fun tunnelFacts(): List<String> = decoder.tunnelFacts()
+    fun pathFacts(): List<String> = decoder.pathFacts()
 
     fun codecFacts(): List<String> =
         decoder.stats.codecParameters?.let { CodecParameterFacts.of(it.vendor, it.outputFormat) }.orEmpty()
