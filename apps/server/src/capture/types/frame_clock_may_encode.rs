@@ -3,7 +3,7 @@ use std::time::Instant;
 
 impl FrameClock {
     pub fn may_encode(&self, now: Instant) -> bool {
-        match self.next {
+        match self.next_picture {
             None => true,
             Some(next) => now + self.interval / INTERVAL_SLACK_DIVISOR >= next,
         }

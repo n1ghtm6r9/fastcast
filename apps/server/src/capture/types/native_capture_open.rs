@@ -68,6 +68,7 @@ impl<'a> NativeCapture<'a> {
             picture: Picture::default(),
             frames: 0,
             pending_shown: None,
+            pending_arrived: None,
         })
     }
 }

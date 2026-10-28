@@ -320,10 +320,9 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
         chosen?.let { PreferredDisplayMode.apply(window, it) }
         val mode = chosen ?: DisplayModes.active(display)
         requestedMode = mode
-        val codecs = if (mode.tunneled) TUNNEL_CODECS else hardwareCodecsAt(mode)
-        val tenBit = if (mode.tunneled) emptySet() else tenBitCodecsAt(mode)
-        modeSummary = ModeSummary.of(modes, codecs, tenBit, screenModes.filter { it.tunneled })
-        return StreamRequest(mode.width, mode.height, mode.fps, codecs, tenBit)
+        val request = UsualRequest.of(mode, ::hardwareCodecsAt, ::tenBitCodecsAt)
+        modeSummary = ModeSummary.of(modes, request.codecs, request.tenBitCodecs, screenModes.filter { it.tunneled })
+        return request
     }
 
     private fun canTunnel(width: Int, height: Int, fps: Int): Boolean =
@@ -440,7 +439,6 @@ class PlayerActivity : Activity(), PlayerSessionListener, DebugPlayer {
         private const val SURFACE_PATH = "surface"
         private const val TEN_BIT = "10-bit"
         private const val EIGHT_BIT = "8-bit"
-        private val TUNNEL_CODECS = listOf(SupportedCodecs.HEVC)
 
         fun createIntent(context: Context, server: DiscoveredServer): Intent =
             Intent(context, PlayerActivity::class.java)

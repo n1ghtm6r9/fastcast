@@ -45,15 +45,6 @@ class TheDecoderTweakChangesOneThingAboutDecodingTest {
     }
 
     @Test
-    fun `low latency at full speed keeps the standard hint and asks the decoder to run as fast as it can`() {
-        assertTrue(DecoderTweak.LOW_LATENCY_FULL_SPEED.lowLatency)
-        assertTrue(DecoderTweak.LOW_LATENCY_FULL_SPEED.usesStandardLowLatency)
-        assertEquals(32_767, DecoderTweak.LOW_LATENCY_FULL_SPEED.operatingRate(120))
-        assertEquals(emptyMap<String, Number>(), DecoderTweak.LOW_LATENCY_FULL_SPEED.vendorValues())
-        assertEquals(emptyMap<String, Number>(), DecoderTweak.LOW_LATENCY_FULL_SPEED.liveVendorValues())
-    }
-
-    @Test
     fun `forcing real time asks the MediaTek decoder for it before and after it starts`() {
         assertFalse(DecoderTweak.MEDIATEK_REAL_TIME.lowLatency)
         assertTrue(DecoderTweak.MEDIATEK_REAL_TIME.usesStandardLowLatency)

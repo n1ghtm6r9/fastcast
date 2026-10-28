@@ -19,6 +19,7 @@ mod ffmpeg_backend_run;
 mod ffmpeg_backend_with_locator;
 mod frame_clock;
 mod frame_clock_encoded;
+mod frame_clock_encoded_picture;
 mod frame_clock_may_encode;
 mod frame_clock_until_repeat;
 mod key_frame_gate;

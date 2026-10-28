@@ -25,9 +25,8 @@ class TheDebugRunWalksEveryStepTest {
             listOf(
                 "step FACTS", "step VSYNC", "vsync", "step ASK", "ask 120.0", "vsync", "ask 144.0", "vsync", "clear",
                 "step STREAM", "hide", "step TUNNEL", "trial tunnel1440", "step TUNNEL", "trial tunnel1440hidden", "hide",
-                "step TUNNEL", "trial tunnel1440fullspeed", "step TUNNEL", "trial tunnel1440avc", "step TUNNEL",
-                "trial tunnel1440main10", "step TUNNEL", "trial tunnel2160", "hide", "step SURFACE", "trial surface2160",
-                "hide", "step SURFACE", "trial surface2160av1", "hide", "step RESTORE", "usual", "done",
+                "step TUNNEL", "trial tunnel1080hidden", "hide", "step SURFACE", "trial surface2160", "step SURFACE",
+                "trial surface2160av1", "step RESTORE", "usual", "done",
             ),
             host.events,
         )
@@ -38,7 +37,7 @@ class TheDebugRunWalksEveryStepTest {
         runToTheEnd()
 
         val bare = host.countedAfterHidingMs.filterNotNull()
-        assertEquals(10, bare.size)
+        assertEquals(6, bare.size)
         assertTrue(bare.toString(), bare.all { it >= 3_000L })
     }
 
@@ -47,7 +46,7 @@ class TheDebugRunWalksEveryStepTest {
         runToTheEnd()
 
         val shownPerTrial = host.countedAfterHidingMs.drop(2).chunked(2).map { counted -> counted.all { it == null } }
-        assertEquals(listOf(true, false, true, true, true, false, false, false), shownPerTrial)
+        assertEquals(listOf(true, false, false, true, true), shownPerTrial)
     }
 
     @Test
@@ -84,26 +83,23 @@ class TheDebugRunWalksEveryStepTest {
     fun `a trial report names what was asked, the rates and what the trial saw`() {
         runToTheEnd()
 
-        val tunnel = textOf("tunnel1440fullspeed")
+        val tunnel = textOf("tunnel1440")
         assertTrue(tunnel, tunnel.startsWith("asked 2560x1440@120 tunneled; queued 120.0/s, decoded 120.0/s"))
         assertTrue(tunnel, tunnel.contains("presented: "))
         assertTrue(tunnel, tunnel.endsWith("; audio played 6.0 s"))
     }
 
     @Test
-    fun `one run tries the tunnel at full speed, in AVC and in 10 bits, then 4K through the tunnel and the usual path`() {
+    fun `one run tries the tunnel in 10 bits at 1440p shown and bare and at 1080p, then 4K in hevc and av1 the usual way`() {
         runToTheEnd()
 
         assertEquals(
             listOf(
-                "2560x1440@120 hevc 8-bit tunneled REALTIME LOW_LATENCY uninspected text shown ON_RUNNING_CLOCK 8000",
-                "2560x1440@120 hevc 8-bit tunneled REALTIME LOW_LATENCY uninspected text hidden ON_RUNNING_CLOCK 8000",
-                "2560x1440@120 hevc 8-bit tunneled REALTIME LOW_LATENCY_FULL_SPEED uninspected text shown ON_RUNNING_CLOCK 8000",
-                "2560x1440@120 avc 8-bit tunneled REALTIME LOW_LATENCY uninspected text shown ON_RUNNING_CLOCK 8000",
                 "2560x1440@120 hevc 10-bit tunneled REALTIME LOW_LATENCY uninspected text shown ON_RUNNING_CLOCK 8000",
-                "3840x2160@60 hevc 10-bit tunneled REALTIME LOW_LATENCY uninspected text hidden ON_RUNNING_CLOCK 8000",
-                "3840x2160@60 hevc 10-bit surface REALTIME LOW_LATENCY uninspected text hidden ON_RUNNING_CLOCK 8000",
-                "3840x2160@60 av1 10-bit surface REALTIME LOW_LATENCY uninspected text hidden ON_RUNNING_CLOCK 8000",
+                "2560x1440@120 hevc 10-bit tunneled REALTIME LOW_LATENCY uninspected text hidden ON_RUNNING_CLOCK 8000",
+                "1920x1080@120 hevc 10-bit tunneled REALTIME LOW_LATENCY uninspected text hidden ON_RUNNING_CLOCK 8000",
+                "3840x2160@60 hevc 10-bit surface REALTIME LOW_LATENCY uninspected text shown ON_RUNNING_CLOCK 8000",
+                "3840x2160@60 av1 10-bit surface REALTIME LOW_LATENCY uninspected text shown ON_RUNNING_CLOCK 8000",
             ),
             host.trials.map(::describeTrial),
         )
@@ -135,17 +131,17 @@ class TheDebugRunWalksEveryStepTest {
 
     @Test
     fun `a trial that never plays is reported with the last error and the next trial still runs`() {
-        host.trialStartsAfterMs = mapOf("tunnel1440avc" to null)
+        host.trialStartsAfterMs = mapOf("tunnel1080hidden" to null)
         host.lastError = "Decoder error: no tunnel"
 
         runToTheEnd()
 
         assertEquals(
-            "asked 2560x1440@120 tunneled; no video within 20 s; Decoder error: no tunnel; audio played 6.0 s",
-            textOf("tunnel1440avc"),
+            "asked 1920x1080@120 tunneled; no video within 20 s; Decoder error: no tunnel; audio played 6.0 s",
+            textOf("tunnel1080hidden"),
         )
-        assertEquals(listOf("trial surface2160av1", "hide", "step RESTORE", "usual", "done"), host.events.takeLast(5))
-        assertEquals(ALL_TRIALS - "tunnel1440avc", requireNotNull(host.shownResults).map { it.trial.step })
+        assertEquals(listOf("trial surface2160av1", "step RESTORE", "usual", "done"), host.events.takeLast(4))
+        assertEquals(ALL_TRIALS - "tunnel1080hidden", requireNotNull(host.shownResults).map { it.trial.step })
     }
 
     @Test
@@ -237,8 +233,7 @@ class TheDebugRunWalksEveryStepTest {
     companion object {
         private const val WHOLE_RUN_MS = 400_000L
         private val ALL_TRIALS = listOf(
-            "tunnel1440", "tunnel1440hidden", "tunnel1440fullspeed", "tunnel1440avc", "tunnel1440main10", "tunnel2160",
-            "surface2160", "surface2160av1",
+            "tunnel1440", "tunnel1440hidden", "tunnel1080hidden", "surface2160", "surface2160av1",
         )
     }
 }

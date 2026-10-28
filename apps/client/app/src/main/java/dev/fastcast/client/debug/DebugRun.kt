@@ -1,8 +1,6 @@
 package dev.fastcast.client.debug
 
-import dev.fastcast.client.decoder.DecoderPace
 import dev.fastcast.client.decoder.DecoderSetup
-import dev.fastcast.client.decoder.DecoderTweak
 import dev.fastcast.client.decoder.SupportedCodecs
 import java.util.ArrayDeque
 import kotlin.math.roundToInt
@@ -185,33 +183,21 @@ class DebugRun(
         private const val NO_TRIAL_VIDEO = "no video within 20 s"
         private val ASKED_RATES = floatArrayOf(120f, 144f)
         private val TRIALS = listOf(
-            tunnelAt1440("tunnel1440", SupportedCodecs.HEVC, tenBit = false, DecoderSetup.USUAL, showsText = true),
-            tunnelAt1440("tunnel1440hidden", SupportedCodecs.HEVC, tenBit = false, DecoderSetup.USUAL, showsText = false),
-            tunnelAt1440(
-                "tunnel1440fullspeed", SupportedCodecs.HEVC, tenBit = false, tweaked(DecoderTweak.LOW_LATENCY_FULL_SPEED),
-                showsText = true,
-            ),
-            tunnelAt1440("tunnel1440avc", SupportedCodecs.AVC, tenBit = false, DecoderSetup.USUAL, showsText = true),
-            tunnelAt1440("tunnel1440main10", SupportedCodecs.HEVC, tenBit = true, DecoderSetup.USUAL, showsText = true),
-            tenBitAt2160("tunnel2160", SupportedCodecs.HEVC, tunneled = true),
-            tenBitAt2160("surface2160", SupportedCodecs.HEVC, tunneled = false),
-            tenBitAt2160("surface2160av1", SupportedCodecs.AV1, tunneled = false),
+            tunnelAt120("tunnel1440", 2560, 1440, showsText = true),
+            tunnelAt120("tunnel1440hidden", 2560, 1440, showsText = false),
+            tunnelAt120("tunnel1080hidden", 1920, 1080, showsText = false),
+            surfaceAt2160("surface2160", SupportedCodecs.HEVC),
+            surfaceAt2160("surface2160av1", SupportedCodecs.AV1),
         )
 
-        private fun tunnelAt1440(
-            step: String,
-            codec: String,
-            tenBit: Boolean,
-            setup: DecoderSetup,
-            showsText: Boolean,
-        ): StreamTrial = StreamTrial(step, 2560, 1440, 120, codec, tenBit, tunneled = true, setup, showsText, DebugStep.TUNNEL)
-
-        private fun tenBitAt2160(step: String, codec: String, tunneled: Boolean): StreamTrial = StreamTrial(
-            step, 3840, 2160, 60, codec, tenBit = true, tunneled, DecoderSetup.USUAL, showsText = false,
-            if (tunneled) DebugStep.TUNNEL else DebugStep.SURFACE,
+        private fun tunnelAt120(step: String, width: Int, height: Int, showsText: Boolean): StreamTrial = StreamTrial(
+            step, width, height, 120, SupportedCodecs.HEVC, tenBit = true, tunneled = true, DecoderSetup.USUAL, showsText,
+            DebugStep.TUNNEL,
         )
 
-        private fun tweaked(tweak: DecoderTweak): DecoderSetup =
-            DecoderSetup(DecoderPace.REALTIME, tweak, inspectsVendorParameters = false)
+        private fun surfaceAt2160(step: String, codec: String): StreamTrial = StreamTrial(
+            step, 3840, 2160, 60, codec, tenBit = true, tunneled = false, DecoderSetup.USUAL, showsText = true,
+            DebugStep.SURFACE,
+        )
     }
 }

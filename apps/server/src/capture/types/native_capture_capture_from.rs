@@ -11,6 +11,7 @@ impl NativeCapture<'_> {
         match acquired {
             Ok(Some(update)) => {
                 self.picture.arrived();
+                self.pending_arrived = Some(arrived);
                 self.pending_shown =
                     shown_at(update.presented, Instant::now()).or(self.pending_shown);
 
